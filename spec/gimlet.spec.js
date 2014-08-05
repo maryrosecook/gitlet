@@ -15,6 +15,7 @@ describe('gimlet', function() {
   describe('init', function() {
     it('should create a .git directory', function() {
       g.init(TEST_DATA_DIR);
+      expect(fs.existsSync(__dirname + "/tmp/.git")).toEqual(true);
     });
   });
 });
