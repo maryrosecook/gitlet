@@ -1,6 +1,6 @@
 # Gimlet
 
-Git implemented in JavaScript.
+A toy Git implemented in JavaScript.
 
 * By Mary Rose Cook
 * http://maryrosecook.com
