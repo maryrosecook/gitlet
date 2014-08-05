@@ -13,13 +13,21 @@ describe('gimlet', function() {
   });
 
   describe('init', function() {
-    it('should create a .git directory', function() {
+    it('should create .git/ and all required dirs', function() {
       g.init(TEST_DATA_DIR);
-      expect(fs.existsSync(__dirname + "/tmp/.git/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/hooks/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/info/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/logs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/objects/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/heads/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/origin/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/refs/tags/")).toEqual(true);
     });
   });
 });
-
 
 var rmdirSyncRecursive = function(dir) {
   fs.readdirSync(dir).forEach(function(fileName) {
