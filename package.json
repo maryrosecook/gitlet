@@ -1,0 +1,18 @@
+{
+  "name": "gimlet",
+  "description": "A toy Git.",
+  "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maryrosecook/gimlet.git"
+  },
+
+  "scripts": {
+    "test": "node_modules/jasmine-node/bin/jasmine-node spec/"
+  },
+
+  "devDependencies": {
+    "jasmine-node": "1.7.1"
+  }
+}
