@@ -15,7 +15,7 @@ describe('gimlet', function() {
   describe('init', function() {
     it('should create a .git directory', function() {
       g.init(TEST_DATA_DIR);
-      expect(fs.existsSync(__dirname + "/tmp/.git")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.git/")).toEqual(true);
     });
   });
 });
@@ -25,7 +25,7 @@ var rmdirSyncRecursive = function(dir) {
   fs.readdirSync(dir).forEach(function(fileName) {
     var filePath = dir + fileName;
     if (fs.statSync(filePath).isDirectory()) {
-      rmdirSyncRecursive(filePath);
+      rmdirSyncRecursive(filePath + "/");
     } else {
       fs.unlinkSync(filePath);
     }
