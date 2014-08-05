@@ -1,12 +1,12 @@
 var fs = require('fs');
 var g = require('../gimlet');
 
-var TEST_DATA_DIR = __dirname + "/tmp";
+var TEST_DATA_DIR = __dirname + "/tmp/";
 
 describe('gimlet', function() {
   beforeEach(function() {
-    if (fs.exists(TEST_DATA_DIR)) {
-      fs.rmdirSync(TEST_DATA_DIR);
+    if (fs.existsSync(TEST_DATA_DIR)) {
+      rmdirSyncRecursive(TEST_DATA_DIR);
     }
 
     fs.mkdirSync(TEST_DATA_DIR);
@@ -18,3 +18,17 @@ describe('gimlet', function() {
     });
   });
 });
+
+
+var rmdirSyncRecursive = function(dir) {
+  fs.readdirSync(dir).forEach(function(fileName) {
+    var filePath = dir + fileName;
+    if (fs.statSync(filePath).isDirectory()) {
+      rmdirSyncRecursive(filePath);
+    } else {
+      fs.unlinkSync(filePath);
+    }
+  });
+
+  fs.rmdirSync(dir);
+};
