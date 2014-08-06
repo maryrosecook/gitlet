@@ -30,7 +30,7 @@ var gitDirPath = function(dir) {
 };
 
 var isRepo = function(repoDir) {
-  return fs.existsSync(repoDir + ".git/");
+  return gitDirPath(repoDir) !== undefined;
 };
 
 var createDirectoryStructure = function(prefix, structure) {
