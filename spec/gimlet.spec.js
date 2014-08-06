@@ -42,6 +42,18 @@ describe('gimlet', function() {
       expectGitFilesAndDirectories();
     });
   });
+
+  describe('hash-object', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.hash_object(); })
+        .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
+    });
+
+    it('should not throw if in repo', function() {
+      g.init();
+      g.hash_object();
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {

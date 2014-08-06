@@ -22,6 +22,14 @@ var gimlet = module.exports = {
     });
 
     fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
+  },
+
+  hash_object: function() {
+    var repoDir = process.cwd() + "/";
+    assertInRepo(repoDir);
+  }
+};
+
 var gitDirPath = function(dir) {
   if (fs.existsSync(dir)) {
     var gitDir = dir + ".git/";
@@ -31,6 +39,12 @@ var gitDirPath = function(dir) {
 
 var isRepo = function(repoDir) {
   return gitDirPath(repoDir) !== undefined;
+};
+
+var assertInRepo = function(cwd) {
+  if (!isRepo(cwd)) {
+    throw "fatal: Not a git repository (or any of the parent directories): .git";
+  }
 };
 
 var createDirectoryStructure = function(prefix, structure) {
