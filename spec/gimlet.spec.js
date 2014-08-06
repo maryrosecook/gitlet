@@ -1,17 +1,17 @@
 var fs = require('fs');
 var g = require('../gimlet');
 
-var TEST_DATA_DIR = __dirname + "/tmp/";
-
 describe('gimlet', function() {
   beforeEach(function() {
-    if (fs.existsSync(TEST_DATA_DIR)) {
-      rmdirSyncRecursive(TEST_DATA_DIR);
+    var tmpDir = __dirname + "/tmp/";
+    if (fs.existsSync(tmpDir)) {
+      rmdirSyncRecursive(tmpDir);
     }
 
-    fs.mkdirSync(TEST_DATA_DIR);
+    fs.mkdirSync(tmpDir);
+    process.chdir(tmpDir); // switch working dir to test repo root
 
-    expect(fs.readdirSync(TEST_DATA_DIR).length).toEqual(0);
+    expect(fs.readdirSync(process.cwd()).length).toEqual(0);
   });
 
   describe('init', function() {
@@ -32,13 +32,13 @@ describe('gimlet', function() {
     };
 
     it('should create .git/ and all required dirs', function() {
-      g.init(TEST_DATA_DIR);
+      g.init();
       expectGitFilesAndDirectories();
     });
 
     it('should not change anything if init run twice', function() {
-      g.init(TEST_DATA_DIR);
-      g.init(TEST_DATA_DIR);
+      g.init();
+      g.init();
       expectGitFilesAndDirectories();
     });
   });

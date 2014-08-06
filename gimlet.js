@@ -1,8 +1,8 @@
 var fs = require('fs');
 
 var gimlet = module.exports = {
-  init: function(repoDir) {
-    repoDir = repoDir || "./";
+  init: function() {
+    var repoDir = process.cwd() + "/";
     if (isRepo(repoDir)) return;
 
     createDirectoryStructure(repoDir, {
