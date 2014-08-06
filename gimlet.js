@@ -22,6 +22,10 @@ var gimlet = module.exports = {
     });
 
     fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
+var gitDirPath = function(dir) {
+  if (fs.existsSync(dir)) {
+    var gitDir = dir + ".git/";
+    return fs.existsSync(gitDir) ? gitDir : gitDirPath("../" + dir);
   }
 };
 
