@@ -27,6 +27,9 @@ describe('gimlet', function() {
       expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/origin/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.git/refs/tags/")).toEqual(true);
+
+      expect(fs.readFileSync(__dirname + "/tmp/.git/HEAD", "utf8"))
+        .toEqual("ref: refs/heads/master\n");
     });
   });
 });

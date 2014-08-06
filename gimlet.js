@@ -19,6 +19,8 @@ var gimlet = module.exports = {
         }
       }
     });
+
+    fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
   }
 };
 
