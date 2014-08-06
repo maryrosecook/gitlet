@@ -15,8 +15,7 @@ describe('gimlet', function() {
   });
 
   describe('init', function() {
-    it('should create .git/ and all required dirs', function() {
-      g.init(TEST_DATA_DIR);
+    var expectGitFilesAndDirectories = function() {
       expect(fs.existsSync(__dirname + "/tmp/.git/hooks/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.git/info/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.git/logs/")).toEqual(true);
@@ -30,6 +29,17 @@ describe('gimlet', function() {
 
       expect(fs.readFileSync(__dirname + "/tmp/.git/HEAD", "utf8"))
         .toEqual("ref: refs/heads/master\n");
+    };
+
+    it('should create .git/ and all required dirs', function() {
+      g.init(TEST_DATA_DIR);
+      expectGitFilesAndDirectories();
+    });
+
+    it('should not change anything if init run twice', function() {
+      g.init(TEST_DATA_DIR);
+      g.init(TEST_DATA_DIR);
+      expectGitFilesAndDirectories();
     });
   });
 });

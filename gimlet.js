@@ -3,6 +3,7 @@ var fs = require('fs');
 var gimlet = module.exports = {
   init: function(repoDir) {
     repoDir = repoDir || "./";
+    if (isRepo(repoDir)) return;
 
     createDirectoryStructure(repoDir, {
       ".git/": {
@@ -22,6 +23,10 @@ var gimlet = module.exports = {
 
     fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
   }
+};
+
+var isRepo = function(repoDir) {
+  return fs.existsSync(repoDir + ".git/");
 };
 
 var createDirectoryStructure = function(prefix, structure) {
