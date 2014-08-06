@@ -1,23 +1,25 @@
 var fs = require('fs');
 
-var init = exports.init = function(repoDir) {
-  repoDir = repoDir || "./";
+var gimlet = module.exports = {
+  init: function(repoDir) {
+    repoDir = repoDir || "./";
 
-  createDirectoryStructure(repoDir, {
-    ".git/": {
-      "hooks/": {},
-      "info/": {},
-      "logs/": {},
-      "objects/": {},
-      "refs/": {
-        "heads/": {},
-        "remotes/": {
-          "origin/": {}
-        },
-        "tags/": {}
+    createDirectoryStructure(repoDir, {
+      ".git/": {
+        "hooks/": {},
+        "info/": {},
+        "logs/": {},
+        "objects/": {},
+        "refs/": {
+          "heads/": {},
+          "remotes/": {
+            "origin/": {}
+          },
+          "tags/": {}
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 var createDirectoryStructure = function(prefix, structure) {
