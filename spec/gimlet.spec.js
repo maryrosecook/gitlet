@@ -10,6 +10,8 @@ describe('gimlet', function() {
     }
 
     fs.mkdirSync(TEST_DATA_DIR);
+
+    expect(fs.readdirSync(TEST_DATA_DIR).length).toEqual(0);
   });
 
   describe('init', function() {
