@@ -13,6 +13,6 @@
   },
 
   "devDependencies": {
-    "jasmine-node": "1.7.1"
+    "jasmine-node": "1.14.5"
   }
 }
