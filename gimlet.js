@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 
 var gimlet = module.exports = {
   init: function() {
@@ -25,8 +26,23 @@ var gimlet = module.exports = {
     fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
   },
 
-  hash_object: function() {
+  hash_object: function(commandArgs) {
     assertInRepo(getCurrentDirectory());
+
+    var args = parseArgs(commandArgs);
+    var filePath = args._[0];
+    if (filePath !== undefined) {
+      if (!fs.existsSync(filePath)) {
+        throw "fatal: Cannot open '" + filePath + "': No such file or directory"
+      } else if (!args.w) {
+        var fileContents = fs.readFileSync(filePath, "utf8");
+        var hashedContents = hash(fileContents);
+        return hashedContents;
+      }
+    }
+  }
+};
+
 var hash = function(string) {
   return string
     .split("")
@@ -34,6 +50,21 @@ var hash = function(string) {
     .reduce(function(a, n) { return a + n; })
     .toString(16);
 };
+
+var parseArgs = function(commandLineArgs) {
+  if (typeof commandLineArgs !== 'string') {
+    return { _: [] };
+  } else {
+    var splitArgs = commandLineArgs.split(" ");
+    var args = { _: splitArgs.filter(function (chunk) { return chunk[0] !== "-"; }) };
+
+    return splitArgs
+      .filter(function(chunk) { return chunk[0] === "-"; })
+      .map(function(chunkWithDash) { return argWithDash.slice(1); })
+      .reduce(function(args, arg) {
+        args[arg] = true;
+        return args;
+      }, args);
   }
 };
 

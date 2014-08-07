@@ -53,6 +53,27 @@ describe('gimlet', function() {
       g.init();
       g.hash_object();
     });
+
+    it('should return undefined if no file specified', function() {
+      g.init();
+      expect(g.hash_object()).toBeUndefined();
+    });
+
+    it('should throw if file specified does not exist', function() {
+      g.init();
+      expect(function() { g.hash_object("not-there") })
+        .toThrow("fatal: Cannot open 'not-there': No such file or directory");
+    });
+
+    it('should return unique (!) hash of contents when file passed with no -w', function() {
+      g.init();
+
+      fs.writeFileSync("a.txt", "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot");
+      expect(g.hash_object("a.txt")).toEqual("15ee");
+
+      fs.writeFileSync("b.txt", "oetuhntoaehuntao hesuh sano.tuh snato.h usntaho .u");
+      expect(g.hash_object("b.txt")).toEqual("1318");
+    });
   });
 });
 
