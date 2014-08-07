@@ -27,6 +27,13 @@ var gimlet = module.exports = {
 
   hash_object: function() {
     assertInRepo(getCurrentDirectory());
+var hash = function(string) {
+  return string
+    .split("")
+    .map(function(c) { return c.charCodeAt(0); })
+    .reduce(function(a, n) { return a + n; })
+    .toString(16);
+};
   }
 };
 

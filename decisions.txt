@@ -1,5 +1,6 @@
 * Running git init is idempotent.  The real behaviour is not idempotent, but it is as far as the features of gimlet are concerned: https://www.kernel.org/pub/software/scm/git/docs/git-init.html
 * no description file
+* hash function as simple as possible for brevity - real git uses sha1
 
 todo
 * cd back to repo root for all commands
