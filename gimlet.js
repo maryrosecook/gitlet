@@ -26,8 +26,7 @@ var gimlet = module.exports = {
   },
 
   hash_object: function() {
-    var repoDir = process.cwd() + "/";
-    assertInRepo(repoDir);
+    assertInRepo(getCurrentDirectory());
   }
 };
 
