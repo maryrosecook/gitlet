@@ -39,6 +39,9 @@ var gitDirPath = function(dir) {
 
 var isRepo = function(repoDir) {
   return gitDirPath(repoDir) !== undefined;
+var getCurrentDirectory = function() {
+  return process.cwd() + "/";
+};
 };
 
 var assertInRepo = function(cwd) {
