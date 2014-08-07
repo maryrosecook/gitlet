@@ -37,16 +37,15 @@ var getGitDir = function(dir) {
   }
 };
 
-var isRepo = function(repoDir) {
-  return gitDirPath(repoDir) !== undefined;
 var getCurrentDirectory = function() {
   return process.cwd() + "/";
 };
+var inRepo = function(cwd) {
   return getGitDir(cwd) !== undefined;
 };
 
 var assertInRepo = function(cwd) {
-  if (!isRepo(cwd)) {
+  if (!inRepo(cwd)) {
     throw "fatal: Not a git repository (or any of the parent directories): .git";
   }
 };
