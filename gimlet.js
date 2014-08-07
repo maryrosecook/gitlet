@@ -5,9 +5,7 @@ var gimlet = module.exports = {
   init: function() {
     if (inRepo(getCurrentDirectory())) return;
 
-    var repoDir = getCurrentDirectory();
-
-    createDirectoryStructure(repoDir, {
+    createDirectoryStructure(getCurrentDirectory(), {
       ".git/": {
         "hooks/": {},
         "info/": {},
@@ -23,7 +21,7 @@ var gimlet = module.exports = {
       }
     });
 
-    fs.writeFileSync(repoDir + ".git/HEAD", "ref: refs/heads/master\n");
+    fs.writeFileSync(getCurrentDirectory() + ".git/HEAD", "ref: refs/heads/master\n");
   },
 
   hash_object: function(commandArgs) {
