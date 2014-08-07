@@ -30,10 +30,10 @@ var gimlet = module.exports = {
   }
 };
 
-var gitDirPath = function(dir) {
+var getGitDir = function(dir) {
   if (fs.existsSync(dir)) {
     var gitDir = dir + ".git/";
-    return fs.existsSync(gitDir) ? gitDir : gitDirPath("../" + dir);
+    return fs.existsSync(gitDir) ? gitDir : getGitDir("../" + dir);
   }
 };
 
@@ -42,6 +42,7 @@ var isRepo = function(repoDir) {
 var getCurrentDirectory = function() {
   return process.cwd() + "/";
 };
+  return getGitDir(cwd) !== undefined;
 };
 
 var assertInRepo = function(cwd) {
