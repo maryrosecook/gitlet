@@ -3,9 +3,9 @@ var path = require('path');
 
 var gimlet = module.exports = {
   init: function() {
-    if (inRepo(getCurrentDirectory())) return;
+    if (inRepo()) return;
 
-    createDirectoryStructure(getCurrentDirectory(), {
+    createDirectoryStructure({
       ".git/": {
         "hooks/": {},
         "info/": {},
@@ -21,11 +21,11 @@ var gimlet = module.exports = {
       }
     });
 
-    fs.writeFileSync(getCurrentDirectory() + ".git/HEAD", "ref: refs/heads/master\n");
+    fs.writeFileSync(getGitDir() + "HEAD", "ref: refs/heads/master\n");
   },
 
   hash_object: function(file, opts) {
-    assertInRepo(getCurrentDirectory());
+    assertInRepo();
     opts = opts || {};
 
     if (file !== undefined) {
@@ -44,7 +44,7 @@ var gimlet = module.exports = {
 };
 
 var writeObject = function(content) {
-  var filePath = getGitDir(getCurrentDirectory()) + "objects/" + hash(content);
+  var filePath = getGitDir() + "objects/" + hash(content);
   fs.writeFileSync(filePath, content);
 };
 
@@ -57,6 +57,7 @@ var hash = function(string) {
 };
 
 var getGitDir = function(dir) {
+  if (dir === undefined) return getGitDir(getCurrentDirectory());
   if (fs.existsSync(dir)) {
     var gitDir = dir + ".git/";
     return fs.existsSync(gitDir) ? gitDir : getGitDir("../" + dir);
@@ -71,16 +72,17 @@ var inRepo = function(cwd) {
   return getGitDir(cwd) !== undefined;
 };
 
-var assertInRepo = function(cwd) {
-  if (!inRepo(cwd)) {
+var assertInRepo = function() {
+  if (!inRepo()) {
     throw "fatal: Not a git repository (or any of the parent directories): .git";
   }
 };
 
-var createDirectoryStructure = function(prefix, structure) {
+var createDirectoryStructure = function(structure, prefix) {
+  if (prefix === undefined) return createDirectoryStructure(structure, getCurrentDirectory());
   Object.keys(structure).forEach(function(dirName) {
     var dirPath = prefix + dirName;
     fs.mkdirSync(dirPath, "777");
-    createDirectoryStructure(dirPath, structure[dirName]);
+    createDirectoryStructure(structure[dirName], dirPath);
   });
 };
