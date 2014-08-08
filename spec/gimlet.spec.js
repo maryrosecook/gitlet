@@ -1,5 +1,5 @@
 var fs = require('fs');
-var g = require('../gimlet');
+var g = require('../gimlet-api');
 
 describe('gimlet', function() {
   beforeEach(function() {

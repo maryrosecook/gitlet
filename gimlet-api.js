@@ -76,6 +76,7 @@ var getGitDir = function(dir) {
 var getCurrentDirectory = function() {
   return process.cwd() + "/";
 };
+
 var inRepo = function(cwd) {
   return getGitDir(cwd) !== undefined;
 };
