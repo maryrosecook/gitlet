@@ -58,7 +58,7 @@ var parseArgs = function(commandLineArgs) {
 
     return splitArgs
       .filter(function(chunk) { return chunk[0] === "-"; })
-      .map(function(chunkWithDash) { return argWithDash.slice(1); })
+      .map(function(chunkWithDash) { return argWithDash.replace(/^-+/, ""); })
       .reduce(function(args, arg) {
         args[arg] = true;
         return args;
