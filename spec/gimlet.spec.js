@@ -74,6 +74,14 @@ describe('gimlet', function() {
       fs.writeFileSync("b.txt", "oetuhntoaehuntao hesuh sano.tuh snato.h usntaho .u");
       expect(g.hash_object("b.txt")).toEqual("1318");
     });
+
+    it('should store blob and return hash when file passed with -w', function() {
+      var content = "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot";
+      g.init();
+      fs.writeFileSync("a.txt", content);
+      expect(g.hash_object("a.txt", { w:true })).toEqual("15ee");
+      expect(fs.readFileSync(__dirname + "/tmp/.git/objects/15ee", "utf8")).toEqual(content);
+    });
   });
 });
 

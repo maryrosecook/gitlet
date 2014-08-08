@@ -31,13 +31,21 @@ var gimlet = module.exports = {
     if (file !== undefined) {
       if (!fs.existsSync(file)) {
         throw "fatal: Cannot open '" + file + "': No such file or directory"
-      } else if (!opts.w) {
+      } else {
         var fileContents = fs.readFileSync(file, "utf8");
-        var hashedContents = hash(fileContents);
-        return hashedContents;
+        if (opts.w) {
+          writeObject(fileContents);
+        }
+
+        return hash(fileContents);
       }
     }
   }
+};
+
+var writeObject = function(content) {
+  var filePath = getGitDir(getCurrentDirectory()) + "objects/" + hash(content);
+  fs.writeFileSync(filePath, content);
 };
 
 var hash = function(string) {
