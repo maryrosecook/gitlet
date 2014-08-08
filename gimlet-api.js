@@ -24,16 +24,15 @@ var gimlet = module.exports = {
     fs.writeFileSync(getCurrentDirectory() + ".git/HEAD", "ref: refs/heads/master\n");
   },
 
-  hash_object: function(commandArgs) {
+  hash_object: function(file, opts) {
     assertInRepo(getCurrentDirectory());
+    opts = opts || {};
 
-    var args = parseArgs(commandArgs);
-    var filePath = args._[0];
-    if (filePath !== undefined) {
-      if (!fs.existsSync(filePath)) {
-        throw "fatal: Cannot open '" + filePath + "': No such file or directory"
-      } else if (!args.w) {
-        var fileContents = fs.readFileSync(filePath, "utf8");
+    if (file !== undefined) {
+      if (!fs.existsSync(file)) {
+        throw "fatal: Cannot open '" + file + "': No such file or directory"
+      } else if (!opts.w) {
+        var fileContents = fs.readFileSync(file, "utf8");
         var hashedContents = hash(fileContents);
         return hashedContents;
       }
@@ -47,23 +46,6 @@ var hash = function(string) {
     .map(function(c) { return c.charCodeAt(0); })
     .reduce(function(a, n) { return a + n; })
     .toString(16);
-};
-
-var parseArgs = function(commandLineArgs) {
-  if (typeof commandLineArgs !== 'string') {
-    return { _: [] };
-  } else {
-    var splitArgs = commandLineArgs.split(" ");
-    var args = { _: splitArgs.filter(function (chunk) { return chunk[0] !== "-"; }) };
-
-    return splitArgs
-      .filter(function(chunk) { return chunk[0] === "-"; })
-      .map(function(chunkWithDash) { return argWithDash.replace(/^-+/, ""); })
-      .reduce(function(args, arg) {
-        args[arg] = true;
-        return args;
-      }, args);
-  }
 };
 
 var getGitDir = function(dir) {
