@@ -83,6 +83,19 @@ describe('gimlet', function() {
       expect(g.hash_object("a.txt", { w:true })).toEqual("15ee");
       expect(fs.readFileSync(__dirname + "/tmp/.git/objects/15ee", "utf8")).toEqual(content);
     });
+
+    it('should not store blob when return hash when file passed with -w', function() {
+      var content = "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot";
+      g.init();
+      fs.writeFileSync("a.txt", content);
+
+      var objectPath = __dirname + "/tmp/.git/objects/" + g.hash_object("a.txt");
+      expect(fs.existsSync(objectPath, "utf8")).toEqual(false);
+
+      // check that file is stored with -w
+      g.hash_object("a.txt", { w: true });
+      expect(fs.existsSync(objectPath, "utf8")).toEqual(true);
+    });
   });
 });
 
