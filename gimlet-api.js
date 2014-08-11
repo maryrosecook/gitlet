@@ -70,7 +70,11 @@ var getGimletDir = function(dir) {
   if (dir === undefined) return getGimletDir(process.cwd());
   if (fs.existsSync(dir)) {
     var gimletDir = path.join(dir, ".gimlet");
-    return fs.existsSync(gimletDir) ? gimletDir : getGimletDir(path.join("..", dir));
+    if (fs.existsSync(gimletDir)) {
+      return gimletDir;
+    } else if (dir !== "/") {
+      return getGimletDir(path.join(dir, ".."));
+    }
   }
 };
 
