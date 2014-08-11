@@ -103,6 +103,26 @@ describe('gimlet', function() {
       g.init();
       expect(function() { g.add(); }).toThrow("Nothing specified, nothing added.");
     });
+
+    describe('pathspec matching', function() {
+      it('should throw rel path if in root and pathspec does not match files', function() {
+        g.init();
+        expect(function() {
+          g.add("blah");
+        }).toThrow("fatal: pathspec 'blah' did not match any files");
+      });
+
+      it('should throw rel path if not in root and pathspec does not match files', function() {
+        g.init();
+        fs.mkdirSync("1");
+        process.chdir("1");
+        fs.mkdirSync("2");
+        process.chdir("2");
+        expect(function() {
+          g.add("blah");
+        }).toThrow("fatal: pathspec '1/2/blah' did not match any files");
+      });
+    });
   });
 });
 

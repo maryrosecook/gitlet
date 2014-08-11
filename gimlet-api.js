@@ -1,5 +1,5 @@
 var fs = require('fs');
-var path = require('path');
+var pathLib = require('path');
 
 var gimlet = module.exports = {
   init: function() {
@@ -21,14 +21,19 @@ var gimlet = module.exports = {
       }
     });
 
-    fs.writeFileSync(path.join(getGimletDir(), "HEAD"), "ref: refs/heads/master\n");
+    fs.writeFileSync(pathLib.join(getGimletDir(), "HEAD"), "ref: refs/heads/master\n");
   },
 
-  add: function(pathSpec) {
+  add: function(path) {
     assertInRepo();
 
-    if (typeof pathSpec === 'string') {
-
+    if (typeof path === 'string') {
+      var files = allFilesAt(path);
+      if (files.length === 0) {
+        var repoRoot = pathLib.join(getGimletDir(), "..");
+        var pathFromRoot = pathLib.relative(repoRoot, pathLib.join(process.cwd(), path));
+        throw "fatal: pathspec '" + pathFromRoot + "' did not match any files";
+      }
     } else {
       throw "Nothing specified, nothing added.";
     }
@@ -54,7 +59,7 @@ var gimlet = module.exports = {
 };
 
 var writeObject = function(content) {
-  var filePath = path.join(getGimletDir(), "objects", hash(content));
+  var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
   fs.writeFileSync(filePath, content);
 };
 
@@ -69,11 +74,11 @@ var hash = function(string) {
 var getGimletDir = function(dir) {
   if (dir === undefined) return getGimletDir(process.cwd());
   if (fs.existsSync(dir)) {
-    var gimletDir = path.join(dir, ".gimlet");
+    var gimletDir = pathLib.join(dir, ".gimlet");
     if (fs.existsSync(gimletDir)) {
       return gimletDir;
     } else if (dir !== "/") {
-      return getGimletDir(path.join(dir, ".."));
+      return getGimletDir(pathLib.join(dir, ".."));
     }
   }
 };
@@ -91,8 +96,22 @@ var assertInRepo = function() {
 var createDirectoryStructure = function(structure, prefix) {
   if (prefix === undefined) return createDirectoryStructure(structure, process.cwd());
   Object.keys(structure).forEach(function(dirName) {
-    var dirPath = path.join(prefix, dirName);
+    var dirPath = pathLib.join(prefix, dirName);
     fs.mkdirSync(dirPath, "777");
     createDirectoryStructure(structure[dirName], dirPath);
   });
+};
+
+var allFilesAt = function(path) {
+  if (!fs.existsSync(path)) {
+    return [];
+  } else if (fs.statSync(path).isFile()) {
+    return path;
+  } else if (fs.statSync(path).isDirectory()) {
+    return fs.readdirSync(path).map(function(dirChild) {
+      return allFilesAt(pathLib.join(dir, dirChild));
+    });
+  } else { // some other thing - ignore
+    return [];
+  }
 };
