@@ -24,6 +24,11 @@ var gimlet = module.exports = {
     fs.writeFileSync(path.join(getGitDir(), "HEAD"), "ref: refs/heads/master\n");
   },
 
+  add: function(pathSpec) {
+    assertInRepo();
+
+  },
+
   hash_object: function(file, opts) {
     assertInRepo();
     opts = opts || {};

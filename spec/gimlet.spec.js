@@ -92,6 +92,14 @@ describe('gimlet', function() {
       expect(fs.existsSync(objectPath, "utf8")).toEqual(true);
     });
   });
+
+  describe('add', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.add(); })
+        .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
+    });
+
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {
