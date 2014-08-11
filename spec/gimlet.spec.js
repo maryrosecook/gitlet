@@ -50,11 +50,6 @@ describe('gimlet', function() {
         .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
     });
 
-    it('should not throw if in repo', function() {
-      g.init();
-      g.hash_object();
-    });
-
     it('should return undefined if no file specified', function() {
       g.init();
       expect(g.hash_object()).toBeUndefined();
