@@ -57,15 +57,11 @@ var hash = function(string) {
 };
 
 var getGitDir = function(dir) {
-  if (dir === undefined) return getGitDir(getCurrentDirectory());
+  if (dir === undefined) return getGitDir(process.cwd());
   if (fs.existsSync(dir)) {
     var gitDir = path.join(dir, ".git");
     return fs.existsSync(gitDir) ? gitDir : getGitDir(path.join("..", dir));
   }
-};
-
-var getCurrentDirectory = function() {
-  return process.cwd();
 };
 
 var inRepo = function(cwd) {
@@ -79,7 +75,7 @@ var assertInRepo = function() {
 };
 
 var createDirectoryStructure = function(structure, prefix) {
-  if (prefix === undefined) return createDirectoryStructure(structure, getCurrentDirectory());
+  if (prefix === undefined) return createDirectoryStructure(structure, process.cwd());
   Object.keys(structure).forEach(function(dirName) {
     var dirPath = path.join(prefix, dirName);
     fs.mkdirSync(dirPath, "777");
