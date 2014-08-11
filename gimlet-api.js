@@ -6,22 +6,22 @@ var gimlet = module.exports = {
     if (inRepo()) return;
 
     createDirectoryStructure({
-      ".git/": {
-        "hooks/": {},
-        "info/": {},
-        "logs/": {},
-        "objects/": {},
-        "refs/": {
-          "heads/": {},
-          "remotes/": {
-            "origin/": {}
+      ".git": {
+        hooks: {},
+        info: {},
+        logs: {},
+        objects: {},
+        refs: {
+          heads: {},
+          remotes: {
+            origin: {}
           },
-          "tags/": {}
+          tags: {}
         }
       }
     });
 
-    fs.writeFileSync(getGitDir() + "HEAD", "ref: refs/heads/master\n");
+    fs.writeFileSync(path.join(getGitDir(), "HEAD"), "ref: refs/heads/master\n");
   },
 
   hash_object: function(file, opts) {
@@ -44,7 +44,7 @@ var gimlet = module.exports = {
 };
 
 var writeObject = function(content) {
-  var filePath = getGitDir() + "objects/" + hash(content);
+  var filePath = path.join(getGitDir(), "objects", hash(content));
   fs.writeFileSync(filePath, content);
 };
 
@@ -59,13 +59,13 @@ var hash = function(string) {
 var getGitDir = function(dir) {
   if (dir === undefined) return getGitDir(getCurrentDirectory());
   if (fs.existsSync(dir)) {
-    var gitDir = dir + ".git/";
-    return fs.existsSync(gitDir) ? gitDir : getGitDir("../" + dir);
+    var gitDir = path.join(dir, ".git");
+    return fs.existsSync(gitDir) ? gitDir : getGitDir(path.join("..", dir));
   }
 };
 
 var getCurrentDirectory = function() {
-  return process.cwd() + "/";
+  return process.cwd();
 };
 
 var inRepo = function(cwd) {
@@ -81,7 +81,7 @@ var assertInRepo = function() {
 var createDirectoryStructure = function(structure, prefix) {
   if (prefix === undefined) return createDirectoryStructure(structure, getCurrentDirectory());
   Object.keys(structure).forEach(function(dirName) {
-    var dirPath = prefix + dirName;
+    var dirPath = path.join(prefix, dirName);
     fs.mkdirSync(dirPath, "777");
     createDirectoryStructure(structure[dirName], dirPath);
   });

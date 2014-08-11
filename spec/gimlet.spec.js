@@ -1,9 +1,10 @@
 var fs = require('fs');
+var path = require('path');
 var g = require('../gimlet-api');
 
 describe('gimlet', function() {
   beforeEach(function() {
-    var tmpDir = __dirname + "/tmp/";
+    var tmpDir = __dirname + "/tmp";
     if (fs.existsSync(tmpDir)) {
       rmdirSyncRecursive(tmpDir);
     }
@@ -87,9 +88,9 @@ describe('gimlet', function() {
 
 var rmdirSyncRecursive = function(dir) {
   fs.readdirSync(dir).forEach(function(fileName) {
-    var filePath = dir + fileName;
+    var filePath = path.join(dir, fileName);
     if (fs.statSync(filePath).isDirectory()) {
-      rmdirSyncRecursive(filePath + "/");
+      rmdirSyncRecursive(filePath);
     } else {
       fs.unlinkSync(filePath);
     }
