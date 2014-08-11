@@ -2,6 +2,8 @@
 * no description file
 * only well-formed -w like command-line flags, and each one separate: -w -b, and no data for any args
 * hash function as simple as possible for brevity - real git uses sha1
+* prob no packfiles
+* prob no support for wildcard paths in git add
 
 todo
 * cd back to repo root for all commands
