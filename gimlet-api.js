@@ -27,6 +27,11 @@ var gimlet = module.exports = {
   add: function(pathSpec) {
     assertInRepo();
 
+    if (typeof pathSpec === 'string') {
+
+    } else {
+      throw "Nothing specified, nothing added.";
+    }
   },
 
   hash_object: function(file, opts) {

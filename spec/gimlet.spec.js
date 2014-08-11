@@ -99,6 +99,10 @@ describe('gimlet', function() {
         .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
     });
 
+    it('should throw if no pathspec passed', function() {
+      g.init();
+      expect(function() { g.add(); }).toThrow("Nothing specified, nothing added.");
+    });
   });
 });
 
