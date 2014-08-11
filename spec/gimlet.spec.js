@@ -16,38 +16,38 @@ describe('gimlet', function() {
   });
 
   describe('init', function() {
-    var expectGitFilesAndDirectories = function() {
-      expect(fs.existsSync(__dirname + "/tmp/.git/hooks/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/info/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/logs/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/objects/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/heads/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/remotes/origin/")).toEqual(true);
-      expect(fs.existsSync(__dirname + "/tmp/.git/refs/tags/")).toEqual(true);
+    var expectGimletFilesAndDirectories = function() {
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/hooks/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/info/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/logs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/objects/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/heads/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/origin/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/tags/")).toEqual(true);
 
-      expect(fs.readFileSync(__dirname + "/tmp/.git/HEAD", "utf8"))
+      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/HEAD", "utf8"))
         .toEqual("ref: refs/heads/master\n");
     };
 
-    it('should create .git/ and all required dirs', function() {
+    it('should create .gimlet/ and all required dirs', function() {
       g.init();
-      expectGitFilesAndDirectories();
+      expectGimletFilesAndDirectories();
     });
 
     it('should not change anything if init run twice', function() {
       g.init();
       g.init();
-      expectGitFilesAndDirectories();
+      expectGimletFilesAndDirectories();
     });
   });
 
   describe('hash-object', function() {
     it('should throw if not in repo', function() {
       expect(function() { g.hash_object(); })
-        .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
 
     it('should return undefined if no file specified', function() {
@@ -76,7 +76,7 @@ describe('gimlet', function() {
       g.init();
       fs.writeFileSync("a.txt", content);
       expect(g.hash_object("a.txt", { w:true })).toEqual("15ee");
-      expect(fs.readFileSync(__dirname + "/tmp/.git/objects/15ee", "utf8")).toEqual(content);
+      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/objects/15ee", "utf8")).toEqual(content);
     });
 
     it('should not store blob when return hash when file passed with -w', function() {
@@ -84,7 +84,7 @@ describe('gimlet', function() {
       g.init();
       fs.writeFileSync("a.txt", content);
 
-      var objectPath = __dirname + "/tmp/.git/objects/" + g.hash_object("a.txt");
+      var objectPath = __dirname + "/tmp/.gimlet/objects/" + g.hash_object("a.txt");
       expect(fs.existsSync(objectPath, "utf8")).toEqual(false);
 
       // check that file is stored with -w
@@ -96,7 +96,7 @@ describe('gimlet', function() {
   describe('add', function() {
     it('should throw if not in repo', function() {
       expect(function() { g.add(); })
-        .toThrow("fatal: Not a git repository (or any of the parent directories): .git");
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
 
     it('should throw if no pathspec passed', function() {

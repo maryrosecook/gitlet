@@ -6,7 +6,7 @@ var gimlet = module.exports = {
     if (inRepo()) return;
 
     createDirectoryStructure({
-      ".git": {
+      ".gimlet": {
         hooks: {},
         info: {},
         logs: {},
@@ -21,7 +21,7 @@ var gimlet = module.exports = {
       }
     });
 
-    fs.writeFileSync(path.join(getGitDir(), "HEAD"), "ref: refs/heads/master\n");
+    fs.writeFileSync(path.join(getGimletDir(), "HEAD"), "ref: refs/heads/master\n");
   },
 
   add: function(pathSpec) {
@@ -54,7 +54,7 @@ var gimlet = module.exports = {
 };
 
 var writeObject = function(content) {
-  var filePath = path.join(getGitDir(), "objects", hash(content));
+  var filePath = path.join(getGimletDir(), "objects", hash(content));
   fs.writeFileSync(filePath, content);
 };
 
@@ -66,21 +66,21 @@ var hash = function(string) {
     .toString(16);
 };
 
-var getGitDir = function(dir) {
-  if (dir === undefined) return getGitDir(process.cwd());
+var getGimletDir = function(dir) {
+  if (dir === undefined) return getGimletDir(process.cwd());
   if (fs.existsSync(dir)) {
-    var gitDir = path.join(dir, ".git");
-    return fs.existsSync(gitDir) ? gitDir : getGitDir(path.join("..", dir));
+    var gimletDir = path.join(dir, ".gimlet");
+    return fs.existsSync(gimletDir) ? gimletDir : getGimletDir(path.join("..", dir));
   }
 };
 
 var inRepo = function(cwd) {
-  return getGitDir(cwd) !== undefined;
+  return getGimletDir(cwd) !== undefined;
 };
 
 var assertInRepo = function() {
   if (!inRepo()) {
-    throw "fatal: Not a git repository (or any of the parent directories): .git";
+    throw "fatal: Not a gimlet repository (or any of the parent directories): .gimlet";
   }
 };
 
