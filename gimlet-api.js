@@ -5,8 +5,9 @@ var gimlet = module.exports = {
   init: function() {
     if (inRepo()) return;
 
-    createDirectoryStructure({
+    createFileTree({
       ".gimlet": {
+        HEAD: "ref: refs/heads/master\n",
         hooks: {},
         info: {},
         logs: {},
@@ -20,8 +21,6 @@ var gimlet = module.exports = {
         }
       }
     });
-
-    fs.writeFileSync(pathLib.join(getGimletDir(), "HEAD"), "ref: refs/heads/master\n");
   },
 
   add: function(path) {
@@ -98,14 +97,7 @@ var assertInRepo = function() {
   }
 };
 
-var createDirectoryStructure = function(structure, prefix) {
-  if (prefix === undefined) return createDirectoryStructure(structure, process.cwd());
-  Object.keys(structure).forEach(function(dirName) {
-    var dirPath = pathLib.join(prefix, dirName);
-    fs.mkdirSync(dirPath, "777");
-    createDirectoryStructure(structure[dirName], dirPath);
-  });
-};
+var createFileTree = function(structure, prefix) {
 
 var allFilesAt = function(path) {
   if (!fs.existsSync(path)) {
@@ -119,4 +111,15 @@ var allFilesAt = function(path) {
   } else { // some other thing - ignore
     return [];
   }
+  if (prefix === undefined) return createFileTree(structure, process.cwd());
+
+  Object.keys(structure).forEach(function(name) {
+    var path = pathLib.join(prefix, name);
+    if (typeof structure[name] === "string") {
+      fs.writeFileSync(path, structure[name]);
+    } else {
+      fs.mkdirSync(path, "777");
+      createFileTree(structure[name], path);
+    }
+  });
 };
