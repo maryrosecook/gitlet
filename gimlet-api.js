@@ -30,8 +30,7 @@ var gimlet = module.exports = {
     if (typeof path === 'string') {
       var files = allFilesAt(path);
       if (files.length === 0) {
-        var repoRoot = pathLib.join(getGimletDir(), "..");
-        var pathFromRoot = pathLib.relative(repoRoot, pathLib.join(process.cwd(), path));
+        var pathFromRoot = pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
         throw "fatal: pathspec '" + pathFromRoot + "' did not match any files";
       }
     } else {
@@ -80,6 +79,12 @@ var getGimletDir = function(dir) {
     } else if (dir !== "/") {
       return getGimletDir(pathLib.join(dir, ".."));
     }
+  }
+};
+
+var getRepoDir = function() {
+  if (getGimletDir() !== undefined) {
+    return pathLib.join(getGimletDir(), "..")
   }
 };
 
