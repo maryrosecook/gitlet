@@ -27,7 +27,7 @@ var gimlet = module.exports = {
     assertInRepo();
 
     if (typeof path === 'string') {
-      var files = allFilesAt(path);
+      var files = index.getWorkingCopyPathsFrom(path);
       if (files.length === 0) {
         var pathFromRoot = pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
         throw "fatal: pathspec '" + pathFromRoot + "' did not match any files";
@@ -54,6 +54,22 @@ var gimlet = module.exports = {
       }
     }
   }
+};
+
+var index = {
+  getWorkingCopyPathsFrom: function(path) {
+    if (!fs.existsSync(path)) {
+      return [];
+    } else if (fs.statSync(path).isFile()) {
+      return path;
+    } else if (fs.statSync(path).isDirectory()) {
+      return fs.readdirSync(path).map(function(dirChild) {
+        return getWorkingCopyPathsFrom(pathLib.join(dir, dirChild));
+      });
+    } else { // some other thing - ignore
+      return [];
+    }
+  },
 };
 
 var writeObject = function(content) {
@@ -98,19 +114,6 @@ var assertInRepo = function() {
 };
 
 var createFileTree = function(structure, prefix) {
-
-var allFilesAt = function(path) {
-  if (!fs.existsSync(path)) {
-    return [];
-  } else if (fs.statSync(path).isFile()) {
-    return path;
-  } else if (fs.statSync(path).isDirectory()) {
-    return fs.readdirSync(path).map(function(dirChild) {
-      return allFilesAt(pathLib.join(dir, dirChild));
-    });
-  } else { // some other thing - ignore
-    return [];
-  }
   if (prefix === undefined) return createFileTree(structure, process.cwd());
 
   Object.keys(structure).forEach(function(name) {
