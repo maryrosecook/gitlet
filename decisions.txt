@@ -4,6 +4,7 @@
 * hash function as simple as possible for brevity - real git uses sha1
 * prob no packfiles
 * prob no support for wildcard paths in git add
+* do not support --remove for update-index so no mention of it when trying to update-index w non existent path
 
 todo
 * cd back to repo root for all commands

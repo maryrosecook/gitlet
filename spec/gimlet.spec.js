@@ -124,6 +124,36 @@ describe('gimlet', function() {
       });
     });
   });
+
+  describe('update-index', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.update_index(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+
+    it('should return undefined if nothing specified', function() {
+      g.init();
+      expect(g.update_index()).toBeUndefined();
+    });
+
+    describe('pathspec matching', function() {
+      it('should throw if path does not match existing working copy file', function() {
+        g.init();
+        expect(function() { g.update_index("blah"); })
+          .toThrow("error: blah: does not exist\nfatal: Unable to process path blah");
+      });
+
+      it('should throw rel path if not in root and pathspec does not match files', function() {
+        g.init();
+        fs.mkdirSync("1");
+        process.chdir("1");
+        fs.mkdirSync("2");
+        process.chdir("2");
+        expect(function() { g.update_index("blah"); })
+          .toThrow("error: blah: does not exist\nfatal: Unable to process path blah");
+      });
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {

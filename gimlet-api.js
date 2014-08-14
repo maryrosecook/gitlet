@@ -37,6 +37,17 @@ var gimlet = module.exports = {
     }
   },
 
+  update_index: function(path) {
+    assertInRepo();
+
+    if (typeof path === 'string') {
+      if (!fs.existsSync(path)) {
+        throw "error: " + path + ": does not exist\n" +
+          "fatal: Unable to process path " + path;
+      }
+    }
+  },
+
   hash_object: function(file, opts) {
     assertInRepo();
     opts = opts || {};
