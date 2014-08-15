@@ -152,6 +152,16 @@ describe('gimlet', function() {
         expect(function() { g.update_index("blah"); })
           .toThrow("error: 1/2/blah: does not exist\nfatal: Unable to process path 1/2/blah");
       });
+
+      it('should throw rel path if not in root and path is dir', function() {
+        g.init();
+        fs.mkdirSync("1");
+        process.chdir("1");
+        fs.mkdirSync("2");
+        expect(function() { g.update_index("2"); })
+          .toThrow("error: 1/2: is a directory - add files inside instead\n" +
+                   "fatal: Unable to process path 1/2");
+      });
     });
   });
 });

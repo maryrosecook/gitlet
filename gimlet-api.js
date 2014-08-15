@@ -46,6 +46,9 @@ var gimlet = module.exports = {
       if (!fs.existsSync(path)) {
         throw "error: " + pathFromRoot + ": does not exist\n" +
           "fatal: Unable to process path " + pathFromRoot;
+      } else if (fs.statSync(path).isDirectory()) {
+        throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
+          "fatal: Unable to process path " + pathFromRoot;
       }
     }
   },
