@@ -150,7 +150,7 @@ describe('gimlet', function() {
         fs.mkdirSync("2");
         process.chdir("2");
         expect(function() { g.update_index("blah"); })
-          .toThrow("error: blah: does not exist\nfatal: Unable to process path blah");
+          .toThrow("error: 1/2/blah: does not exist\nfatal: Unable to process path 1/2/blah");
       });
     });
   });

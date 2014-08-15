@@ -42,9 +42,10 @@ var gimlet = module.exports = {
     assertInRepo();
 
     if (typeof path === 'string') {
+      var pathFromRoot = pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
       if (!fs.existsSync(path)) {
-        throw "error: " + path + ": does not exist\n" +
-          "fatal: Unable to process path " + path;
+        throw "error: " + pathFromRoot + ": does not exist\n" +
+          "fatal: Unable to process path " + pathFromRoot;
       }
     }
   },
