@@ -8,6 +8,7 @@ var gimlet = module.exports = {
     createFileTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
+        index: "",
         hooks: {},
         info: {},
         logs: {},
