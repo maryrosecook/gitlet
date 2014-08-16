@@ -30,8 +30,7 @@ var gimlet = module.exports = {
     if (typeof path === 'string') {
       var files = index.getWorkingCopyPathsFrom(path);
       if (files.length === 0) {
-        var pathFromRoot = pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
-        throw "fatal: pathspec '" + pathFromRoot + "' did not match any files";
+        throw "fatal: pathspec '" + pathFromRepoRoot(path) + "' did not match any files";
       }
     } else {
       throw "Nothing specified, nothing added.";
@@ -42,7 +41,7 @@ var gimlet = module.exports = {
     assertInRepo();
 
     if (typeof path === 'string') {
-      var pathFromRoot = pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
+      var pathFromRoot = pathFromRepoRoot(path)
       if (!fs.existsSync(path)) {
         throw "error: " + pathFromRoot + ": does not exist\n" +
           "fatal: Unable to process path " + pathFromRoot;
@@ -127,6 +126,10 @@ var assertInRepo = function() {
   if (!inRepo()) {
     throw "fatal: Not a gimlet repository (or any of the parent directories): .gimlet";
   }
+};
+
+var pathFromRepoRoot = function(path) {
+  return pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
 };
 
 var createFileTree = function(structure, prefix) {
