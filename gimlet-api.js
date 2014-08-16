@@ -81,8 +81,6 @@ var index = {
       return fs.readdirSync(path).map(function(dirChild) {
         return getWorkingCopyPathsFrom(pathLib.join(dir, dirChild));
       });
-    } else { // some other thing - ignore
-      return [];
     }
   },
 };

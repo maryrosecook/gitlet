@@ -5,6 +5,7 @@
 * prob no packfiles
 * prob no support for wildcard paths in git add
 * do not support --remove for update-index so no mention of it when trying to update-index w non existent path
+* assume all things inside repos are dirs or files
 
 todo
 * cd back to repo root for all commands
