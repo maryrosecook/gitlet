@@ -136,7 +136,7 @@ describe('gimlet', function() {
       expect(g.update_index()).toBeUndefined();
     });
 
-    describe('pathspec matching', function() {
+    describe('pathspec stipulations', function() {
       it('should throw if path does not match existing working copy file', function() {
         g.init();
         expect(function() { g.update_index("blah"); })
