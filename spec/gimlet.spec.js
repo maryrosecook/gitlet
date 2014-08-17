@@ -143,7 +143,7 @@ describe('gimlet', function() {
           .toThrow("error: blah: does not exist\nfatal: Unable to process path blah");
       });
 
-      it('should throw rel path if not in root and pathspec does not match files', function() {
+      it('should throw rel path if not in root and pathspec does not match file', function() {
         g.init();
         fs.mkdirSync("1");
         process.chdir("1");
