@@ -235,6 +235,17 @@ describe('gimlet', function() {
 
       expect(g.ls_files()[0]).toEqual("src/README1.md");
     });
+
+    it('should return files with hashes if --stage passed', function() {
+      g.init();
+      fs.writeFileSync("README1.md", "this is a readme1");
+      fs.writeFileSync("README2.md", "this is a readme2");
+      g.update_index("README1.md", { add: true });
+      g.update_index("README2.md", { add: true });
+
+      expect(g.ls_files({stage: true})[0]).toEqual("README1.md " +g.hash_object("README1.md"));
+      expect(g.ls_files({stage: true})[1]).toEqual("README2.md " +g.hash_object("README2.md"));
+    });
   });
 });
 

@@ -77,9 +77,17 @@ var gimlet = module.exports = {
     }
   },
 
-  ls_files: function() {
+  ls_files: function(opts) {
     assertInRepo();
-    return Object.keys(index.get());
+    opts = opts || {};
+
+    var indexObjs = index.get();
+    if (opts.stage) {
+      return Object.keys(indexObjs)
+        .map(function(path) { return path + " " + indexObjs[path]; });
+    } else {
+      return Object.keys(indexObjs);
+    }
   }
 };
 
