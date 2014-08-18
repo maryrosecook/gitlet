@@ -176,6 +176,25 @@ describe('gimlet', function() {
 
         expect(g.ls_files()[0]).toEqual("README.md");
       });
+
+      it('should add file to index with stuff in it', function() {
+        g.init();
+        fs.writeFileSync("README1.md", "this is a readme1");
+        g.update_index("README1.md", { add: true });
+        fs.writeFileSync("README2.md", "this is a readme2");
+        g.update_index("README2.md", { add: true });
+
+        expect(fs.readFileSync(pathLib.join(".gimlet/objects", g.hash_object("README1.md")),
+                               "utf8")).toEqual("this is a readme1");
+        expect(fs.readFileSync(pathLib.join(".gimlet/objects", g.hash_object("README2.md")),
+                               "utf8")).toEqual("this is a readme2");
+
+        expect(g.ls_files()[0]).toEqual("README1.md");
+        expect(g.ls_files()[1]).toEqual("README2.md");
+      });
+    });
+  });
+
   describe('ls-files', function() {
     it('should throw if not in repo', function() {
       expect(function() { g.update_index(); })
