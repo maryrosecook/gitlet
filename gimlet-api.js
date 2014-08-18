@@ -75,6 +75,11 @@ var gimlet = module.exports = {
         return hash(fileContents);
       }
     }
+  },
+
+  ls_files: function() {
+    assertInRepo();
+    return Object.keys(index.get());
   }
 };
 

@@ -176,6 +176,45 @@ describe('gimlet', function() {
         expect(fs.readFileSync(pathLib.join(".gimlet/objects", hash), "utf8"))
           .toEqual("this is a readme");
       });
+  describe('ls-files', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.update_index(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+
+    it('should return no files if nothing in index', function() {
+      g.init();
+      expect(g.ls_files()).toEqual([]);
+    });
+
+    it('should return files in index', function() {
+      g.init();
+      fs.writeFileSync("README1.md", "this is a readme1");
+      fs.writeFileSync("README2.md", "this is a readme2");
+      g.update_index("README1.md", { add: true });
+      g.update_index("README2.md", { add: true });
+
+      expect(g.ls_files()[0]).toEqual("README1.md");
+      expect(g.ls_files()[1]).toEqual("README2.md");
+    });
+
+    it('should not return files not in index', function() {
+      g.init();
+      fs.writeFileSync("README1.md", "this is a readme1");
+      fs.writeFileSync("README2.md", "this is a readme2");
+      g.update_index("README1.md", { add: true });
+
+      expect(g.ls_files()[0]).toEqual("README1.md");
+      expect(g.ls_files().length).toEqual(1);
+    });
+
+    it('should include full path in returned entries', function() {
+      g.init();
+      fs.mkdirSync("src");
+      fs.writeFileSync("src/README1.md", "this is a readme1");
+      g.update_index("src/README1.md", { add: true });
+
+      expect(g.ls_files()[0]).toEqual("src/README1.md");
     });
   });
 });
