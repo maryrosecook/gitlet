@@ -168,9 +168,11 @@ describe('gimlet', function() {
       it('should add a file to an empty index and create object', function() {
         g.init();
         fs.writeFileSync("README.md", "this is a readme");
-        var hash = g.hash_object("README.md");
         g.update_index("README.md", { add: true });
 
+        var readmeHash = g.hash_object("README.md");
+        expect(fs.readFileSync(pathLib.join(".gimlet/objects", readmeHash), "utf8"))
+          .toEqual("this is a readme");
         expect(fs.readFileSync(pathLib.join(".gimlet/objects", hash), "utf8"))
           .toEqual("this is a readme");
       });
