@@ -101,7 +101,7 @@ var index = {
       .slice(0, -1) // chuck last empty line
       .reduce(function(index, blobStr) {
         var blobData = blobStr.split(/ /);
-        index[blobData[1]] = blobData[0];
+        index[blobData[0]] = blobData[1];
         return index;
       }, {});
   },
