@@ -79,7 +79,7 @@ describe('gimlet', function() {
       expect(fs.readFileSync(__dirname + "/tmp/.gimlet/objects/15ee", "utf8")).toEqual(content);
     });
 
-    it('should not store blob when return hash when file passed with -w', function() {
+    it('should not store blob when -w not passed', function() {
       var content = "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot";
       g.init();
       fs.writeFileSync("a.txt", content);
