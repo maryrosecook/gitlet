@@ -1,5 +1,5 @@
 var fs = require('fs');
-var path = require('path');
+var pathLib = require('path');
 var g = require('../gimlet-api');
 
 describe('gimlet', function() {
@@ -163,12 +163,24 @@ describe('gimlet', function() {
                    "fatal: Unable to process path 1/2");
       });
     });
+
+    describe('adding files to index', function() {
+      it('should add a file to an empty index and create object', function() {
+        g.init();
+        fs.writeFileSync("README.md", "this is a readme");
+        var hash = g.hash_object("README.md");
+        g.update_index("README.md", { add: true });
+
+        expect(fs.readFileSync(pathLib.join(".gimlet/objects", hash), "utf8"))
+          .toEqual("this is a readme");
+      });
+    });
   });
 });
 
 var rmdirSyncRecursive = function(dir) {
   fs.readdirSync(dir).forEach(function(fileName) {
-    var filePath = path.join(dir, fileName);
+    var filePath = pathLib.join(dir, fileName);
     if (fs.statSync(filePath).isDirectory()) {
       rmdirSyncRecursive(filePath);
     } else {

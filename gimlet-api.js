@@ -37,8 +37,9 @@ var gimlet = module.exports = {
     }
   },
 
-  update_index: function(path) {
+  update_index: function(path, opts) {
     assertInRepo();
+    opts = opts || {};
 
     if (typeof path === 'string') {
       var pathFromRoot = pathFromRepoRoot(path)
@@ -48,6 +49,12 @@ var gimlet = module.exports = {
       } else if (fs.statSync(path).isDirectory()) {
         throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
           "fatal: Unable to process path " + pathFromRoot;
+      } else if (!index.hasFile(path) && opts.add === undefined) {
+        throw "error: " + pathFromRoot  +
+          ": cannot add to the index - missing --add option?\n" +
+          "fatal: Unable to process path " + pathFromRoot;
+      } else {
+        index.addFile(path);
       }
     }
   },
@@ -72,6 +79,35 @@ var gimlet = module.exports = {
 };
 
 var index = {
+  hasFile: function(path) {
+    return index.get()[path] !== undefined;
+  },
+
+  addFile: function(path) {
+    var index = this.get();
+    index[path] = hash(fs.readFileSync(pathLib.join(getGimletDir(), "..", path), "utf8"));
+    gimlet.hash_object(path, { w: true });
+    this.set(index);
+  },
+
+  get: function() {
+    return fs.readFileSync(pathLib.join(getGimletDir(), "index"), "utf8")
+      .split("\n")
+      .slice(0, -1) // chuck last empty line
+      .reduce(function(index, blobStr) {
+        var blobData = blobStr.split(/ /);
+        index[blobData[1]] = blobData[0];
+        return index;
+      }, {});
+  },
+
+  set: function(index) {
+    var indexStr = Object.keys(index)
+        .map(function(path) { return path + " " + index[path]; })
+        .join("\n");
+    fs.writeFileSync(pathLib.join(getGimletDir(), "index"), indexStr);
+  },
+
   getWorkingCopyPathsFrom: function(path) {
     if (!fs.existsSync(path)) {
       return [];
@@ -82,7 +118,7 @@ var index = {
         return getWorkingCopyPathsFrom(pathLib.join(dir, dirChild));
       });
     }
-  },
+  }
 };
 
 var writeObject = function(content) {
