@@ -173,8 +173,8 @@ describe('gimlet', function() {
         var readmeHash = g.hash_object("README.md");
         expect(fs.readFileSync(pathLib.join(".gimlet/objects", readmeHash), "utf8"))
           .toEqual("this is a readme");
-        expect(fs.readFileSync(pathLib.join(".gimlet/objects", hash), "utf8"))
-          .toEqual("this is a readme");
+
+        expect(g.ls_files()[0]).toEqual("README.md");
       });
   describe('ls-files', function() {
     it('should throw if not in repo', function() {
