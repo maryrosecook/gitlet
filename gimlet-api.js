@@ -109,7 +109,8 @@ var index = {
   set: function(index) {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
-        .join("\n");
+        .join("\n")
+        .concat("\n"); // trailing new line
     fs.writeFileSync(pathLib.join(getGimletDir(), "index"), indexStr);
   },
 
