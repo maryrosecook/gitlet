@@ -148,6 +148,25 @@ describe('gimlet', function() {
         expect(g.ls_files()[2]).toEqual("1/2/filec");
         expect(g.ls_files().length).toEqual(3);
       });
+
+      it('should be able to add multiple sets of files', function() {
+        g.init();
+        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                { "filec": "filec", "3a":
+                                  { "filed": "filed", "filee": "filee"}, "3b":
+                                  { "filef": "filef", "fileg": "fileg"}}}});
+        g.add("1/2/3a");
+        expect(g.ls_files()[0]).toEqual("1/2/3a/filed");
+        expect(g.ls_files()[1]).toEqual("1/2/3a/filee");
+        expect(g.ls_files().length).toEqual(2);
+
+        g.add("1/2/3b");
+        expect(g.ls_files()[0]).toEqual("1/2/3a/filed");
+        expect(g.ls_files()[1]).toEqual("1/2/3a/filee");
+        expect(g.ls_files()[2]).toEqual("1/2/3b/filef");
+        expect(g.ls_files()[3]).toEqual("1/2/3b/fileg");
+        expect(g.ls_files().length).toEqual(4);
+      });
     });
   });
 
