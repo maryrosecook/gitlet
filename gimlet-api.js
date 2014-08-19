@@ -28,7 +28,7 @@ var gimlet = module.exports = {
     assertInRepo();
 
     if (typeof path === 'string') {
-      var files = index.getWorkingCopyPathsFrom(path);
+      var files = index.getWorkingCopyFilesFrom(path);
       if (files.length === 0) {
         throw "fatal: pathspec '" + pathFromRepoRoot(path) + "' did not match any files";
       }
@@ -122,14 +122,14 @@ var index = {
     fs.writeFileSync(pathLib.join(getGimletDir(), "index"), indexStr);
   },
 
-  getWorkingCopyPathsFrom: function(path) {
+  getWorkingCopyFilesFrom: function(path) {
     if (!fs.existsSync(path)) {
       return [];
     } else if (fs.statSync(path).isFile()) {
       return path;
     } else if (fs.statSync(path).isDirectory()) {
       return fs.readdirSync(path).map(function(dirChild) {
-        return getWorkingCopyPathsFrom(pathLib.join(dir, dirChild));
+        return getWorkingCopyFilesFrom(pathLib.join(dir, dirChild));
       });
     }
   }
