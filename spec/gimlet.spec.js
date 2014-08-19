@@ -192,6 +192,15 @@ describe('gimlet', function() {
         expect(g.ls_files()[0]).toEqual("README1.md");
         expect(g.ls_files()[1]).toEqual("README2.md");
       });
+
+      it('should throw if try to add new file w/o --add flag', function() {
+        g.init();
+        fs.writeFileSync("README.md", "this is a readme");
+
+        expect(function() { g.update_index("README.md"); })
+          .toThrow("error: README.md: cannot add to the index - missing --add option?\n" +
+                   "fatal: Unable to process path README.md");
+      });
     });
   });
 
