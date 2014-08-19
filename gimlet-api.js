@@ -128,9 +128,10 @@ var index = {
     } else if (fs.statSync(path).isFile()) {
       return path;
     } else if (fs.statSync(path).isDirectory()) {
-      return fs.readdirSync(path).map(function(dirChild) {
-        return getWorkingCopyFilesFrom(pathLib.join(dir, dirChild));
-      });
+      var self = this;
+      return fs.readdirSync(path).reduce(function(files, dirChild) {
+        return files.concat(self.getWorkingCopyFilesFrom(pathLib.join(path, dirChild)));
+      }, []);
     }
   }
 };
