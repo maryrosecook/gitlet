@@ -98,7 +98,7 @@ var index = {
 
   addFile: function(path) {
     var index = this.get();
-    index[path] = hash(fs.readFileSync(pathLib.join(getGimletDir(), "..", path), "utf8"));
+    index[path] = hash(fs.readFileSync(pathLib.join(getRepoDir(), path), "utf8"));
     gimlet.hash_object(path, { w: true });
     this.set(index);
   },
