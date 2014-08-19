@@ -136,6 +136,18 @@ describe('gimlet', function() {
         expect(g.ls_files()[4]).toEqual("1/fileb");
         expect(g.ls_files().length).toEqual(5);
       });
+
+      it('should add only files in specified subdir', function() {
+        g.init();
+        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                { "filec": "filec", "3":
+                                  { "filed": "filed", "filee": "filee"}}}});
+        g.add("1/2");
+        expect(g.ls_files()[0]).toEqual("1/2/3/filed");
+        expect(g.ls_files()[1]).toEqual("1/2/3/filee");
+        expect(g.ls_files()[2]).toEqual("1/2/filec");
+        expect(g.ls_files().length).toEqual(3);
+      });
     });
   });
 
