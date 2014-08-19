@@ -212,6 +212,24 @@ describe('gimlet', function() {
         expect(fs.readFileSync("README.md", "utf8")).toEqual("this is a readme1");
         expect(g.ls_files({ stage: true })[0].split(" ")[1]).toEqual(origContentHash);
       });
+
+      it('should update file hash in index and add new obj if update file', function() {
+        g.init();
+        fs.writeFileSync("README.md", "this is a readme");
+        g.update_index("README.md", { add: true });
+        expect(g.ls_files({ stage: true })[0].split(" ")[1])
+          .toEqual(g.hash_object("README.md")); // sanity check hash added for first version
+
+        // update file and update index again
+        fs.writeFileSync("README.md", "this is a readme1");
+        g.update_index("README.md");
+
+        var newVersionHash = g.ls_files({ stage: true })[0].split(" ")[1];
+
+        expect(fs.readFileSync(pathLib.join(".gimlet/objects", newVersionHash), "utf8"))
+               .toEqual("this is a readme1");
+        expect(newVersionHash).toEqual(g.hash_object("README.md"));
+      });
     });
   });
 
