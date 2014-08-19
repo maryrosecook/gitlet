@@ -201,6 +201,17 @@ describe('gimlet', function() {
           .toThrow("error: README.md: cannot add to the index - missing --add option?\n" +
                    "fatal: Unable to process path README.md");
       });
+
+      it('should still refer to staged version if file changes after stage', function() {
+        g.init();
+        fs.writeFileSync("README.md", "this is a readme");
+        var origContentHash = g.hash_object("README.md");
+        g.update_index("README.md", { add: true });
+        fs.writeFileSync("README.md", "this is a readme1");
+
+        expect(fs.readFileSync("README.md", "utf8")).toEqual("this is a readme1");
+        expect(g.ls_files({ stage: true })[0].split(" ")[1]).toEqual(origContentHash);
+      });
     });
   });
 
