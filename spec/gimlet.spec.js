@@ -114,10 +114,8 @@ describe('gimlet', function() {
 
       it('should throw rel path if not in root and pathspec does not match files', function() {
         g.init();
-        fs.mkdirSync("1");
-        process.chdir("1");
-        fs.mkdirSync("2");
-        process.chdir("2");
+        createFileTree({ "1": { "2": {}}})
+        process.chdir("1/2");
         expect(function() {
           g.add("blah");
         }).toThrow("fatal: pathspec '1/2/blah' did not match any files");
@@ -145,19 +143,16 @@ describe('gimlet', function() {
 
       it('should throw rel path if not in root and pathspec does not match file', function() {
         g.init();
-        fs.mkdirSync("1");
-        process.chdir("1");
-        fs.mkdirSync("2");
-        process.chdir("2");
+        createFileTree({ "1": { "2": {}}})
+        process.chdir("1/2");
         expect(function() { g.update_index("blah"); })
           .toThrow("error: 1/2/blah: does not exist\nfatal: Unable to process path 1/2/blah");
       });
 
       it('should throw rel path if not in root and path is dir', function() {
         g.init();
-        fs.mkdirSync("1");
+        createFileTree({ "1": { "2": {}}})
         process.chdir("1");
-        fs.mkdirSync("2");
         expect(function() { g.update_index("2"); })
           .toThrow("error: 1/2: is a directory - add files inside instead\n" +
                    "fatal: Unable to process path 1/2");
@@ -179,9 +174,8 @@ describe('gimlet', function() {
 
       it('should add file to index with stuff in it', function() {
         g.init();
-        fs.writeFileSync("README1.md", "this is a readme1");
+        createFileTree({ "README1.md": "this is a readme1", "README2.md":"this is a readme2"});
         g.update_index("README1.md", { add: true });
-        fs.writeFileSync("README2.md", "this is a readme2");
         g.update_index("README2.md", { add: true });
 
         expect(fs.readFileSync(pathLib.join(".gimlet/objects", g.hash_object("README1.md")),
@@ -246,8 +240,7 @@ describe('gimlet', function() {
 
     it('should return files in index', function() {
       g.init();
-      fs.writeFileSync("README1.md", "this is a readme1");
-      fs.writeFileSync("README2.md", "this is a readme2");
+      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
@@ -257,8 +250,7 @@ describe('gimlet', function() {
 
     it('should not return files not in index', function() {
       g.init();
-      fs.writeFileSync("README1.md", "this is a readme1");
-      fs.writeFileSync("README2.md", "this is a readme2");
+      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
 
       expect(g.ls_files()[0]).toEqual("README1.md");
@@ -267,8 +259,7 @@ describe('gimlet', function() {
 
     it('should include full path in returned entries', function() {
       g.init();
-      fs.mkdirSync("src");
-      fs.writeFileSync("src/README1.md", "this is a readme1");
+      createFileTree({ "src": { "README1.md": "this is a readme1"}});
       g.update_index("src/README1.md", { add: true });
 
       expect(g.ls_files()[0]).toEqual("src/README1.md");
@@ -276,8 +267,7 @@ describe('gimlet', function() {
 
     it('should return files with hashes if --stage passed', function() {
       g.init();
-      fs.writeFileSync("README1.md", "this is a readme1");
-      fs.writeFileSync("README2.md", "this is a readme2");
+      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
@@ -298,4 +288,18 @@ var rmdirSyncRecursive = function(dir) {
   });
 
   fs.rmdirSync(dir);
+};
+
+var createFileTree = function(structure, prefix) {
+  if (prefix === undefined) return createFileTree(structure, process.cwd());
+
+  Object.keys(structure).forEach(function(name) {
+    var path = pathLib.join(prefix, name);
+    if (typeof structure[name] === "string") {
+      fs.writeFileSync(path, structure[name]);
+    } else {
+      fs.mkdirSync(path, "777");
+      createFileTree(structure[name], path);
+    }
+  });
 };
