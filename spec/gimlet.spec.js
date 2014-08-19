@@ -121,6 +121,22 @@ describe('gimlet', function() {
         }).toThrow("fatal: pathspec '1/2/blah' did not match any files");
       });
     });
+
+    describe('adding files', function() {
+      it('should add all files in a large dir tree', function() {
+        g.init();
+        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                { "filec": "filec", "3":
+                                  { "filed": "filed", "filee": "filee"}}}});
+        g.add("1");
+        expect(g.ls_files()[0]).toEqual("1/2/3/filed");
+        expect(g.ls_files()[1]).toEqual("1/2/3/filee");
+        expect(g.ls_files()[2]).toEqual("1/2/filec");
+        expect(g.ls_files()[3]).toEqual("1/filea");
+        expect(g.ls_files()[4]).toEqual("1/fileb");
+        expect(g.ls_files().length).toEqual(5);
+      });
+    });
   });
 
   describe('update-index', function() {
