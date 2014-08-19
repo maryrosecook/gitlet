@@ -31,6 +31,10 @@ var gimlet = module.exports = {
       var files = index.getWorkingCopyFilesFrom(path);
       if (files.length === 0) {
         throw "fatal: pathspec '" + pathFromRepoRoot(path) + "' did not match any files";
+      } else {
+        for (var i = 0; i < files.length; i++) {
+          this.update_index(files[i], { add: true });
+        }
       }
     } else {
       throw "Nothing specified, nothing added.";
