@@ -3,7 +3,7 @@ var pathLib = require('path');
 
 var gimlet = module.exports = {
   init: function() {
-    if (inRepo()) return;
+    if (inRepo()) { return; }
 
     createFilesFromTree({
       ".gimlet": {
@@ -190,7 +190,8 @@ var hash = function(string) {
 };
 
 var getGimletDir = function(dir) {
-  if (dir === undefined) return getGimletDir(process.cwd());
+  if (dir === undefined) { return getGimletDir(process.cwd()); }
+
   if (fs.existsSync(dir)) {
     var gimletDir = pathLib.join(dir, ".gimlet");
     if (fs.existsSync(gimletDir)) {
@@ -232,7 +233,7 @@ var util = {
 };
 
 var createFilesFromTree = function(structure, prefix) {
-  if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
+  if (prefix === undefined) { return createFilesFromTree(structure, process.cwd()); }
 
   Object.keys(structure).forEach(function(name) {
     var path = pathLib.join(prefix, name);
