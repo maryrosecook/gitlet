@@ -65,18 +65,18 @@ describe('gimlet', function() {
       g.init();
 
       fs.writeFileSync("a.txt", "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot");
-      expect(g.hash_object("a.txt")).toEqual("15ee");
+      expect(g.hash_object("a.txt")).toEqual("19d6");
 
       fs.writeFileSync("b.txt", "oetuhntoaehuntao hesuh sano.tuh snato.h usntaho .u");
-      expect(g.hash_object("b.txt")).toEqual("1318");
+      expect(g.hash_object("b.txt")).toEqual("1700");
     });
 
     it('should store blob and return hash when file passed with -w', function() {
       var content = "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot";
       g.init();
       fs.writeFileSync("a.txt", content);
-      expect(g.hash_object("a.txt", { w:true })).toEqual("15ee");
-      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/objects/15ee", "utf8")).toEqual(content);
+      expect(g.hash_object("a.txt", { w:true })).toEqual("19d6");
+      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/objects/19d6", "utf8")).toEqual(content);
     });
 
     it('should not store blob when -w not passed', function() {

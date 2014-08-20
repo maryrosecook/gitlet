@@ -154,7 +154,7 @@ var hash = function(string) {
   return string
     .split("")
     .map(function(c) { return c.charCodeAt(0); })
-    .reduce(function(a, n) { return a + n; })
+    .reduce(function(a, n) { return a + n; }, 1000)
     .toString(16);
 };
 
