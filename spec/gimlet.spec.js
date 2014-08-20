@@ -32,8 +32,7 @@ describe('gimlet', function() {
       expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/origin/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/tags/")).toEqual(true);
 
-      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/HEAD", "utf8"))
-        .toEqual("ref: refs/heads/master\n");
+      expectFile(__dirname + "/tmp/.gimlet/HEAD", "ref: refs/heads/master\n");
     };
 
     it('should create .gimlet/ and all required dirs', function() {
@@ -80,7 +79,7 @@ describe('gimlet', function() {
       g.init();
       fs.writeFileSync("a.txt", content);
       expect(g.hash_object("a.txt", { w:true })).toEqual("19d6");
-      expect(fs.readFileSync(__dirname + "/tmp/.gimlet/objects/19d6", "utf8")).toEqual(content);
+      expectFile(__dirname + "/tmp/.gimlet/objects/19d6", content);
     });
 
     it('should not store blob when -w not passed', function() {
@@ -217,8 +216,7 @@ describe('gimlet', function() {
         g.update_index("README.md", { add: true });
 
         var readmeHash = g.hash_object("README.md");
-        expect(fs.readFileSync(pathLib.join(".gimlet/objects", readmeHash), "utf8"))
-          .toEqual("this is a readme");
+        expectFile(pathLib.join(".gimlet/objects", readmeHash), "this is a readme");
 
         expect(g.ls_files()[0]).toEqual("README.md");
       });
@@ -229,10 +227,10 @@ describe('gimlet', function() {
         g.update_index("README1.md", { add: true });
         g.update_index("README2.md", { add: true });
 
-        expect(fs.readFileSync(pathLib.join(".gimlet/objects", g.hash_object("README1.md")),
-                               "utf8")).toEqual("this is a readme1");
-        expect(fs.readFileSync(pathLib.join(".gimlet/objects", g.hash_object("README2.md")),
-                               "utf8")).toEqual("this is a readme2");
+        expectFile(pathLib.join(".gimlet/objects", g.hash_object("README1.md")),
+                   "this is a readme1");
+        expectFile(pathLib.join(".gimlet/objects", g.hash_object("README2.md")),
+                   "this is a readme2");
 
         expect(g.ls_files()[0]).toEqual("README1.md");
         expect(g.ls_files()[1]).toEqual("README2.md");
@@ -254,7 +252,7 @@ describe('gimlet', function() {
         g.update_index("README.md", { add: true });
         fs.writeFileSync("README.md", "this is a readme1");
 
-        expect(fs.readFileSync("README.md", "utf8")).toEqual("this is a readme1");
+        expectFile("README.md", "this is a readme1");
         expect(g.ls_files({ stage: true })[0].split(" ")[1]).toEqual(origContentHash);
       });
 
@@ -271,8 +269,7 @@ describe('gimlet', function() {
 
         var newVersionHash = g.ls_files({ stage: true })[0].split(" ")[1];
 
-        expect(fs.readFileSync(pathLib.join(".gimlet/objects", newVersionHash), "utf8"))
-               .toEqual("this is a readme1");
+        expectFile(pathLib.join(".gimlet/objects", newVersionHash), "this is a readme1");
         expect(newVersionHash).toEqual(g.hash_object("README.md"));
       });
     });
