@@ -114,7 +114,7 @@ describe('gimlet', function() {
 
       it('should throw rel path if not in root and pathspec does not match files', function() {
         g.init();
-        createFileTree({ "1": { "2": {}}})
+        createFilesFromTree({ "1": { "2": {}}})
         process.chdir("1/2");
         expect(function() {
           g.add("blah");
@@ -125,7 +125,7 @@ describe('gimlet', function() {
     describe('adding files', function() {
       it('should add all files in a large dir tree', function() {
         g.init();
-        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+        createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                 { "filec": "filec", "3":
                                   { "filed": "filed", "filee": "filee"}}}});
         g.add("1");
@@ -139,7 +139,7 @@ describe('gimlet', function() {
 
       it('should add only files in specified subdir', function() {
         g.init();
-        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+        createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                 { "filec": "filec", "3":
                                   { "filed": "filed", "filee": "filee"}}}});
         g.add("1/2");
@@ -151,7 +151,7 @@ describe('gimlet', function() {
 
       it('should be able to add multiple sets of files', function() {
         g.init();
-        createFileTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+        createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                 { "filec": "filec", "3a":
                                   { "filed": "filed", "filee": "filee"}, "3b":
                                   { "filef": "filef", "fileg": "fileg"}}}});
@@ -190,7 +190,7 @@ describe('gimlet', function() {
 
       it('should throw rel path if not in root and pathspec does not match file', function() {
         g.init();
-        createFileTree({ "1": { "2": {}}})
+        createFilesFromTree({ "1": { "2": {}}})
         process.chdir("1/2");
         expect(function() { g.update_index("blah"); })
           .toThrow("error: 1/2/blah: does not exist\nfatal: Unable to process path 1/2/blah");
@@ -198,7 +198,7 @@ describe('gimlet', function() {
 
       it('should throw rel path if not in root and path is dir', function() {
         g.init();
-        createFileTree({ "1": { "2": {}}})
+        createFilesFromTree({ "1": { "2": {}}})
         process.chdir("1");
         expect(function() { g.update_index("2"); })
           .toThrow("error: 1/2: is a directory - add files inside instead\n" +
@@ -221,7 +221,7 @@ describe('gimlet', function() {
 
       it('should add file to index with stuff in it', function() {
         g.init();
-        createFileTree({ "README1.md": "this is a readme1", "README2.md":"this is a readme2"});
+        createFilesFromTree({ "README1.md": "this is a readme1", "README2.md":"this is a readme2"});
         g.update_index("README1.md", { add: true });
         g.update_index("README2.md", { add: true });
 
@@ -287,7 +287,7 @@ describe('gimlet', function() {
 
     it('should return files in index', function() {
       g.init();
-      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
+      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
@@ -297,7 +297,7 @@ describe('gimlet', function() {
 
     it('should not return files not in index', function() {
       g.init();
-      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
+      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
 
       expect(g.ls_files()[0]).toEqual("README1.md");
@@ -306,7 +306,7 @@ describe('gimlet', function() {
 
     it('should include full path in returned entries', function() {
       g.init();
-      createFileTree({ "src": { "README1.md": "this is a readme1"}});
+      createFilesFromTree({ "src": { "README1.md": "this is a readme1"}});
       g.update_index("src/README1.md", { add: true });
 
       expect(g.ls_files()[0]).toEqual("src/README1.md");
@@ -314,7 +314,7 @@ describe('gimlet', function() {
 
     it('should return files with hashes if --stage passed', function() {
       g.init();
-      createFileTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
+      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
@@ -337,8 +337,8 @@ var rmdirSyncRecursive = function(dir) {
   fs.rmdirSync(dir);
 };
 
-var createFileTree = function(structure, prefix) {
-  if (prefix === undefined) return createFileTree(structure, process.cwd());
+var createFilesFromTree = function(structure, prefix) {
+  if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
 
   Object.keys(structure).forEach(function(name) {
     var path = pathLib.join(prefix, name);
@@ -346,7 +346,7 @@ var createFileTree = function(structure, prefix) {
       fs.writeFileSync(path, structure[name]);
     } else {
       fs.mkdirSync(path, "777");
-      createFileTree(structure[name], path);
+      createFilesFromTree(structure[name], path);
     }
   });
 };

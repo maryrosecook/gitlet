@@ -5,7 +5,7 @@ var gimlet = module.exports = {
   init: function() {
     if (inRepo()) return;
 
-    createFileTree({
+    createFilesFromTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
         index: "",
@@ -165,6 +165,20 @@ var getGimletDir = function(dir) {
   }
 };
 
+var pathsToDirectoryTree = function() {
+  var tree = {};
+  Object.keys(this.get()).forEach(function(wholePath) {
+    (function addPathToTree(subTree, subPathParts) {
+      if (subPathParts.length === 1) {
+        subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
+      } else {
+        addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
+                      subPathParts.slice(1));
+      }
+    })(tree, wholePath.split(pathLib.sep));
+  });
+};
+
 var getRepoDir = function() {
   if (getGimletDir() !== undefined) {
     return pathLib.join(getGimletDir(), "..")
@@ -185,8 +199,8 @@ var pathFromRepoRoot = function(path) {
   return pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
 };
 
-var createFileTree = function(structure, prefix) {
-  if (prefix === undefined) return createFileTree(structure, process.cwd());
+var createFilesFromTree = function(structure, prefix) {
+  if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
 
   Object.keys(structure).forEach(function(name) {
     var path = pathLib.join(prefix, name);
@@ -194,7 +208,7 @@ var createFileTree = function(structure, prefix) {
       fs.writeFileSync(path, structure[name]);
     } else {
       fs.mkdirSync(path, "777");
-      createFileTree(structure[name], path);
+      createFilesFromTree(structure[name], path);
     }
   });
 };
