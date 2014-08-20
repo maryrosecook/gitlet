@@ -148,12 +148,12 @@ var index = {
     var tree = {};
     Object.keys(this.get()).forEach(function(wholePath) {
       (function addPathToTree(subTree, subPathParts) {
-      if (subPathParts.length === 1) {
-        subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
-      } else {
-        addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
-                      subPathParts.slice(1));
-      }
+        if (subPathParts.length === 1) {
+          subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
+        } else {
+          addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
+                        subPathParts.slice(1));
+        }
       })(tree, wholePath.split(pathLib.sep));
     });
 
