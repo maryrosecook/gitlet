@@ -92,6 +92,11 @@ var gimlet = module.exports = {
     } else {
       return Object.keys(indexObjs);
     }
+  },
+
+  write_tree: function() {
+    assertInRepo();
+
   }
 };
 

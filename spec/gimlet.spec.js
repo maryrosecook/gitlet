@@ -322,6 +322,13 @@ describe('gimlet', function() {
       expect(g.ls_files({stage: true})[1]).toEqual("README2.md " +g.hash_object("README2.md"));
     });
   });
+
+  describe('write-tree', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.write_tree(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {
