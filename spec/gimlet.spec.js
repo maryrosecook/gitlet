@@ -2,6 +2,10 @@ var fs = require('fs');
 var pathLib = require('path');
 var g = require('../gimlet-api');
 
+var expectFile = function(path, content) {
+  expect(fs.readFileSync(path, "utf8")).toEqual(content);
+};
+
 describe('gimlet', function() {
   beforeEach(function() {
     var tmpDir = __dirname + "/tmp";
@@ -327,6 +331,11 @@ describe('gimlet', function() {
     it('should throw if not in repo', function() {
       expect(function() { g.write_tree(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+    it('should write-tree of empty root tree if no files staged', function() {
+      g.init();
+      expect(g.write_tree()).toEqual("3f2");
+      expectFile(".gimlet/objects/3f2", "\n");
     });
   });
 });

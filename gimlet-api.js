@@ -96,7 +96,7 @@ var gimlet = module.exports = {
 
   write_tree: function() {
     assertInRepo();
-
+    return objectDatabase.writeTree(index.toTree());
   }
 };
 
@@ -142,10 +142,39 @@ var index = {
         return files.concat(self.getWorkingCopyFilesFrom(pathLib.join(path, dirChild)));
       }, []);
     }
+  },
+
+  toTree: function() {
+    var tree = {};
+    Object.keys(this.get()).forEach(function(wholePath) {
+      (function addPathToTree(subTree, subPathParts) {
+      if (subPathParts.length === 1) {
+        subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
+      } else {
+        addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
+                      subPathParts.slice(1));
+      }
+      })(tree, wholePath.split(pathLib.sep));
+    });
+
+    return tree;
   }
 };
 
 var objectDatabase = {
+  writeTree: function(tree) {
+    var treeObject = Object.keys(tree).map(function(key) {
+      if (util.isString(tree[key])) {
+        return "blob " + hash(tree[key]) + " " + key;
+      } else {
+        return "tree " + objectDatabase.writeTree(tree[key]) + " " + key;
+      }
+    }).join("\n") + "\n";
+
+    this.writeObject(treeObject);
+    return hash(treeObject);
+  },
+
   writeObject: function(content) {
     var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
     fs.writeFileSync(filePath, content);
@@ -170,20 +199,6 @@ var getGimletDir = function(dir) {
       return getGimletDir(pathLib.join(dir, ".."));
     }
   }
-};
-
-var pathsToDirectoryTree = function() {
-  var tree = {};
-  Object.keys(this.get()).forEach(function(wholePath) {
-    (function addPathToTree(subTree, subPathParts) {
-      if (subPathParts.length === 1) {
-        subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
-      } else {
-        addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
-                      subPathParts.slice(1));
-      }
-    })(tree, wholePath.split(pathLib.sep));
-  });
 };
 
 var getRepoDir = function() {
