@@ -73,7 +73,7 @@ var gimlet = module.exports = {
       } else {
         var fileContents = fs.readFileSync(file, "utf8");
         if (opts.w) {
-          writeObject(fileContents);
+          objectDatabase.writeObject(fileContents);
         }
 
         return hash(fileContents);
@@ -145,9 +145,11 @@ var index = {
   }
 };
 
-var writeObject = function(content) {
-  var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
-  fs.writeFileSync(filePath, content);
+var objectDatabase = {
+  writeObject: function(content) {
+    var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
+    fs.writeFileSync(filePath, content);
+  }
 };
 
 var hash = function(string) {
