@@ -344,6 +344,22 @@ describe('gimlet', function() {
       expectFile(".gimlet/objects/c28", "tree dbe 3\nblob 5eb filec\n");
       expectFile(".gimlet/objects/dbe", "blob 5ec filed\nblob 5ed filee\n");
     });
+
+    it('should keep blobs written by git add', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3":
+                                     { "filed": "filed", "filee": "filee"}}}});
+      g.add("1");
+      g.write_tree();
+
+      // check only blobs
+      expectFile(".gimlet/objects/5e9", "filea");
+      expectFile(".gimlet/objects/5ea", "fileb");
+      expectFile(".gimlet/objects/5eb", "filec");
+      expectFile(".gimlet/objects/5ec", "filed");
+      expectFile(".gimlet/objects/5ed", "filee");
+    });
     it('should write-tree of empty root tree if no files staged', function() {
       g.init();
       expect(g.write_tree()).toEqual("3f2");
