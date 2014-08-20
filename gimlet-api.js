@@ -27,7 +27,7 @@ var gimlet = module.exports = {
   add: function(path) {
     assertInRepo();
 
-    if (typeof path === 'string') {
+    if (isString(path)) {
       var files = index.getWorkingCopyFilesFrom(path);
       if (files.length === 0) {
         throw "fatal: pathspec '" + pathFromRepoRoot(path) + "' did not match any files";
@@ -45,7 +45,7 @@ var gimlet = module.exports = {
     assertInRepo();
     opts = opts || {};
 
-    if (typeof path === 'string') {
+    if (isString(path)) {
       var pathFromRoot = pathFromRepoRoot(path)
       if (!fs.existsSync(path)) {
         throw "error: " + pathFromRoot + ": does not exist\n" +
@@ -208,12 +208,16 @@ var pp = function(obj) {
   console.log(JSON.stringify(obj, null, 2))
 };
 
+var isString = function(thing) {
+  return typeof thing === "string";
+};
+
 var createFilesFromTree = function(structure, prefix) {
   if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
 
   Object.keys(structure).forEach(function(name) {
     var path = pathLib.join(prefix, name);
-    if (typeof structure[name] === "string") {
+    if (isString(structure[name])) {
       fs.writeFileSync(path, structure[name]);
     } else {
       fs.mkdirSync(path, "777");
