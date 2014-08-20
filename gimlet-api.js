@@ -204,6 +204,10 @@ var pathFromRepoRoot = function(path) {
   return pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
 };
 
+var pp = function(obj) {
+  console.log(JSON.stringify(obj, null, 2))
+};
+
 var createFilesFromTree = function(structure, prefix) {
   if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
 
