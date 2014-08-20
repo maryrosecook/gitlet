@@ -329,6 +329,21 @@ describe('gimlet', function() {
       expect(function() { g.write_tree(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
+
+    it('should be able to write largish tree when no trees written yet', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3":
+                                     { "filed": "filed", "filee": "filee"}}}});
+      g.add("1");
+      expect(g.write_tree()).toEqual("6e0");
+
+      // check only trees
+      expectFile(".gimlet/objects/6e0", "tree 1084 1\n");
+      expectFile(".gimlet/objects/1084", "tree c28 2\nblob 5e9 filea\nblob 5ea fileb\n");
+      expectFile(".gimlet/objects/c28", "tree dbe 3\nblob 5eb filec\n");
+      expectFile(".gimlet/objects/dbe", "blob 5ec filed\nblob 5ed filee\n");
+    });
     it('should write-tree of empty root tree if no files staged', function() {
       g.init();
       expect(g.write_tree()).toEqual("3f2");
