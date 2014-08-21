@@ -361,6 +361,20 @@ describe('gimlet', function() {
       expectFile(".gimlet/objects/5ceba68", "filed");
       expectFile(".gimlet/objects/5ceba69", "filee");
     });
+
+    it('should omit files in trees above dir that is several layers down', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3":
+                                     { "filed": "filed", "filee": "filee"}}}});
+      g.add("1/2");
+      expect(g.write_tree()).toEqual("45cddb46");
+
+      expectFile(".gimlet/objects/45cddb46", "tree 37ebbafc 1\n");
+      expectFile(".gimlet/objects/37ebbafc", "tree 1c778a9 2\n");
+      expectFile(".gimlet/objects/1c778a9", "tree 51125fde 3\nblob 5ceba67 filec\n");
+      expectFile(".gimlet/objects/51125fde", "blob 5ceba68 filed\nblob 5ceba69 filee\n");
+    });
     it('should write-tree of empty root tree if no files staged', function() {
       g.init();
       expect(g.write_tree()).toEqual("a");
