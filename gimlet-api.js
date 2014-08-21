@@ -176,9 +176,13 @@ var objectDatabase = {
   },
 
   writeObject: function(content) {
-    var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
-    fs.writeFileSync(filePath, content);
+    var contentHash = hash(content);
+    if (this.readObject(contentHash) === undefined) {
+      var filePath = pathLib.join(getGimletDir(), "objects", contentHash);
+      fs.writeFileSync(filePath, content);
+    }
   },
+
   readObject: function(objectHash) {
     var objectPath = pathLib.join(getGimletDir(), "objects", objectHash);
     if (fs.existsSync(objectPath)) {
