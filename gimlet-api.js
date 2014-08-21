@@ -192,11 +192,13 @@ var objectDatabase = {
 };
 
 var hash = function(string) {
-  return string
-    .split("")
-    .map(function(c) { return c.charCodeAt(0); })
-    .reduce(function(a, n) { return a + n; }, 1000)
-    .toString(16);
+  var hashInt = 0;
+  for (var i = 0; i < string.length; i++) {
+    hashInt = hashInt * 31 + string.charCodeAt(i);
+    hashInt = hashInt | 0;
+  }
+
+  return Math.abs(hashInt).toString(16);
 };
 
 var getGimletDir = function(dir) {

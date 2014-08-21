@@ -68,18 +68,18 @@ describe('gimlet', function() {
       g.init();
 
       fs.writeFileSync("a.txt", "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot");
-      expect(g.hash_object("a.txt")).toEqual("19d6");
+      expect(g.hash_object("a.txt")).toEqual("7f9f2dae");
 
       fs.writeFileSync("b.txt", "oetuhntoaehuntao hesuh sano.tuh snato.h usntaho .u");
-      expect(g.hash_object("b.txt")).toEqual("1700");
+      expect(g.hash_object("b.txt")).toEqual("71dc6f5a");
     });
 
     it('should store blob and return hash when file passed with -w', function() {
       var content = "taoehusnaot uhrs.ochurcaoh. usrcao.h usrc oa.husrc aosr.ot";
       g.init();
       fs.writeFileSync("a.txt", content);
-      expect(g.hash_object("a.txt", { w:true })).toEqual("19d6");
-      expectFile(__dirname + "/tmp/.gimlet/objects/19d6", content);
+      expect(g.hash_object("a.txt", { w:true })).toEqual("7f9f2dae");
+      expectFile(__dirname + "/tmp/.gimlet/objects/7f9f2dae", content);
     });
 
     it('should not store blob when -w not passed', function() {
@@ -336,13 +336,14 @@ describe('gimlet', function() {
                                    { "filec": "filec", "3":
                                      { "filed": "filed", "filee": "filee"}}}});
       g.add("1");
-      expect(g.write_tree()).toEqual("6e0");
+      expect(g.write_tree()).toEqual("7afc965a");
 
       // check only trees
-      expectFile(".gimlet/objects/6e0", "tree 1084 1\n");
-      expectFile(".gimlet/objects/1084", "tree c28 2\nblob 5e9 filea\nblob 5ea fileb\n");
-      expectFile(".gimlet/objects/c28", "tree dbe 3\nblob 5eb filec\n");
-      expectFile(".gimlet/objects/dbe", "blob 5ec filed\nblob 5ed filee\n");
+      expectFile(".gimlet/objects/7afc965a", "tree 380b9be6 1\n");
+      expectFile(".gimlet/objects/380b9be6",
+                 "tree 1c778a9 2\nblob 5ceba65 filea\nblob 5ceba66 fileb\n");
+      expectFile(".gimlet/objects/1c778a9", "tree 51125fde 3\nblob 5ceba67 filec\n");
+      expectFile(".gimlet/objects/51125fde", "blob 5ceba68 filed\nblob 5ceba69 filee\n");
     });
 
     it('should keep blobs written by git add', function() {
@@ -354,16 +355,15 @@ describe('gimlet', function() {
       g.write_tree();
 
       // check only blobs
-      expectFile(".gimlet/objects/5e9", "filea");
-      expectFile(".gimlet/objects/5ea", "fileb");
-      expectFile(".gimlet/objects/5eb", "filec");
-      expectFile(".gimlet/objects/5ec", "filed");
-      expectFile(".gimlet/objects/5ed", "filee");
+      expectFile(".gimlet/objects/5ceba65", "filea");
+      expectFile(".gimlet/objects/5ceba66", "fileb");
+      expectFile(".gimlet/objects/5ceba67", "filec");
+      expectFile(".gimlet/objects/5ceba68", "filed");
+      expectFile(".gimlet/objects/5ceba69", "filee");
     });
     it('should write-tree of empty root tree if no files staged', function() {
       g.init();
-      expect(g.write_tree()).toEqual("3f2");
-      expectFile(".gimlet/objects/3f2", "\n");
+      expect(g.write_tree()).toEqual("a");
     });
   });
 });
