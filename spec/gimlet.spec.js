@@ -375,6 +375,35 @@ describe('gimlet', function() {
       expectFile(".gimlet/objects/1c778a9", "tree 51125fde 3\nblob 5ceba67 filec\n");
       expectFile(".gimlet/objects/51125fde", "blob 5ceba68 filed\nblob 5ceba69 filee\n");
     });
+
+    it('should compose tree from new and existing trees and blobs', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec",
+                                     "3a": { "filed": "filed", "filee": "filee"},
+                                     "3b": { "filef": "filef", "fileg": "fileg"}}}});
+
+      var _3aHash = "51125fde";
+      var _3bHash = "3b5029be";
+
+      g.add("1/2/3a");
+      expect(g.write_tree()).toEqual("59431df");
+      expectFile(".gimlet/objects/59431df", "tree 2711fbd9 1\n");
+      expectFile(".gimlet/objects/2711fbd9", "tree 74f6972d 2\n");
+      expectFile(".gimlet/objects/74f6972d", "tree " + _3aHash + " 3a\n");
+      expectFile(".gimlet/objects/" + _3aHash, "blob 5ceba68 filed\nblob 5ceba69 filee\n");
+      expect(fs.readdirSync(".gimlet/objects").length).toEqual(6);
+
+      g.add("1/2/3b");
+      expect(g.write_tree()).toEqual("53d8eab5");
+      expectFile(".gimlet/objects/53d8eab5", "tree 494c2c41 1\n");
+      expectFile(".gimlet/objects/494c2c41", "tree 9c02fdc 2\n");
+      expectFile(".gimlet/objects/9c02fdc",
+                 "tree " + _3aHash + " 3a\ntree " + _3bHash + " 3b\n");
+      expectFile(".gimlet/objects/" + _3bHash, "blob 5ceba6a filef\nblob 5ceba6b fileg\n");
+      expect(fs.readdirSync(".gimlet/objects").length).toEqual(12);
+    });
+
     it('should write-tree of empty root tree if no files staged', function() {
       g.init();
       expect(g.write_tree()).toEqual("a");
