@@ -178,6 +178,12 @@ var objectDatabase = {
   writeObject: function(content) {
     var filePath = pathLib.join(getGimletDir(), "objects", hash(content));
     fs.writeFileSync(filePath, content);
+  },
+  readObject: function(objectHash) {
+    var objectPath = pathLib.join(getGimletDir(), "objects", objectHash);
+    if (fs.existsSync(objectPath)) {
+      return fs.readFileSync(objectPath, "utf8");
+    }
   }
 };
 
