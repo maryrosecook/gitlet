@@ -207,9 +207,9 @@ var directory = {
     if (dir === undefined) { return this.gimlet(process.cwd()); }
 
     if (fs.existsSync(dir)) {
-      var gimletDir = nodePath.join(dir, ".gimlet");
-      if (fs.existsSync(gimletDir)) {
-        return gimletDir;
+      var potentialGimletDir = nodePath.join(dir, ".gimlet");
+      if (fs.existsSync(potentialGimletDir)) {
+        return potentialGimletDir;
       } else if (dir !== "/") {
         return this.gimlet(nodePath.join(dir, ".."));
       }
