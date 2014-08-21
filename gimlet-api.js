@@ -1,5 +1,5 @@
 var fs = require('fs');
-var pathLib = require('path');
+var nodePath = require('path');
 
 var gimlet = module.exports = {
   init: function() {
@@ -107,13 +107,13 @@ var index = {
 
   addFile: function(path) {
     var index = this.get();
-    index[path] = hash(fs.readFileSync(pathLib.join(getRepoDir(), path), "utf8"));
+    index[path] = hash(fs.readFileSync(nodePath.join(getRepoDir(), path), "utf8"));
     gimlet.hash_object(path, { w: true });
     this.set(index);
   },
 
   get: function() {
-    return fs.readFileSync(pathLib.join(getGimletDir(), "index"), "utf8")
+    return fs.readFileSync(nodePath.join(getGimletDir(), "index"), "utf8")
       .split("\n")
       .slice(0, -1) // chuck last empty line
       .reduce(function(index, blobStr) {
@@ -128,7 +128,7 @@ var index = {
         .map(function(path) { return path + " " + index[path]; })
         .join("\n")
         .concat("\n"); // trailing new line
-    fs.writeFileSync(pathLib.join(getGimletDir(), "index"), indexStr);
+    fs.writeFileSync(nodePath.join(getGimletDir(), "index"), indexStr);
   },
 
   getWorkingCopyFilesFrom: function(path) {
@@ -139,7 +139,7 @@ var index = {
     } else if (fs.statSync(path).isDirectory()) {
       var self = this;
       return fs.readdirSync(path).reduce(function(files, dirChild) {
-        return files.concat(self.getWorkingCopyFilesFrom(pathLib.join(path, dirChild)));
+        return files.concat(self.getWorkingCopyFilesFrom(nodePath.join(path, dirChild)));
       }, []);
     }
   },
@@ -154,7 +154,7 @@ var index = {
           addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
                         subPathParts.slice(1));
         }
-      })(tree, wholePath.split(pathLib.sep));
+      })(tree, wholePath.split(nodePath.sep));
     });
 
     return tree;
@@ -178,13 +178,13 @@ var objectDatabase = {
   writeObject: function(content) {
     var contentHash = hash(content);
     if (this.readObject(contentHash) === undefined) {
-      var filePath = pathLib.join(getGimletDir(), "objects", contentHash);
+      var filePath = nodePath.join(getGimletDir(), "objects", contentHash);
       fs.writeFileSync(filePath, content);
     }
   },
 
   readObject: function(objectHash) {
-    var objectPath = pathLib.join(getGimletDir(), "objects", objectHash);
+    var objectPath = nodePath.join(getGimletDir(), "objects", objectHash);
     if (fs.existsSync(objectPath)) {
       return fs.readFileSync(objectPath, "utf8");
     }
@@ -205,18 +205,18 @@ var getGimletDir = function(dir) {
   if (dir === undefined) { return getGimletDir(process.cwd()); }
 
   if (fs.existsSync(dir)) {
-    var gimletDir = pathLib.join(dir, ".gimlet");
+    var gimletDir = nodePath.join(dir, ".gimlet");
     if (fs.existsSync(gimletDir)) {
       return gimletDir;
     } else if (dir !== "/") {
-      return getGimletDir(pathLib.join(dir, ".."));
+      return getGimletDir(nodePath.join(dir, ".."));
     }
   }
 };
 
 var getRepoDir = function() {
   if (getGimletDir() !== undefined) {
-    return pathLib.join(getGimletDir(), "..")
+    return nodePath.join(getGimletDir(), "..")
   }
 };
 
@@ -231,7 +231,7 @@ var assertInRepo = function() {
 };
 
 var pathFromRepoRoot = function(path) {
-  return pathLib.relative(getRepoDir(), pathLib.join(process.cwd(), path));
+  return nodePath.relative(getRepoDir(), nodePath.join(process.cwd(), path));
 };
 
 var util = {
@@ -248,7 +248,7 @@ var createFilesFromTree = function(structure, prefix) {
   if (prefix === undefined) { return createFilesFromTree(structure, process.cwd()); }
 
   Object.keys(structure).forEach(function(name) {
-    var path = pathLib.join(prefix, name);
+    var path = nodePath.join(prefix, name);
     if (util.isString(structure[name])) {
       fs.writeFileSync(path, structure[name]);
     } else {
