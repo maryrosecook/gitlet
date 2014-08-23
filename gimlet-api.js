@@ -103,6 +103,10 @@ var gimlet = module.exports = {
   commit: function() {
     directory.assertInRepo();
 
+    if (Object.keys(index.get()).length === 0) {
+      throw "# On branch master\n#\n# Initial commit\n#\n" +
+        "nothing to commit (create/copy files and use 'git add' to track)";
+    }
   }
 };
 

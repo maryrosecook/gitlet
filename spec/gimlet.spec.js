@@ -415,6 +415,14 @@ describe('gimlet', function() {
       expect(function() { g.commit(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
+
+    it('should throw and explain how to stage if index empty', function() {
+      expect(function() {
+        g.init();
+        g.commit();
+      }).toThrow("# On branch master\n#\n# Initial commit\n#\n" +
+                 "nothing to commit (create/copy files and use 'git add' to track)");
+    });
   });
 });
 
