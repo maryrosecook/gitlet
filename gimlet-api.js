@@ -98,6 +98,11 @@ var gimlet = module.exports = {
   write_tree: function() {
     directory.assertInRepo();
     return objectDatabase.writeTree(index.toTree());
+  },
+
+  commit: function() {
+    directory.assertInRepo();
+
   }
 };
 

@@ -409,6 +409,13 @@ describe('gimlet', function() {
       expect(g.write_tree()).toEqual("a");
     });
   });
+
+  describe('commit', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.commit(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {
