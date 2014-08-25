@@ -424,6 +424,13 @@ describe('gimlet', function() {
                  "nothing to commit (create/copy files and use 'git add' to track)");
     });
   });
+
+  describe('branch', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.branch(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {
