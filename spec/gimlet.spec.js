@@ -277,7 +277,7 @@ describe('gimlet', function() {
 
   describe('ls-files', function() {
     it('should throw if not in repo', function() {
-      expect(function() { g.update_index(); })
+      expect(function() { g.ls_files(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
 
