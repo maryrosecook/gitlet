@@ -111,6 +111,12 @@ var gimlet = module.exports = {
 
   branch: function(name) {
     directory.assertInRepo();
+  },
+
+  show_ref: function(name) {
+    directory.assertInRepo();
+
+
   }
 };
 

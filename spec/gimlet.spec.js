@@ -431,6 +431,12 @@ describe('gimlet', function() {
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
   });
+  describe('show-ref', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.show_ref(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+  });
 });
 
 var rmdirSyncRecursive = function(dir) {
