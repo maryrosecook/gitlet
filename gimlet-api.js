@@ -116,6 +116,10 @@ var gimlet = module.exports = {
   show_ref: function(name) {
     directory.assertInRepo();
 
+  },
+
+  update_ref: function(refPath, hash) {
+    directory.assertInRepo();
 
   }
 };
