@@ -123,9 +123,17 @@ var gimlet = module.exports = {
 
     if (!util.isString(ref1) || !util.isString(ref2)) {
       throw "usage: see documentation"
+    } else if (!refs.isValid(ref1)) {
+      throw "fatal: Cannot lock the ref " + ref1 + ".";
 
     }
   }
+};
+
+var refs = {
+  isValid: function(ref) {
+    return ref === "HEAD" || ref.match("refs/heads/[A-Za-z-]+");
+  },
 };
 
 var index = {

@@ -461,6 +461,20 @@ describe('gimlet', function() {
       expect(function() { g.update_ref(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
+
+    it('should throw if try to update ref that is not in refs/heads/', function() {
+      g.init();
+      expect(function() { g.update_ref("/", ""); }).toThrow("fatal: Cannot lock the ref /.");
+      expect(function() { g.update_ref("refs/", ""); })
+        .toThrow("fatal: Cannot lock the ref refs/.");
+      expect(function() { g.update_ref("refs/heads", ""); })
+        .toThrow("fatal: Cannot lock the ref refs/heads.");
+      expect(function() { g.update_ref("refs/heads/", ""); })
+        .toThrow("fatal: Cannot lock the ref refs/heads/.");
+      expect(function() { g.update_ref("../woo", ""); })
+        .toThrow("fatal: Cannot lock the ref ../woo.");
+    });
+
     it('should throw if do not supply two strings', function() {
       g.init();
       expect(function() { g.update_ref(); }).toThrow("usage: see documentation");
