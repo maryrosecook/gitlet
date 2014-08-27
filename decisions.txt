@@ -6,6 +6,7 @@
 * prob no support for wildcard paths in git add
 * do not support --remove for update-index so no mention of it when trying to update-index w non existent path
 * assume all things inside repos are dirs or files
+* artificially lock refs creation to HEAD and refs/heads/[whatever] - otherwise have to protect other files and deal with different messages for eg overwriting dirs vs trying to overwrite files like index that git relies on
 
 todo
 * cd back to repo root for all commands
