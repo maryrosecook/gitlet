@@ -437,12 +437,34 @@ describe('gimlet', function() {
       expect(function() { g.show_ref(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
+
+    it('should return undefined if no master created', function() {
+      g.init();
+      expect(g.show_ref()).toBeUndefined();
+    });
+
+    it('should return undefined if ask about head', function() {
+      g.init();
+      expect(g.show_ref("HEAD")).toBeUndefined();
+    });
   });
 
   describe('update-ref', function() {
     it('should throw if not in repo', function() {
       expect(function() { g.update_ref(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+  });
+
+  describe('update-ref', function() {
+    it('should throw if not in repo', function() {
+      expect(function() { g.update_ref(); })
+        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+    });
+    it('should throw if do not supply two strings', function() {
+      g.init();
+      expect(function() { g.update_ref(); }).toThrow("usage: see documentation");
+      expect(function() { g.update_ref(""); }).toThrow("usage: see documentation");
     });
   });
 });

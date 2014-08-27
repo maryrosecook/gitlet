@@ -118,9 +118,13 @@ var gimlet = module.exports = {
 
   },
 
-  update_ref: function(refPath, hash) {
+  update_ref: function(ref1, ref2) {
     directory.assertInRepo();
 
+    if (!util.isString(ref1) || !util.isString(ref2)) {
+      throw "usage: see documentation"
+
+    }
   }
 };
 
