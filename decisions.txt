@@ -7,11 +7,10 @@
 * do not support --remove for update-index so no mention of it when trying to update-index w non existent path
 * assume all things inside repos are dirs or files
 * artificially lock refs creation to HEAD and refs/heads/[whatever] - otherwise have to protect other files and deal with different messages for eg overwriting dirs vs trying to overwrite files like index that git relies on
-
-* support update-ref for head
-* error: Trying to write non-commit object 61780798228d17af2d34fce4cfbdf35556832472 to branch refs/heads/master
+* do not support hash abreviations
 
 todo
 * cd back to repo root for all commands
+* support update-ref for HEAD (will need to change update-ref code so that ref1 is rerefed to branch ref) (will need to mention )
 * sort out which unexpected results to throw for and which to just print for: error, fatal, or just message (eg commit when nothing to commit)
 * support detached head
