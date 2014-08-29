@@ -139,6 +139,15 @@ var refs = {
       return "refs/heads/" + ref;
     }
   },
+
+  toHash: function(ref) {
+    if (this.toFinalRef(ref) !== undefined) {
+      var path = nodePath.join(directory.gimlet(), this.toFinalRef(ref));
+      if (fs.existsSync(path)) {
+        return fs.readFileSync(path, "utf8");
+      }
+    }
+  },
 };
 
 var index = {
