@@ -129,6 +129,16 @@ var refs = {
   isValid: function(ref) {
     return ref === "HEAD" || ref.match("refs/heads/[A-Za-z-]+");
   },
+
+  toFinalRef: function(ref) {
+    if (ref === "HEAD") {
+      return this.toFinalRef(fs.readFileSync(nodePath.join(directory.gimlet(), ref)));
+    } else if (ref.match("refs/heads/[A-Za-z-]+")) {
+      return ref;
+    } else {
+      return "refs/heads/" + ref;
+    }
+  },
 };
 
 var index = {
