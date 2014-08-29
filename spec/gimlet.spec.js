@@ -462,6 +462,26 @@ describe('gimlet', function() {
       expect(function() { g.update_ref("refs/heads/master", "123"); })
         .toThrow("fatal: 123: not a valid SHA1");
     });
+
+    it('should throw if try to update HEAD to hash that is not a commit', function() {
+      g.init();
+      fs.writeFileSync("a", "a");
+      var hash = g.hash_object("a", { w: true });
+      expect(function() { g.update_ref("HEAD", hash); })
+        .toThrow("error: Trying to write non-commit object " + hash +
+                 " to branch refs/heads/master\n" +
+                 "fatal: Cannot update the ref HEAD");
+    });
+
+    it('should throw if try to update master to hash that is not a commit', function() {
+      g.init();
+      fs.writeFileSync("a", "a");
+      var hash = g.hash_object("a", { w: true });
+      expect(function() { g.update_ref("refs/heads/master", hash); })
+        .toThrow("error: Trying to write non-commit object " + hash +
+                 " to branch refs/heads/master\n" +
+                 "fatal: Cannot update the ref refs/heads/master");
+    });
   });
 });
 

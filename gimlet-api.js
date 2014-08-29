@@ -122,8 +122,13 @@ var gimlet = module.exports = {
       throw "fatal: Cannot lock the ref " + ref1 + ".";
     } else {
       var hash = refs.toHash(ref2);
-      if (hash === undefined) {
+      var objectContent = objectDatabase.readObject(hash);
+      if (objectContent === undefined) {
         throw "fatal: " + ref2 + ": not a valid SHA1";
+      } else if (!(objectDatabase.parseObject(objectContent) instanceof Commit)) {
+        throw "error: Trying to write non-commit object " + hash + " to branch " +
+          refs.toFinalRef(ref1) + "\n" +
+          "fatal: Cannot update the ref " + ref1;
       }
     }
   }
@@ -136,7 +141,10 @@ var refs = {
 
   toFinalRef: function(ref) {
     if (ref === "HEAD") {
-      return this.toFinalRef(fs.readFileSync(nodePath.join(directory.gimlet(), ref)));
+      var headContent = fs.readFileSync(nodePath.join(directory.gimlet(), ref))
+          .toString()
+          .match("ref: (refs/heads/.+)")[1];
+      return this.toFinalRef(headContent);
     } else if (ref.match("refs/heads/[A-Za-z-]+")) {
       return ref;
     } else {
@@ -145,7 +153,9 @@ var refs = {
   },
 
   toHash: function(ref) {
-    if (this.toFinalRef(ref) !== undefined) {
+    if (!this.isValid(ref)) {
+      return ref;
+    } else if (this.toFinalRef(ref) !== undefined) {
       var path = nodePath.join(directory.gimlet(), this.toFinalRef(ref));
       if (fs.existsSync(path)) {
         return fs.readFileSync(path, "utf8");
@@ -242,6 +252,17 @@ var objectDatabase = {
     if (fs.existsSync(objectPath)) {
       return fs.readFileSync(objectPath, "utf8");
     }
+  },
+
+  parseObject: function(content) {
+    var firstToken = content.split(" ")[0];
+    if (firstToken === "commit") {
+      return new Commit(content);
+    } else if (firstToken === "tree" || firstToken === "blob") {
+      return new Tree(content);
+    } else {
+      return new Blob(content);
+    }
   }
 };
 
@@ -288,6 +309,23 @@ var directory = {
   pathFromRepoRoot: function(path) {
     return nodePath.relative(this.repo(), nodePath.join(process.cwd(), path));
   }
+};
+
+var Commit = function(content) {
+  this.type = "commit";
+  this.hash = content.split(" ")[1];
+  this.date = new Date(content.split("\n")[1].split(" ")[1]);
+  this.message = content.split("\n")[3].split(" ")[1];
+};
+
+var Tree = function(content) {
+  this.type = "tree";
+  this.entries = content.split("\n") // may need to break this up further
+};
+
+var Blob = function(content) {
+  this.type = "blob";
+  this.content = content;
 };
 
 var util = {
