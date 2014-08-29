@@ -120,7 +120,11 @@ var gimlet = module.exports = {
       throw "usage: see documentation"
     } else if (!refs.isValid(ref1)) {
       throw "fatal: Cannot lock the ref " + ref1 + ".";
-
+    } else {
+      var hash = refs.toHash(ref2);
+      if (hash === undefined) {
+        throw "fatal: " + ref2 + ": not a valid SHA1";
+      }
     }
   }
 };

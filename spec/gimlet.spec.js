@@ -456,6 +456,12 @@ describe('gimlet', function() {
       expect(function() { g.update_ref(); }).toThrow("usage: see documentation");
       expect(function() { g.update_ref(""); }).toThrow("usage: see documentation");
     });
+
+    it('should throw if ref2 is a hash that is not in the db', function() {
+      g.init();
+      expect(function() { g.update_ref("refs/heads/master", "123"); })
+        .toThrow("fatal: 123: not a valid SHA1");
+    });
   });
 });
 
