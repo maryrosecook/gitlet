@@ -162,6 +162,12 @@ var refs = {
       }
     }
   },
+
+  set: function(ref, hash) {
+    if (ref.match("refs/heads/[A-Za-z-]+")) {
+      fs.writeFile(nodePath.join(directory.gimlet(), ref), hash);
+    }
+  }
 };
 
 var index = {
