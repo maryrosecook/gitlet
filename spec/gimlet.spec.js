@@ -471,6 +471,21 @@ describe('gimlet', function() {
       expect(commitFileLines2[3]).toEqual("    second");
     });
 
+    it('should point current branch at subsequent commits', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3a":
+                                     { "filed": "filed", "filee": "filee"}, "3b":
+                                     { "filef": "filef", "fileg": "fileg"}}}});
+      g.add("1/2/3a");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
+
+      g.add("1/2/3b");
+      g.commit({ m: "second", date: new Date(1409404605356) });
+      expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("16f3a11f");
+    });
+
     it('should create commit without passing date', function() {
       g.init();
       createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
