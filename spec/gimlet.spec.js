@@ -450,6 +450,27 @@ describe('gimlet', function() {
       g.commit({ m: "first", date: new Date(1409404605356) });
       expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("1ff21fcc");
     });
+
+    it('should record subsequent commit object', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3a":
+                                     { "filed": "filed", "filee": "filee"}, "3b":
+                                     { "filef": "filef", "fileg": "fileg"}}}});
+      g.add("1/2/3a");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      g.add("1/2/3b");
+      g.commit({ m: "second", date: new Date(1409404605356) });
+
+      var commitFileLines1 = fs.readFileSync(".gimlet/objects/343b3d02", "utf8").split("\n");
+      expect(commitFileLines1[0]).toEqual("commit 59431df");
+      expect(commitFileLines1[3]).toEqual("    first");
+
+      var commitFileLines2 = fs.readFileSync(".gimlet/objects/16f3a11f", "utf8").split("\n");
+      expect(commitFileLines2[0]).toEqual("commit 53d8eab5");
+      expect(commitFileLines2[3]).toEqual("    second");
+    });
+
     it('should create commit without passing date', function() {
       g.init();
       createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
