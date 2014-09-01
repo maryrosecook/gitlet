@@ -440,6 +440,27 @@ describe('gimlet', function() {
       expect(commitFile.split("\n")[2]).toEqual("");
       expect(commitFile.split("\n")[3]).toEqual("    first");
     });
+
+    it('should create commit without passing date', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
+      g.add("1");
+      g.commit({ m: "first" });
+
+      fs.readdirSync(".gimlet/objects/").forEach(function(filename) {
+        var contents = fs.readFileSync(pathLib.join(".gimlet/objects", filename)).toString();
+        if (contents.split(" ")[0] === "commit") {
+          var lines = contents.split("\n");
+
+          var dateStr = lines[1].split(" ").slice(1).join(" ");
+          expect(new Date(dateStr).getFullYear() > 2013).toEqual(true);
+
+          expect(lines[2]).toEqual("");
+          expect(lines[3]).toEqual("    first");
+        }
+      });
+    });
+
   });
 
   describe('branch', function() {
