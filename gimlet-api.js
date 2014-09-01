@@ -115,7 +115,7 @@ var gimlet = module.exports = {
           "nothing to commit, working directory clean";
       } else {
         var commmitHash = objectDatabase.writeCommit(treeHash, opts.m, opts.date);
-        refs.set(refs.toFinalRef("HEAD"), commmitHash);
+        this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
       }
     }
@@ -141,6 +141,8 @@ var gimlet = module.exports = {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toFinalRef(ref1) + "\n" +
           "fatal: Cannot update the ref " + ref1;
+      } else {
+        refs.set(refs.toFinalRef(ref1), hash);
       }
     }
   }
@@ -186,7 +188,7 @@ var refs = {
 
   set: function(ref, hash) {
     if (ref.match("refs/heads/[A-Za-z-]+")) {
-      fs.writeFile(nodePath.join(directory.gimlet(), ref), hash);
+      fs.writeFileSync(nodePath.join(directory.gimlet(), ref), hash);
     }
   }
 };

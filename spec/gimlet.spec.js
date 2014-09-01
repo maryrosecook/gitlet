@@ -441,6 +441,15 @@ describe('gimlet', function() {
       expect(commitFile.split("\n")[3]).toEqual("    first");
     });
 
+    it('should point current branch at commit when committing', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3":
+                                     { "filed": "filed", "filee": "filee"}}}});
+      g.add("1");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("1ff21fcc");
+    });
     it('should create commit without passing date', function() {
       g.init();
       createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
