@@ -14,3 +14,6 @@ todo
 * cd back to repo root for all commands
 * sort out which unexpected results to throw for and which to just print for: error, fatal, or just message (eg commit when nothing to commit)
 * support detached head
+* test committing when other branch checked out
+* remove ls_files? - not used
+* remove some non-demonstrative error handling to reduce line count
