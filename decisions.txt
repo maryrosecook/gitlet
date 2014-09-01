@@ -8,6 +8,7 @@
 * assume all things inside repos are dirs or files
 * artificially lock refs creation to HEAD and refs/heads/[whatever] - otherwise have to protect other files and deal with different messages for eg overwriting dirs vs trying to overwrite files like index that git relies on
 * do not support hash abreviations
+* no diffing so no summory of changes on commit
 
 todo
 * cd back to repo root for all commands
