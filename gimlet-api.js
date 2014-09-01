@@ -134,6 +134,15 @@ var gimlet = module.exports = {
   }
 };
 
+var head = {
+  currentBranchName: function() {
+    var content = fs.readFileSync(nodePath.join(directory.gimlet(), "HEAD"), "utf8");
+    if (content.match(/ref:/)) {
+      return content.match("ref: refs/heads/(.+)");
+    }
+  }
+};
+
 var refs = {
   isValid: function(ref) {
     return ref === "HEAD" || ref.match("refs/heads/[A-Za-z-]+");
