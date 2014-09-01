@@ -424,7 +424,7 @@ describe('gimlet', function() {
                  "nothing to commit (create/copy files and use 'git add' to track)");
     });
 
-    it('should allow initial commiting of several staged folders and files', function() {
+    it('should create commit file when initially commiting', function() {
       g.init();
       var date = new Date(1409404605356);
       createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
