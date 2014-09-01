@@ -74,7 +74,7 @@ var gimlet = module.exports = {
       } else {
         var fileContents = fs.readFileSync(file, "utf8");
         if (opts.w) {
-          objectDatabase.writeObject(fileContents);
+          return objectDatabase.writeObject(fileContents);
         }
 
         return hash(fileContents);
@@ -235,8 +235,7 @@ var objectDatabase = {
       }
     }).join("\n") + "\n";
 
-    this.writeObject(treeObject);
-    return hash(treeObject);
+    return this.writeObject(treeObject);
   },
 
   writeObject: function(content) {
@@ -245,6 +244,8 @@ var objectDatabase = {
       var filePath = nodePath.join(directory.gimlet(), "objects", contentHash);
       fs.writeFileSync(filePath, content);
     }
+
+    return contentHash;
   },
 
   readObject: function(objectHash) {
