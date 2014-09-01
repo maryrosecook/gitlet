@@ -100,12 +100,24 @@ var gimlet = module.exports = {
     return objectDatabase.writeTree(index.toTree());
   },
 
-  commit: function() {
+  commit: function(opts) {
     directory.assertInRepo();
 
     if (Object.keys(index.get()).length === 0) {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
+    } else {
+      var treeHash = this.write_tree();
+
+      if (refs.toHash("HEAD") !== undefined &&
+          treeHash === objectDatabase.parseObject(refs.toHash("HEAD")).hash) {
+        throw "# On " + head.currentBranchName() + "\n" +
+          "nothing to commit, working directory clean";
+      } else {
+        var commmitHash = objectDatabase.writeCommit(treeHash, opts.m, opts.date);
+        refs.set(refs.toFinalRef("HEAD"), commmitHash);
+        return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
+      }
     }
   },
 
@@ -251,6 +263,14 @@ var objectDatabase = {
     }).join("\n") + "\n";
 
     return this.writeObject(treeObject);
+  },
+
+  writeCommit: function(treeHash, message, date) {
+    date = date || new Date();
+    return this.writeObject("commit " + treeHash + "\n" +
+                            "Date:  " + date.toString() + "\n" +
+                            "\n" +
+                            "    " + message);
   },
 
   writeObject: function(content) {

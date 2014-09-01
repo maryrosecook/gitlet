@@ -423,6 +423,23 @@ describe('gimlet', function() {
       }).toThrow("# On branch master\n#\n# Initial commit\n#\n" +
                  "nothing to commit (create/copy files and use 'git add' to track)");
     });
+
+    it('should allow initial commiting of several staged folders and files', function() {
+      g.init();
+      var date = new Date(1409404605356);
+      createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                   { "filec": "filec", "3":
+                                     { "filed": "filed", "filee": "filee"}}}});
+      g.add("1");
+      g.commit({ m: "first", date: date });
+
+      var commitFile = fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8");
+      expect(commitFile.split("\n")[0]).toEqual("commit 7afc965a");
+      expect(commitFile.split("\n")[1])
+        .toEqual("Date:  Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)");
+      expect(commitFile.split("\n")[2]).toEqual("");
+      expect(commitFile.split("\n")[3]).toEqual("    first");
+    });
   });
 
   describe('branch', function() {
