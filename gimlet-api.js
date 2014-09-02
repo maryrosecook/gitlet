@@ -3,7 +3,7 @@ var nodePath = require('path');
 
 var gimlet = module.exports = {
   init: function() {
-    if (directory.inRepo()) { return; }
+    if (fileSystem.inRepo()) { return; }
 
     createFilesFromTree({
       ".gimlet": {
@@ -25,12 +25,12 @@ var gimlet = module.exports = {
   },
 
   add: function(path) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
 
     if (util.isString(path)) {
       var files = index.getWorkingCopyFilesFrom(path);
       if (files.length === 0) {
-        throw "fatal: pathspec '" + directory.pathFromRepoRoot(path) +
+        throw "fatal: pathspec '" + fileSystem.pathFromRepoRoot(path) +
           "' did not match any files";
       } else {
         for (var i = 0; i < files.length; i++) {
@@ -43,11 +43,11 @@ var gimlet = module.exports = {
   },
 
   update_index: function(path, opts) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
     opts = opts || {};
 
     if (util.isString(path)) {
-      var pathFromRoot = directory.pathFromRepoRoot(path)
+      var pathFromRoot = fileSystem.pathFromRepoRoot(path)
       if (!fs.existsSync(path)) {
         throw "error: " + pathFromRoot + ": does not exist\n" +
           "fatal: Unable to process path " + pathFromRoot;
@@ -65,7 +65,7 @@ var gimlet = module.exports = {
   },
 
   hash_object: function(file, opts) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
     opts = opts || {};
 
     if (file !== undefined) {
@@ -83,7 +83,7 @@ var gimlet = module.exports = {
   },
 
   ls_files: function(opts) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
     opts = opts || {};
 
     var indexObjs = index.get();
@@ -96,12 +96,12 @@ var gimlet = module.exports = {
   },
 
   write_tree: function() {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
     return objectDatabase.writeTree(index.toTree());
   },
 
   commit: function(opts) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
 
     if (Object.keys(index.get()).length === 0) {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
@@ -122,7 +122,7 @@ var gimlet = module.exports = {
   },
 
   branch: function(name) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
 
     if (name === undefined) {
       return refs.localHeads().map(function(branchName) {
@@ -137,7 +137,7 @@ var gimlet = module.exports = {
   },
 
   update_ref: function(ref1, ref2) {
-    directory.assertInRepo();
+    fileSystem.assertInRepo();
 
     if (!util.isString(ref1) || !util.isString(ref2)) {
       throw "usage: see documentation"
@@ -161,7 +161,7 @@ var gimlet = module.exports = {
 
 var head = {
   currentBranchName: function() {
-    var content = fs.readFileSync(nodePath.join(directory.gimlet(), "HEAD"), "utf8");
+    var content = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), "HEAD"), "utf8");
     if (content.match(/ref:/)) {
       return content.match("ref: refs/heads/(.+)")[1];
     }
@@ -175,7 +175,7 @@ var refs = {
 
   toFinalRef: function(ref) {
     if (ref === "HEAD") {
-      var headContent = fs.readFileSync(nodePath.join(directory.gimlet(), ref))
+      var headContent = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref))
           .toString()
           .match("ref: (refs/heads/.+)")[1];
       return this.toFinalRef(headContent);
@@ -190,7 +190,7 @@ var refs = {
     if (!this.isValid(ref)) {
       return ref;
     } else if (this.toFinalRef(ref) !== undefined) {
-      var path = nodePath.join(directory.gimlet(), this.toFinalRef(ref));
+      var path = nodePath.join(fileSystem.gimletDir(), this.toFinalRef(ref));
       if (fs.existsSync(path)) {
         return fs.readFileSync(path, "utf8");
       }
@@ -199,12 +199,12 @@ var refs = {
 
   set: function(ref, hash) {
     if (ref.match("refs/heads/[A-Za-z-]+")) {
-      fs.writeFileSync(nodePath.join(directory.gimlet(), ref), hash);
+      fs.writeFileSync(nodePath.join(fileSystem.gimletDir(), ref), hash);
     }
   },
 
   localHeads: function() {
-    return fs.readdirSync(nodePath.join(directory.gimlet(), "refs/heads/"));
+    return fs.readdirSync(nodePath.join(fileSystem.gimletDir(), "refs/heads/"));
   }
 };
 
@@ -215,13 +215,13 @@ var index = {
 
   addFile: function(path) {
     var index = this.get();
-    index[path] = hash(fs.readFileSync(nodePath.join(directory.repo(), path), "utf8"));
+    index[path] = hash(fs.readFileSync(nodePath.join(fileSystem.repoDir(), path), "utf8"));
     gimlet.hash_object(path, { w: true });
     this.set(index);
   },
 
   get: function() {
-    return fs.readFileSync(nodePath.join(directory.gimlet(), "index"), "utf8")
+    return fs.readFileSync(nodePath.join(fileSystem.gimletDir(), "index"), "utf8")
       .split("\n")
       .slice(0, -1) // chuck last empty line
       .reduce(function(index, blobStr) {
@@ -236,7 +236,7 @@ var index = {
         .map(function(path) { return path + " " + index[path]; })
         .join("\n")
         .concat("\n"); // trailing new line
-    fs.writeFileSync(nodePath.join(directory.gimlet(), "index"), indexStr);
+    fs.writeFileSync(nodePath.join(fileSystem.gimletDir(), "index"), indexStr);
   },
 
   getWorkingCopyFilesFrom: function(path) {
@@ -293,7 +293,7 @@ var objectDatabase = {
   writeObject: function(content) {
     var contentHash = hash(content);
     if (this.readObject(contentHash) === undefined) {
-      var filePath = nodePath.join(directory.gimlet(), "objects", contentHash);
+      var filePath = nodePath.join(fileSystem.gimletDir(), "objects", contentHash);
       fs.writeFileSync(filePath, content);
     }
 
@@ -301,7 +301,7 @@ var objectDatabase = {
   },
 
   readObject: function(objectHash) {
-    var objectPath = nodePath.join(directory.gimlet(), "objects", objectHash);
+    var objectPath = nodePath.join(fileSystem.gimletDir(), "objects", objectHash);
     if (fs.existsSync(objectPath)) {
       return fs.readFileSync(objectPath, "utf8");
     }
@@ -329,28 +329,28 @@ function hash(string) {
   return Math.abs(hashInt).toString(16);
 };
 
-var directory = {
-  gimlet: function(dir) {
-    if (dir === undefined) { return this.gimlet(process.cwd()); }
+var fileSystem = {
+  gimletDir: function(dir) {
+    if (dir === undefined) { return this.gimletDir(process.cwd()); }
 
     if (fs.existsSync(dir)) {
       var potentialGimletDir = nodePath.join(dir, ".gimlet");
       if (fs.existsSync(potentialGimletDir)) {
         return potentialGimletDir;
       } else if (dir !== "/") {
-        return this.gimlet(nodePath.join(dir, ".."));
+        return this.gimletDir(nodePath.join(dir, ".."));
       }
     }
   },
 
-  repo: function() {
-    if (this.gimlet() !== undefined) {
-      return nodePath.join(this.gimlet(), "..")
+  repoDir: function() {
+    if (this.gimletDir() !== undefined) {
+      return nodePath.join(this.gimletDir(), "..")
     }
   },
 
   inRepo: function(cwd) {
-    return this.gimlet(cwd) !== undefined;
+    return this.gimletDir(cwd) !== undefined;
   },
 
   assertInRepo: function() {
@@ -360,7 +360,7 @@ var directory = {
   },
 
   pathFromRepoRoot: function(path) {
-    return nodePath.relative(this.repo(), nodePath.join(process.cwd(), path));
+    return nodePath.relative(this.repoDir(), nodePath.join(process.cwd(), path));
   }
 };
 
