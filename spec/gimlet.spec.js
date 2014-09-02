@@ -529,6 +529,25 @@ describe('gimlet', function() {
         .toThrow("fatal: Not a valid object name: 'master'.");
     });
 
+    it('should create new branch pointed at HEAD when call branch w branch name', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea"}});
+      g.add("1/filea");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      g.branch("woo");
+      expectFile(".gimlet/refs/heads/woo", "48946d55");
+    });
+
+    it('should should leave master pointed at orig hash after branching', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea"}});
+      g.add("1/filea");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      expectFile(".gimlet/refs/heads/master", "48946d55");
+      g.branch("woo");
+      expectFile(".gimlet/refs/heads/master", "48946d55");
+    });
+
     it('should return list of branches when called with no args', function() {
       g.init();
       createFilesFromTree({ "1": { "filea": "filea"}});
