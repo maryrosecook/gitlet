@@ -123,6 +123,10 @@ var gimlet = module.exports = {
 
   branch: function(name) {
     directory.assertInRepo();
+
+    if (refs.toHash("HEAD") === undefined) {
+      throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
+    }
   },
 
   update_ref: function(ref1, ref2) {
@@ -152,7 +156,7 @@ var head = {
   currentBranchName: function() {
     var content = fs.readFileSync(nodePath.join(directory.gimlet(), "HEAD"), "utf8");
     if (content.match(/ref:/)) {
-      return content.match("ref: refs/heads/(.+)");
+      return content.match("ref: refs/heads/(.+)")[1];
     }
   }
 };

@@ -513,6 +513,12 @@ describe('gimlet', function() {
       expect(function() { g.branch(); })
         .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
     });
+
+    it('should throw if master has not been created', function() {
+      g.init();
+      expect(function() { g.branch("woo"); })
+        .toThrow("fatal: Not a valid object name: 'master'.");
+    });
   });
 
   describe('update-ref', function() {
