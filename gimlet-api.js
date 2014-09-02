@@ -232,7 +232,7 @@ var index = {
     if (!fs.existsSync(path)) {
       return [];
     } else if (fs.statSync(path).isFile()) {
-      return path;
+      return [path];
     } else if (fs.statSync(path).isDirectory()) {
       var self = this;
       return fs.readdirSync(path).reduce(function(files, dirChild) {

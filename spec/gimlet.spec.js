@@ -126,6 +126,15 @@ describe('gimlet', function() {
     });
 
     describe('adding files', function() {
+      it('should be able to add single file in sub dir', function() {
+        // regression test
+        g.init();
+        createFilesFromTree({ "1": { "filea": "filea" }});
+        g.add("1/filea");
+        expect(g.ls_files()[0]).toEqual("1/filea");
+        expect(g.ls_files().length).toEqual(1);
+      });
+
       it('should add all files in a large dir tree', function() {
         g.init();
         createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
