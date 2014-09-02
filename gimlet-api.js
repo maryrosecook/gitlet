@@ -319,7 +319,7 @@ var objectDatabase = {
   }
 };
 
-var hash = function(string) {
+function hash(string) {
   var hashInt = 0;
   for (var i = 0; i < string.length; i++) {
     hashInt = hashInt * 31 + string.charCodeAt(i);
@@ -364,19 +364,19 @@ var directory = {
   }
 };
 
-var Commit = function(content) {
+function Commit(content) {
   this.type = "commit";
   this.hash = content.split(" ")[1];
   this.date = new Date(content.split("\n")[1].split(" ")[1]);
   this.message = content.split("\n")[3].split(" ")[1];
 };
 
-var Tree = function(content) {
+function Tree(content) {
   this.type = "tree";
   this.entries = content.split("\n") // may need to break this up further
 };
 
-var Blob = function(content) {
+function Blob(content) {
   this.type = "blob";
   this.content = content;
 };
@@ -391,7 +391,7 @@ var util = {
   }
 };
 
-var createFilesFromTree = function(structure, prefix) {
+function createFilesFromTree(structure, prefix) {
   if (prefix === undefined) { return createFilesFromTree(structure, process.cwd()); }
 
   Object.keys(structure).forEach(function(name) {

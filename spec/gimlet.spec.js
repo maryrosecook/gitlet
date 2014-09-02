@@ -2,7 +2,7 @@ var fs = require('fs');
 var pathLib = require('path');
 var g = require('../gimlet-api');
 
-var expectFile = function(path, content) {
+function expectFile(path, content) {
   expect(fs.readFileSync(path, "utf8")).toEqual(content);
 };
 
@@ -20,7 +20,7 @@ describe('gimlet', function() {
   });
 
   describe('init', function() {
-    var expectGimletFilesAndDirectories = function() {
+    function expectGimletFilesAndDirectories() {
       expect(fs.existsSync(__dirname + "/tmp/.gimlet/hooks/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.gimlet/info/")).toEqual(true);
       expect(fs.existsSync(__dirname + "/tmp/.gimlet/logs/")).toEqual(true);
@@ -650,7 +650,7 @@ describe('gimlet', function() {
   });
 });
 
-var rmdirSyncRecursive = function(dir) {
+function rmdirSyncRecursive(dir) {
   fs.readdirSync(dir).forEach(function(fileName) {
     var filePath = pathLib.join(dir, fileName);
     if (fs.statSync(filePath).isDirectory()) {
@@ -663,7 +663,7 @@ var rmdirSyncRecursive = function(dir) {
   fs.rmdirSync(dir);
 };
 
-var createFilesFromTree = function(structure, prefix) {
+function createFilesFromTree(structure, prefix) {
   if (prefix === undefined) return createFilesFromTree(structure, process.cwd());
 
   Object.keys(structure).forEach(function(name) {
