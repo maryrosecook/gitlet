@@ -124,8 +124,15 @@ var gimlet = module.exports = {
   branch: function(name) {
     directory.assertInRepo();
 
-    if (refs.toHash("HEAD") === undefined) {
+    if (name === undefined) {
+      return refs.localHeads().map(function(branchName) {
+        var marker = branchName === head.currentBranchName() ? "* " : "  ";
+        return marker + branchName;
+      }).join("\n") + "\n";
+    } else if (refs.toHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
+    } else {
+      refs.set(refs.toFinalRef(name), refs.toHash("HEAD"));
     }
   },
 
@@ -194,6 +201,10 @@ var refs = {
     if (ref.match("refs/heads/[A-Za-z-]+")) {
       fs.writeFileSync(nodePath.join(directory.gimlet(), ref), hash);
     }
+  },
+
+  localHeads: function() {
+    return fs.readdirSync(nodePath.join(directory.gimlet(), "refs/heads/"));
   }
 };
 

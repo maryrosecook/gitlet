@@ -528,6 +528,16 @@ describe('gimlet', function() {
       expect(function() { g.branch("woo"); })
         .toThrow("fatal: Not a valid object name: 'master'.");
     });
+
+    it('should return list of branches when called with no args', function() {
+      g.init();
+      createFilesFromTree({ "1": { "filea": "filea"}});
+      g.add("1/filea");
+      g.commit({ m: "first", date: new Date(1409404605356) });
+      g.branch("woo");
+      g.branch("boo");
+      expect(g.branch()).toEqual("  boo\n* master\n  woo\n");
+    });
   });
 
   describe('update-ref', function() {
