@@ -18,3 +18,4 @@ todo
 * remove ls_files? - not used
 * remove some non-demonstrative error handling to reduce line count
 * rename directory. to workingCopy. or fileSystem. ?
+* rename pathLib in tests to nodePath
