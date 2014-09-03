@@ -5,7 +5,7 @@ var gimlet = module.exports = {
   init: function() {
     if (fileSystem.inRepo()) { return; }
 
-    createFilesFromTree({
+    util.createFilesFromTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
         index: "",
@@ -77,7 +77,7 @@ var gimlet = module.exports = {
           return objectDatabase.writeObject(fileContents);
         }
 
-        return hash(fileContents);
+        return util.hash(fileContents);
       }
     }
   },
@@ -202,7 +202,8 @@ var index = {
 
   addFile: function(path) {
     var index = this.get();
-    index[path] = hash(fs.readFileSync(nodePath.join(fileSystem.repoDir(), path), "utf8"));
+    index[path] = util.hash(fs.readFileSync(nodePath.join(fileSystem.repoDir(), path),
+                                            "utf8"));
     gimlet.hash_object(path, { w: true });
     this.set(index);
   },
@@ -260,7 +261,7 @@ var objectDatabase = {
   writeTree: function(tree) {
     var treeObject = Object.keys(tree).map(function(key) {
       if (util.isString(tree[key])) {
-        return "blob " + hash(tree[key]) + " " + key;
+        return "blob " + util.hash(tree[key]) + " " + key;
       } else {
         return "tree " + objectDatabase.writeTree(tree[key]) + " " + key;
       }
@@ -278,7 +279,7 @@ var objectDatabase = {
   },
 
   writeObject: function(content) {
-    var contentHash = hash(content);
+    var contentHash = util.hash(content);
     if (this.readObject(contentHash) === undefined) {
       var filePath = nodePath.join(fileSystem.gimletDir(), "objects", contentHash);
       fs.writeFileSync(filePath, content);
@@ -304,16 +305,6 @@ var objectDatabase = {
       return new Blob(content);
     }
   }
-};
-
-function hash(string) {
-  var hashInt = 0;
-  for (var i = 0; i < string.length; i++) {
-    hashInt = hashInt * 31 + string.charCodeAt(i);
-    hashInt = hashInt | 0;
-  }
-
-  return Math.abs(hashInt).toString(16);
 };
 
 var fileSystem = {
@@ -375,19 +366,29 @@ var util = {
 
   isString: function(thing) {
     return typeof thing === "string";
-  }
-};
+  },
 
-function createFilesFromTree(structure, prefix) {
-  if (prefix === undefined) { return createFilesFromTree(structure, process.cwd()); }
-
-  Object.keys(structure).forEach(function(name) {
-    var path = nodePath.join(prefix, name);
-    if (util.isString(structure[name])) {
-      fs.writeFileSync(path, structure[name]);
-    } else {
-      fs.mkdirSync(path, "777");
-      createFilesFromTree(structure[name], path);
+  hash: function(string) {
+    var hashInt = 0;
+    for (var i = 0; i < string.length; i++) {
+      hashInt = hashInt * 31 + string.charCodeAt(i);
+      hashInt = hashInt | 0;
     }
-  });
+
+    return Math.abs(hashInt).toString(16);
+  },
+
+  createFilesFromTree: function(structure, prefix) {
+    if (prefix === undefined) { return util.createFilesFromTree(structure, process.cwd()); }
+
+    Object.keys(structure).forEach(function(name) {
+      var path = nodePath.join(prefix, name);
+      if (util.isString(structure[name])) {
+        fs.writeFileSync(path, structure[name]);
+      } else {
+        fs.mkdirSync(path, "777");
+        util.createFilesFromTree(structure[name], path);
+      }
+    });
+  }
 };
