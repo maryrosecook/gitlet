@@ -8,7 +8,6 @@ describe('init', function() {
   function expectGimletFilesAndDirectories() {
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/objects/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/heads/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/origin/")).toEqual(true);
