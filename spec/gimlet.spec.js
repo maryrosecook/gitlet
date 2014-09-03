@@ -131,8 +131,8 @@ describe('gimlet', function() {
         g.init();
         createFilesFromTree({ "1": { "filea": "filea" }});
         g.add("1/filea");
-        expect(g.ls_files()[0]).toEqual("1/filea");
-        expect(g.ls_files().length).toEqual(1);
+        expect(index()[0].path).toEqual("1/filea");
+        expect(index().length).toEqual(1);
       });
 
       it('should add all files in a large dir tree', function() {
@@ -141,12 +141,12 @@ describe('gimlet', function() {
                                 { "filec": "filec", "3":
                                   { "filed": "filed", "filee": "filee"}}}});
         g.add("1");
-        expect(g.ls_files()[0]).toEqual("1/2/3/filed");
-        expect(g.ls_files()[1]).toEqual("1/2/3/filee");
-        expect(g.ls_files()[2]).toEqual("1/2/filec");
-        expect(g.ls_files()[3]).toEqual("1/filea");
-        expect(g.ls_files()[4]).toEqual("1/fileb");
-        expect(g.ls_files().length).toEqual(5);
+        expect(index()[0].path).toEqual("1/2/3/filed");
+        expect(index()[1].path).toEqual("1/2/3/filee");
+        expect(index()[2].path).toEqual("1/2/filec");
+        expect(index()[3].path).toEqual("1/filea");
+        expect(index()[4].path).toEqual("1/fileb");
+        expect(index().length).toEqual(5);
       });
 
       it('should add only files in specified subdir', function() {
@@ -155,10 +155,10 @@ describe('gimlet', function() {
                                 { "filec": "filec", "3":
                                   { "filed": "filed", "filee": "filee"}}}});
         g.add("1/2");
-        expect(g.ls_files()[0]).toEqual("1/2/3/filed");
-        expect(g.ls_files()[1]).toEqual("1/2/3/filee");
-        expect(g.ls_files()[2]).toEqual("1/2/filec");
-        expect(g.ls_files().length).toEqual(3);
+        expect(index()[0].path).toEqual("1/2/3/filed");
+        expect(index()[1].path).toEqual("1/2/3/filee");
+        expect(index()[2].path).toEqual("1/2/filec");
+        expect(index().length).toEqual(3);
       });
 
       it('should be able to add multiple sets of files', function() {
@@ -168,16 +168,16 @@ describe('gimlet', function() {
                                   { "filed": "filed", "filee": "filee"}, "3b":
                                   { "filef": "filef", "fileg": "fileg"}}}});
         g.add("1/2/3a");
-        expect(g.ls_files()[0]).toEqual("1/2/3a/filed");
-        expect(g.ls_files()[1]).toEqual("1/2/3a/filee");
-        expect(g.ls_files().length).toEqual(2);
+        expect(index()[0].path).toEqual("1/2/3a/filed");
+        expect(index()[1].path).toEqual("1/2/3a/filee");
+        expect(index().length).toEqual(2);
 
         g.add("1/2/3b");
-        expect(g.ls_files()[0]).toEqual("1/2/3a/filed");
-        expect(g.ls_files()[1]).toEqual("1/2/3a/filee");
-        expect(g.ls_files()[2]).toEqual("1/2/3b/filef");
-        expect(g.ls_files()[3]).toEqual("1/2/3b/fileg");
-        expect(g.ls_files().length).toEqual(4);
+        expect(index()[0].path).toEqual("1/2/3a/filed");
+        expect(index()[1].path).toEqual("1/2/3a/filee");
+        expect(index()[2].path).toEqual("1/2/3b/filef");
+        expect(index()[3].path).toEqual("1/2/3b/fileg");
+        expect(index().length).toEqual(4);
       });
     });
   });
@@ -227,7 +227,7 @@ describe('gimlet', function() {
         var readmeHash = g.hash_object("README.md");
         expectFile(pathLib.join(".gimlet/objects", readmeHash), "this is a readme");
 
-        expect(g.ls_files()[0]).toEqual("README.md");
+        expect(index()[0].path).toEqual("README.md");
       });
 
       it('should add file to index with stuff in it', function() {
@@ -241,8 +241,8 @@ describe('gimlet', function() {
         expectFile(pathLib.join(".gimlet/objects", g.hash_object("README2.md")),
                    "this is a readme2");
 
-        expect(g.ls_files()[0]).toEqual("README1.md");
-        expect(g.ls_files()[1]).toEqual("README2.md");
+        expect(index()[0].path).toEqual("README1.md");
+        expect(index()[1].path).toEqual("README2.md");
       });
 
       it('should throw if try to add new file w/o --add flag', function() {
@@ -262,74 +262,25 @@ describe('gimlet', function() {
         fs.writeFileSync("README.md", "this is a readme1");
 
         expectFile("README.md", "this is a readme1");
-        expect(g.ls_files({ stage: true })[0].split(" ")[1]).toEqual(origContentHash);
+        expect(index()[0].hash).toEqual(origContentHash);
       });
 
       it('should update file hash in index and add new obj if update file', function() {
         g.init();
         fs.writeFileSync("README.md", "this is a readme");
         g.update_index("README.md", { add: true });
-        expect(g.ls_files({ stage: true })[0].split(" ")[1])
+        expect(index()[0].hash)
           .toEqual(g.hash_object("README.md")); // sanity check hash added for first version
 
         // update file and update index again
         fs.writeFileSync("README.md", "this is a readme1");
         g.update_index("README.md");
 
-        var newVersionHash = g.ls_files({ stage: true })[0].split(" ")[1];
+        var newVersionHash = index()[0].hash;
 
         expectFile(pathLib.join(".gimlet/objects", newVersionHash), "this is a readme1");
         expect(newVersionHash).toEqual(g.hash_object("README.md"));
       });
-    });
-  });
-
-  describe('ls-files', function() {
-    it('should throw if not in repo', function() {
-      expect(function() { g.ls_files(); })
-        .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
-    });
-
-    it('should return no files if nothing in index', function() {
-      g.init();
-      expect(g.ls_files()).toEqual([]);
-    });
-
-    it('should return files in index', function() {
-      g.init();
-      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
-      g.update_index("README1.md", { add: true });
-      g.update_index("README2.md", { add: true });
-
-      expect(g.ls_files()[0]).toEqual("README1.md");
-      expect(g.ls_files()[1]).toEqual("README2.md");
-    });
-
-    it('should not return files not in index', function() {
-      g.init();
-      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
-      g.update_index("README1.md", { add: true });
-
-      expect(g.ls_files()[0]).toEqual("README1.md");
-      expect(g.ls_files().length).toEqual(1);
-    });
-
-    it('should include full path in returned entries', function() {
-      g.init();
-      createFilesFromTree({ "src": { "README1.md": "this is a readme1"}});
-      g.update_index("src/README1.md", { add: true });
-
-      expect(g.ls_files()[0]).toEqual("src/README1.md");
-    });
-
-    it('should return files with hashes if --stage passed', function() {
-      g.init();
-      createFilesFromTree({ "README1.md": "this is a readme1", "README2.md": "this is a readme2"});
-      g.update_index("README1.md", { add: true });
-      g.update_index("README2.md", { add: true });
-
-      expect(g.ls_files({stage: true})[0]).toEqual("README1.md " +g.hash_object("README1.md"));
-      expect(g.ls_files({stage: true})[1]).toEqual("README2.md " +g.hash_object("README2.md"));
     });
   });
 
@@ -675,4 +626,14 @@ function createFilesFromTree(structure, prefix) {
       createFilesFromTree(structure[name], path);
     }
   });
+};
+
+function index() {
+  return fs.readFileSync(".gimlet/index", "utf8")
+    .split("\n")
+    .slice(0, -1)
+    .map(function(blobStr) {
+      var blobData = blobStr.split(/ /);
+      return { path: blobData[0], hash: blobData[1] };
+    });
 };

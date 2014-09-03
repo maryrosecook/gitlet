@@ -82,19 +82,6 @@ var gimlet = module.exports = {
     }
   },
 
-  ls_files: function(opts) {
-    fileSystem.assertInRepo();
-    opts = opts || {};
-
-    var indexObjs = index.get();
-    if (opts.stage) {
-      return Object.keys(indexObjs)
-        .map(function(path) { return path + " " + indexObjs[path]; });
-    } else {
-      return Object.keys(indexObjs);
-    }
-  },
-
   write_tree: function() {
     fileSystem.assertInRepo();
     return objectDatabase.writeTree(index.toTree());
