@@ -9,16 +9,12 @@ var gimlet = module.exports = {
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
         index: "",
-        hooks: {},
-        info: {},
-        logs: {},
         objects: {},
         refs: {
           heads: {},
           remotes: {
             origin: {}
           },
-          tags: {}
         }
       }
     });

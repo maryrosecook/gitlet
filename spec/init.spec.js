@@ -6,16 +6,12 @@ describe('init', function() {
   beforeEach(testUtil.createEmptyRepo);
 
   function expectGimletFilesAndDirectories() {
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/hooks/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/info/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/logs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/objects/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/heads/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/origin/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/tags/")).toEqual(true);
 
     testUtil.expectFile(__dirname + "/tmp/.gimlet/HEAD", "ref: refs/heads/master\n");
   };
