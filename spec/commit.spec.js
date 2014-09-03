@@ -1,6 +1,6 @@
 var fs = require('fs');
 var g = require('../gimlet-api');
-var pathLib = require('path');
+var nodePath = require('path');
 var testUtil = require('./test-util');
 
 describe('commit', function() {
@@ -88,7 +88,7 @@ describe('commit', function() {
     g.commit({ m: "first" });
 
     fs.readdirSync(".gimlet/objects/").forEach(function(filename) {
-      var contents = fs.readFileSync(pathLib.join(".gimlet/objects", filename)).toString();
+      var contents = fs.readFileSync(nodePath.join(".gimlet/objects", filename)).toString();
       if (contents.split(" ")[0] === "commit") {
         var lines = contents.split("\n");
 

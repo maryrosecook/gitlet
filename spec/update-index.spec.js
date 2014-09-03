@@ -1,6 +1,6 @@
 var fs = require('fs');
 var g = require('../gimlet-api');
-var pathLib = require('path');
+var nodePath = require('path');
 var testUtil = require('./test-util');
 
 describe('update-index', function() {
@@ -48,7 +48,7 @@ describe('update-index', function() {
       g.update_index("README.md", { add: true });
 
       var readmeHash = g.hash_object("README.md");
-      testUtil.expectFile(pathLib.join(".gimlet/objects", readmeHash), "this is a readme");
+      testUtil.expectFile(nodePath.join(".gimlet/objects", readmeHash), "this is a readme");
 
       expect(testUtil.index()[0].path).toEqual("README.md");
     });
@@ -59,9 +59,9 @@ describe('update-index', function() {
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
-      testUtil.expectFile(pathLib.join(".gimlet/objects", g.hash_object("README1.md")),
+      testUtil.expectFile(nodePath.join(".gimlet/objects", g.hash_object("README1.md")),
                           "this is a readme1");
-      testUtil.expectFile(pathLib.join(".gimlet/objects", g.hash_object("README2.md")),
+      testUtil.expectFile(nodePath.join(".gimlet/objects", g.hash_object("README2.md")),
                           "this is a readme2");
 
       expect(testUtil.index()[0].path).toEqual("README1.md");
@@ -101,7 +101,7 @@ describe('update-index', function() {
 
       var newVersionHash = testUtil.index()[0].hash;
 
-      testUtil.expectFile(pathLib.join(".gimlet/objects", newVersionHash), "this is a readme1");
+      testUtil.expectFile(nodePath.join(".gimlet/objects", newVersionHash), "this is a readme1");
       expect(newVersionHash).toEqual(g.hash_object("README.md"));
     });
   });

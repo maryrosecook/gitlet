@@ -1,5 +1,5 @@
 var fs = require('fs');
-var pathLib = require('path');
+var nodePath = require('path');
 
 var testUtil = module.exports = {
   expectFile: function(path, content) {
@@ -8,7 +8,7 @@ var testUtil = module.exports = {
 
   rmdirSyncRecursive: function(dir) {
     fs.readdirSync(dir).forEach(function(fileName) {
-      var filePath = pathLib.join(dir, fileName);
+      var filePath = nodePath.join(dir, fileName);
       if (fs.statSync(filePath).isDirectory()) {
         testUtil.rmdirSyncRecursive(filePath);
       } else {
@@ -23,7 +23,7 @@ var testUtil = module.exports = {
     if (prefix === undefined) return testUtil.createFilesFromTree(structure, process.cwd());
 
     Object.keys(structure).forEach(function(name) {
-      var path = pathLib.join(prefix, name);
+      var path = nodePath.join(prefix, name);
       if (typeof structure[name] === "string") {
         fs.writeFileSync(path, structure[name]);
       } else {
