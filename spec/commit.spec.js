@@ -46,6 +46,25 @@ describe('commit', function() {
     fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8").split("\n")[1].match("Date:");
   });
 
+  it('should store parent on all commits after first', function() {
+    g.init();
+    testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb", filec: "filec" });
+
+    g.add("filea");
+    g.commit({ m: "first", date: new Date(1409404605356) });
+    var firstHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+
+    g.add("fileb");
+    g.commit({ m: "second", date: new Date(1409404605356) });
+    var secondHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+
+    g.add("filec");
+    g.commit({ m: "third", date: new Date(1409404605356) });
+    var thirdHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+
+    expect(fs.readFileSync(".gimlet/objects/" + secondHash, "utf8").split("\n")[1]).toEqual("parent " + firstHash);
+    expect(fs.readFileSync(".gimlet/objects/" + thirdHash, "utf8").split("\n")[1]).toEqual("parent " + secondHash);
+  });
 
   it('should point current branch at commit when committing', function() {
     g.init();
