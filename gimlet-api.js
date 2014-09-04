@@ -139,6 +139,10 @@ var gimlet = module.exports = {
         refs.set(refs.toFinalRef(ref1), hash);
       }
     }
+  },
+
+  checkout: function(ref) {
+    fileSystem.assertInRepo();
   }
 };
 
