@@ -36,6 +36,17 @@ describe('commit', function() {
     expect(commitFile.split("\n")[3]).toEqual("    first");
   });
 
+  it('should initial commit file should have no parents', function() {
+    g.init();
+    testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
+                                          { "filec": "filec", "3":
+                                            { "filed": "filed", "filee": "filee"}}}});
+    g.add("1");
+    g.commit({ m: "first", date: new Date(1409404605356) });
+    fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8").split("\n")[1].match("Date:");
+  });
+
+
   it('should point current branch at commit when committing', function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
