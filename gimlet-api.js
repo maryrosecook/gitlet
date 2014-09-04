@@ -124,24 +124,24 @@ var gimlet = module.exports = {
     }
   },
 
-  update_ref: function(ref1, ref2) {
+  update_ref: function(refToUpdate, refToUpdateTo) {
     fileSystem.assertInRepo();
 
-    if (!util.isString(ref1) || !util.isString(ref2)) {
+    if (!util.isString(refToUpdate) || !util.isString(refToUpdateTo)) {
       throw "usage: see documentation"
-    } else if (!refs.isRef(ref1)) {
-      throw "fatal: Cannot lock the ref " + ref1 + ".";
+    } else if (!refs.isRef(refToUpdate)) {
+      throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = refs.isRef(ref2) ? refs.toHash(ref2) : ref2;
+      var hash = refs.isRef(refToUpdateTo) ? refs.toHash(refToUpdateTo) : refToUpdateTo;
       if (hash === undefined || !objectDatabase.exists(hash)) {
-        throw "fatal: " + ref2 + ": not a valid SHA1";
+        throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objectDatabase.parseObject(objectDatabase.readObject(hash))
                    instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
-          refs.toFinalRef(ref1) + "\n" +
-          "fatal: Cannot update the ref " + ref1;
+          refs.toFinalRef(refToUpdate) + "\n" +
+          "fatal: Cannot update the ref " + refToUpdate;
       } else {
-        refs.set(refs.toFinalRef(ref1), hash);
+        refs.set(refs.toFinalRef(refToUpdate), hash);
       }
     }
   },

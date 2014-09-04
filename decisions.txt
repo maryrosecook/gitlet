@@ -18,4 +18,3 @@ todo
 * remove some non-demonstrative error handling to reduce line count
 * make sure merge does two parents
 * rm toStrings to cover up forgotten encodings in file reads
-* change ref1 and ref2 to refToUpdate and refToUpdateTo
