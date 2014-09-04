@@ -99,7 +99,10 @@ var gimlet = module.exports = {
       } else {
         var isFirstCommit = refs.toHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.toHash("HEAD")];
-        var commmitHash = objectDatabase.writeCommit(treeHash, opts.m, parentHashes, opts.date);
+        var commmitHash = objectDatabase.writeCommit(treeHash,
+                                                     opts.m,
+                                                     parentHashes,
+                                                     opts.date);
         this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
       }
