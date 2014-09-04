@@ -61,9 +61,9 @@ describe('commit', function() {
     expect(commitFileLines1[0]).toEqual("commit 59431df");
     expect(commitFileLines1[3]).toEqual("    first");
 
-    var commitFileLines2 = fs.readFileSync(".gimlet/objects/16f3a11f", "utf8").split("\n");
+    var commitFileLines2 = fs.readFileSync(".gimlet/objects/5e0b3550", "utf8").split("\n");
     expect(commitFileLines2[0]).toEqual("commit 53d8eab5");
-    expect(commitFileLines2[3]).toEqual("    second");
+    expect(commitFileLines2[4]).toEqual("    second");
   });
 
   it('should point current branch at subsequent commits', function() {
@@ -78,7 +78,7 @@ describe('commit', function() {
 
     g.add("1/2/3b");
     g.commit({ m: "second", date: new Date(1409404605356) });
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("16f3a11f");
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
   });
 
   it('should create commit without passing date', function() {

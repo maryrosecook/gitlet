@@ -68,7 +68,7 @@ describe('update-ref', function() {
     g.commit({ m: "second", date: new Date(1409404605356) });
 
     expect(fs.readFileSync(".gimlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("16f3a11f");
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
 
     g.update_ref("HEAD", "343b3d02");
 
@@ -88,7 +88,7 @@ describe('update-ref', function() {
     g.add("1/2/3b");
     g.commit({ m: "second", date: new Date(1409404605356) });
 
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("16f3a11f");
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
     g.update_ref("refs/heads/master", "343b3d02");
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
   });

@@ -97,7 +97,9 @@ var gimlet = module.exports = {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
-        var commmitHash = objectDatabase.writeCommit(treeHash, opts.m, opts.date);
+        var isFirstCommit = refs.toHash("HEAD") === undefined;
+        var parentHashes = isFirstCommit ? [] : [refs.toHash("HEAD")];
+        var commmitHash = objectDatabase.writeCommit(treeHash, opts.m, parentHashes, opts.date);
         this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
       }
@@ -275,9 +277,14 @@ var objectDatabase = {
     return this.writeObject(treeObject);
   },
 
-  writeCommit: function(treeHash, message, date) {
+  writeCommit: function(treeHash, message, parentHashes, date) {
     date = date || new Date();
+    var parentLines = parentHashes.map(function(h) {
+      return "parent " + h + "\n";
+    }).join("");
+
     return this.writeObject("commit " + treeHash + "\n" +
+                            parentLines +
                             "Date:  " + date.toString() + "\n" +
                             "\n" +
                             "    " + message);
