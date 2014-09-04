@@ -70,7 +70,7 @@ var gimlet = module.exports = {
       } else {
         var fileContents = fs.readFileSync(file, "utf8");
         if (opts.w) {
-          return objectDatabase.writeObject(fileContents);
+          return objects.writeObject(fileContents);
         }
 
         return util.hash(fileContents);
@@ -80,7 +80,7 @@ var gimlet = module.exports = {
 
   write_tree: function() {
     fileSystem.assertInRepo();
-    return objectDatabase.writeTree(index.toTree());
+    return objects.writeTree(index.toTree());
   },
 
   commit: function(opts) {
@@ -93,13 +93,13 @@ var gimlet = module.exports = {
       var treeHash = this.write_tree();
 
       if (refs.toHash("HEAD") !== undefined &&
-          treeHash === objectDatabase.parseObject(refs.toHash("HEAD")).hash) {
+          treeHash === objects.parseObject(refs.toHash("HEAD")).hash) {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
         var isFirstCommit = refs.toHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.toHash("HEAD")];
-        var commmitHash = objectDatabase.writeCommit(treeHash,
+        var commmitHash = objects.writeCommit(treeHash,
                                                      opts.m,
                                                      parentHashes,
                                                      opts.date);
@@ -133,10 +133,9 @@ var gimlet = module.exports = {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
       var hash = refs.isRef(refToUpdateTo) ? refs.toHash(refToUpdateTo) : refToUpdateTo;
-      if (hash === undefined || !objectDatabase.exists(hash)) {
+      if (hash === undefined || !objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
-      } else if (!(objectDatabase.parseObject(objectDatabase.readObject(hash))
-                   instanceof Commit)) {
+      } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toFinalRef(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
@@ -152,7 +151,7 @@ var gimlet = module.exports = {
     var finalRef = refs.isRef(ref) ? ref : refs.toFinalRef(ref);
     var hash = refs.toHash(finalRef);
 
-    if (!objectDatabase.exists(hash)) {
+    if (!objects.exists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to git."
     }
   }
@@ -266,13 +265,13 @@ var index = {
   }
 };
 
-var objectDatabase = {
+var objects = {
   writeTree: function(tree) {
     var treeObject = Object.keys(tree).map(function(key) {
       if (util.isString(tree[key])) {
         return "blob " + util.hash(tree[key]) + " " + key;
       } else {
-        return "tree " + objectDatabase.writeTree(tree[key]) + " " + key;
+        return "tree " + objects.writeTree(tree[key]) + " " + key;
       }
     }).join("\n") + "\n";
 
