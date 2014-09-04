@@ -17,4 +17,3 @@ todo
 * test committing when other branch checked out
 * remove some non-demonstrative error handling to reduce line count
 * make sure merge does two parents
-* rm toStrings to cover up forgotten encodings in file reads

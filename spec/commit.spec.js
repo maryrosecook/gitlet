@@ -118,7 +118,7 @@ describe('commit', function() {
     g.commit({ m: "first" });
 
     fs.readdirSync(".gimlet/objects/").forEach(function(filename) {
-      var contents = fs.readFileSync(nodePath.join(".gimlet/objects", filename)).toString();
+      var contents = fs.readFileSync(nodePath.join(".gimlet/objects", filename), "utf8");
       if (contents.split(" ")[0] === "commit") {
         var lines = contents.split("\n");
 

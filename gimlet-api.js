@@ -174,8 +174,7 @@ var refs = {
 
   toFinalRef: function(ref) {
     if (ref === "HEAD") {
-      var headContent = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref))
-          .toString()
+      var headContent = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref), "utf8")
           .match("ref: (refs/heads/.+)")[1];
       return this.toFinalRef(headContent);
     } else if (ref.match("refs/heads/[A-Za-z-]+")) {
