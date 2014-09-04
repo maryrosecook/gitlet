@@ -9,4 +9,10 @@ describe('checkout', function() {
     expect(function() { g.checkout(); })
       .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
   });
+
+  it('should throw if pass ref that does not resolve to a hash', function() {
+    g.init();
+    expect(function() { g.checkout("woo"); })
+      .toThrow("error: pathspec woo did not match any file(s) known to git.");
+  });
 });

@@ -143,6 +143,11 @@ var gimlet = module.exports = {
 
   checkout: function(ref) {
     fileSystem.assertInRepo();
+
+    var objectContent = objectDatabase.readObject(refs.toHash(ref));
+    if (objectContent === undefined) {
+      throw "error: pathspec " + ref + " did not match any file(s) known to git."
+    }
   }
 };
 
