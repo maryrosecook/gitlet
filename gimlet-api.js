@@ -129,14 +129,14 @@ var gimlet = module.exports = {
 
     if (!util.isString(ref1) || !util.isString(ref2)) {
       throw "usage: see documentation"
-    } else if (!refs.isValid(ref1)) {
+    } else if (!refs.isRef(ref1)) {
       throw "fatal: Cannot lock the ref " + ref1 + ".";
     } else {
-      var hash = refs.toHash(ref2);
-      var objectContent = objectDatabase.readObject(hash);
-      if (objectContent === undefined) {
+      var hash = refs.isRef(ref2) ? refs.toHash(ref2) : ref2;
+      if (hash === undefined || !objectDatabase.exists(hash)) {
         throw "fatal: " + ref2 + ": not a valid SHA1";
-      } else if (!(objectDatabase.parseObject(objectContent) instanceof Commit)) {
+      } else if (!(objectDatabase.parseObject(objectDatabase.readObject(hash))
+                   instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toFinalRef(ref1) + "\n" +
           "fatal: Cannot update the ref " + ref1;
@@ -149,8 +149,10 @@ var gimlet = module.exports = {
   checkout: function(ref) {
     fileSystem.assertInRepo();
 
-    var objectContent = objectDatabase.readObject(refs.toHash(ref));
-    if (objectContent === undefined) {
+    var finalRef = refs.isRef(ref) ? ref : refs.toFinalRef(ref);
+    var hash = refs.toHash(finalRef);
+
+    if (!objectDatabase.exists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to git."
     }
   }
@@ -166,7 +168,7 @@ var head = {
 };
 
 var refs = {
-  isValid: function(ref) {
+  isRef: function(ref) {
     return ref === "HEAD" || ref.match("refs/heads/[A-Za-z-]+");
   },
 
@@ -184,9 +186,7 @@ var refs = {
   },
 
   toHash: function(ref) {
-    if (!this.isValid(ref)) {
-      return ref;
-    } else if (this.toFinalRef(ref) !== undefined) {
+    if (this.isRef(ref) && this.toFinalRef(ref) !== undefined) {
       var path = nodePath.join(fileSystem.gimletDir(), this.toFinalRef(ref));
       if (fs.existsSync(path)) {
         return fs.readFileSync(path, "utf8");
@@ -301,6 +301,11 @@ var objectDatabase = {
     }
 
     return contentHash;
+  },
+
+  exists: function(objectHash) {
+    return objectHash !== undefined &&
+      fs.existsSync(nodePath.join(fileSystem.gimletDir(), "objects", objectHash));
   },
 
   readObject: function(objectHash) {
