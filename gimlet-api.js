@@ -38,21 +38,19 @@ var gimlet = module.exports = {
     fileSystem.assertInRepo();
     opts = opts || {};
 
-    if (util.isString(path)) {
-      var pathFromRoot = fileSystem.pathFromRepoRoot(path)
-      if (!fs.existsSync(path)) {
-        throw "error: " + pathFromRoot + ": does not exist\n" +
-          "fatal: Unable to process path " + pathFromRoot;
-      } else if (fs.statSync(path).isDirectory()) {
-        throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
-          "fatal: Unable to process path " + pathFromRoot;
-      } else if (!index.hasFile(path) && opts.add === undefined) {
-        throw "error: " + pathFromRoot  +
-          ": cannot add to the index - missing --add option?\n" +
-          "fatal: Unable to process path " + pathFromRoot;
-      } else {
-        index.addFile(path);
-      }
+    var pathFromRoot = fileSystem.pathFromRepoRoot(path)
+    if (!fs.existsSync(path)) {
+      throw "error: " + pathFromRoot + ": does not exist\n" +
+        "fatal: Unable to process path " + pathFromRoot;
+    } else if (fs.statSync(path).isDirectory()) {
+      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
+        "fatal: Unable to process path " + pathFromRoot;
+    } else if (!index.hasFile(path) && opts.add === undefined) {
+      throw "error: " + pathFromRoot  +
+        ": cannot add to the index - missing --add option?\n" +
+        "fatal: Unable to process path " + pathFromRoot;
+    } else {
+      index.addFile(path);
     }
   },
 

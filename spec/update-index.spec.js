@@ -11,11 +11,6 @@ describe('update-index', function() {
       .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
   });
 
-  it('should return undefined if nothing specified', function() {
-    g.init();
-    expect(g.update_index()).toBeUndefined();
-  });
-
   describe('pathspec stipulations', function() {
     it('should throw if path does not match existing working copy file', function() {
       g.init();
