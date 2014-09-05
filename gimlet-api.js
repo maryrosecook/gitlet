@@ -425,10 +425,6 @@ function Blob(content) {
 };
 
 var util = {
-  pp: function(obj) {
-    console.log(JSON.stringify(obj, null, 2))
-  },
-
   isString: function(thing) {
     return typeof thing === "string";
   },
