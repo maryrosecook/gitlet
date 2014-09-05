@@ -55,7 +55,7 @@ describe('update-ref', function() {
                "fatal: Cannot update the ref refs/heads/master");
   });
 
-  it('should allow updating HEAD to master', function() {
+  it('should allow updating HEAD to hash', function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                           { "filec": "filec", "3a":
@@ -93,7 +93,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
   });
 
-  it('should allow HEAD to be updated to a qualified branch', function() {
+  it('should allow master to be updated to a qualified branch', function() {
     g.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
@@ -110,7 +110,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("98d541a");
   });
 
-  it('should allow HEAD to be updated to an unqualified branch', function() {
+  it('should allow master to be updated to an unqualified branch', function() {
     g.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
