@@ -174,7 +174,7 @@ var gimlet = module.exports = {
 var head = {
   currentBranchName: function() {
     if (this.get().match("refs")) {
-      return this.content().match("refs/heads/(.+)")[1];
+      return this.get().match("refs/heads/(.+)")[1];
     }
   },
 
