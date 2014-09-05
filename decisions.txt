@@ -9,6 +9,10 @@
 * artificially lock refs creation to HEAD and refs/heads/[whatever] - otherwise have to protect other files and deal with different messages for eg overwriting dirs vs trying to overwrite files like index that git relies on
 * do not support hash abreviations
 * no diffing so no summory of changes on commit
+* update-ref only takes full ref for first arg (no branch names).  Real behaviour is to take relative paths allow creation of refsjust create files relative
+* only support HEAD for symbolic ref
+* do not support non-symbolic (non HEAD) refs pointing at other refs
+* update-ref supports branch name for second arg
 
 todo
 * cd back to repo root for all commands
