@@ -5,7 +5,7 @@ var gimlet = module.exports = {
   init: function() {
     if (fileSystem.inRepo()) { return; }
 
-    util.createFilesFromTree({
+    fileSystem.createFilesFromTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
         index: "",
@@ -400,6 +400,22 @@ var fileSystem = {
 
   pathFromRepoRoot: function(path) {
     return nodePath.relative(this.repoDir(), nodePath.join(process.cwd(), path));
+  },
+
+  createFilesFromTree: function(structure, prefix) {
+    if (prefix === undefined) {
+      return fileSystem.createFilesFromTree(structure, process.cwd());
+    }
+
+    Object.keys(structure).forEach(function(name) {
+      var path = nodePath.join(prefix, name);
+      if (util.isString(structure[name])) {
+        fs.writeFileSync(path, structure[name]);
+      } else {
+        fs.mkdirSync(path, "777");
+        fileSystem.createFilesFromTree(structure[name], path);
+      }
+    });
   }
 };
 
@@ -437,19 +453,5 @@ var util = {
     }
 
     return Math.abs(hashInt).toString(16);
-  },
-
-  createFilesFromTree: function(structure, prefix) {
-    if (prefix === undefined) { return util.createFilesFromTree(structure, process.cwd()); }
-
-    Object.keys(structure).forEach(function(name) {
-      var path = nodePath.join(prefix, name);
-      if (util.isString(structure[name])) {
-        fs.writeFileSync(path, structure[name]);
-      } else {
-        fs.mkdirSync(path, "777");
-        util.createFilesFromTree(structure[name], path);
-      }
-    });
   }
 };
