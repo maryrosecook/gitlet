@@ -76,6 +76,24 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
   });
 
+  it('should update terminal ref at HEAD to passed hash, not HEAD file content', function() {
+    g.init();
+    testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
+
+    g.add("filea");
+    g.commit({ m: "first", date: new Date(1409404605356) });
+
+    g.branch("other-branch");
+
+    g.add("fileb");
+    g.commit({ m: "second", date: new Date(1409404605356) });
+
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
+    g.update_ref("HEAD", "refs/heads/other-branch");
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("98d541a");
+    expect(fs.readFileSync(".gimlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
+  });
+
   it('should allow update of master to a hash', function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
