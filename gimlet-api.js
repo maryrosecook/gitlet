@@ -202,15 +202,9 @@ var refs = {
 
   toTerminalRef: function(ref) {
     if (ref === "HEAD") {
-      return this.toTerminalRef(fs.readFileSync(nodePath.join(fileSystem.gimletDir(), "HEAD"),
-                                                "utf8"));
+      return head.get();
     } else if (this.isLocalHeadRef(ref)) {
-      var content = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref), "utf8");
-      if (this.isLocalHeadRef(content)) {
-        this.toTerminalRef();
-      } else {
-        return ref;
-      }
+      return ref;
     }
   },
 
