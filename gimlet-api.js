@@ -124,6 +124,20 @@ var gimlet = module.exports = {
     }
   },
 
+  symbolic_ref: function(symbolicRef, refToUpdateTo) {
+    fileSystem.assertInRepo();
+
+    if (symbolicRef !== "HEAD") {
+      throw "fatal: ref " + symbolicRef + " is not a symbolic ref";
+    } else if (refToUpdateTo === undefined) {
+      return head.get();
+    } else if (refs.isLocalHeadRef(refToUpdateTo)) {
+      head.set(refToUpdateTo);
+    } else {
+      throw "fatal: Refusing to point " + symbolicRef + " outside of refs/heads/";
+    }
+  },
+
   update_ref: function(refToUpdate, refToUpdateTo) {
     fileSystem.assertInRepo();
 
@@ -137,10 +151,10 @@ var gimlet = module.exports = {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
-          refs.toFinalRef(refToUpdate) + "\n" +
+          refs.toTerminalRef(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
       } else {
-        refs.set(refs.toFinalRef(refToUpdate), hash);
+        refs.set(refs.toTerminalRef(refToUpdate), hash);
       }
     }
   },
@@ -159,33 +173,50 @@ var gimlet = module.exports = {
 
 var head = {
   currentBranchName: function() {
+    if (this.get().match("refs")) {
+      return this.content().match("refs/heads/(.+)")[1];
+    }
+  },
+
+  get: function() {
     var content = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), "HEAD"), "utf8");
-    if (content.match(/ref:/)) {
-      return content.match("ref: refs/heads/(.+)")[1];
+    var refMatch = content.match("ref: (refs/heads/.+)");
+    return refMatch ? refMatch[1] : content;
+  },
+
+  set: function(ref) {
+    if (refs.isLocalHeadRef(ref)) {
+      fs.writeFileSync(nodePath.join(fileSystem.gimletDir(), "HEAD"), "ref: " + ref + "\n");
     }
   }
 };
 
 var refs = {
-  isRef: function(ref) {
-    return ref === "HEAD" || ref.match("refs/heads/[A-Za-z-]+");
+  isLocalHeadRef: function(ref) {
+    return ref.match("refs/heads/[A-Za-z-]+");
   },
 
-  toFinalRef: function(ref) {
+  isRef: function(ref) {
+    return ref === "HEAD" || this.isLocalHeadRef(ref);
+  },
+
+  toTerminalRef: function(ref) {
     if (ref === "HEAD") {
-      var headContent = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref), "utf8")
-          .match("ref: (refs/heads/.+)")[1];
-      return this.toFinalRef(headContent);
-    } else if (ref.match("refs/heads/[A-Za-z-]+")) {
-      return ref;
-    } else {
-      return this.toBranchRef(ref);
+      return this.toTerminalRef(fs.readFileSync(nodePath.join(fileSystem.gimletDir(), "HEAD"),
+                                                "utf8"));
+    } else if (this.isLocalHeadRef(ref)) {
+      var content = fs.readFileSync(nodePath.join(fileSystem.gimletDir(), ref), "utf8");
+      if (this.isLocalHeadRef(content)) {
+        this.toTerminalRef();
+      } else {
+        return ref;
+      }
     }
   },
 
   toHash: function(ref) {
-    if (this.isRef(ref) && this.toFinalRef(ref) !== undefined) {
-      var path = nodePath.join(fileSystem.gimletDir(), this.toFinalRef(ref));
+    if (this.isRef(ref) && this.toTerminalRef(ref) !== undefined) {
+      var path = nodePath.join(fileSystem.gimletDir(), this.toTerminalRef(ref));
       if (fs.existsSync(path)) {
         return fs.readFileSync(path, "utf8");
       }
@@ -196,9 +227,9 @@ var refs = {
     return "refs/heads/" + name;
   },
 
-  set: function(ref, hash) {
-    if (ref.match("refs/heads/[A-Za-z-]+")) {
-      fs.writeFileSync(nodePath.join(fileSystem.gimletDir(), ref), hash);
+  set: function(ref, content) {
+    if (this.isLocalHeadRef(ref)) {
+      fs.writeFileSync(nodePath.join(fileSystem.gimletDir(), ref), content);
     }
   },
 
