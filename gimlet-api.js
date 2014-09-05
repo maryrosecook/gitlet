@@ -58,17 +58,15 @@ var gimlet = module.exports = {
     fileSystem.assertInRepo();
     opts = opts || {};
 
-    if (file !== undefined) {
-      if (!fs.existsSync(file)) {
-        throw "fatal: Cannot open '" + file + "': No such file or directory"
-      } else {
-        var fileContents = fs.readFileSync(file, "utf8");
-        if (opts.w) {
-          return objects.writeObject(fileContents);
-        }
-
-        return util.hash(fileContents);
+    if (!fs.existsSync(file)) {
+      throw "fatal: Cannot open '" + file + "': No such file or directory"
+    } else {
+      var fileContents = fs.readFileSync(file, "utf8");
+      if (opts.w) {
+        return objects.writeObject(fileContents);
       }
+
+      return util.hash(fileContents);
     }
   },
 

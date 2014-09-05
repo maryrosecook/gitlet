@@ -10,11 +10,6 @@ describe('hash-object', function() {
       .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
   });
 
-  it('should return undefined if no file specified', function() {
-    g.init();
-    expect(g.hash_object()).toBeUndefined();
-  });
-
   it('should throw if file specified does not exist', function() {
     g.init();
     expect(function() { g.hash_object("not-there") })
