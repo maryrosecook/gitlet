@@ -144,4 +144,22 @@ describe('update-ref', function() {
     g.update_ref("refs/heads/master", "other-branch");
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("98d541a");
   });
+
+  it('should allow ref to be updated to HEAD', function() {
+    g.init();
+    testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
+
+    g.add("filea");
+    g.commit({ m: "first", date: new Date(1409404605356) });
+
+    g.branch("other-branch");
+
+    g.add("fileb");
+    g.commit({ m: "second", date: new Date(1409404605356) });
+
+    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
+    expect(fs.readFileSync(".gimlet/refs/heads/other-branch", "utf8")).toEqual("98d541a");
+    g.update_ref("refs/heads/other-branch", "HEAD");
+    expect(fs.readFileSync(".gimlet/refs/heads/other-branch", "utf8")).toEqual("67fd42fe");
+  });
 });
