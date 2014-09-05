@@ -133,9 +133,7 @@ var gimlet = module.exports = {
   update_ref: function(refToUpdate, refToUpdateTo) {
     fileSystem.assertInRepo();
 
-    if (!util.isString(refToUpdate) || !util.isString(refToUpdateTo)) {
-      throw "usage: see documentation"
-    } else if (!refs.isRef(refToUpdate)) {
+    if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
       var hash;
