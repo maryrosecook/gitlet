@@ -120,7 +120,7 @@ var gimlet = module.exports = {
     } else if (refs.toHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
     } else {
-      refs.set(refs.toFinalRef(name), refs.toHash("HEAD"));
+      refs.set(refs.nameToBranchRef(name), refs.toHash("HEAD"));
     }
   },
 
@@ -179,7 +179,7 @@ var refs = {
     } else if (ref.match("refs/heads/[A-Za-z-]+")) {
       return ref;
     } else {
-      return "refs/heads/" + ref;
+      return this.toBranchRef(ref);
     }
   },
 
@@ -190,6 +190,10 @@ var refs = {
         return fs.readFileSync(path, "utf8");
       }
     }
+  },
+
+  nameToBranchRef: function(name) {
+    return "refs/heads/" + name;
   },
 
   set: function(ref, hash) {
