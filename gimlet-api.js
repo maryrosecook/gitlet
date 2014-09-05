@@ -391,7 +391,7 @@ var fileSystem = {
 
 function Commit(content) {
   this.type = "commit";
-  this.hash = content.split(" ")[1];
+  this.tree = content.split(" ")[1];
   this.date = new Date(content.split("\n")[1].split(" ")[1]);
   this.message = content.split("\n")[3].split(" ")[1];
 };
