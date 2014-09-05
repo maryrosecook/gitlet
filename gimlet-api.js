@@ -146,8 +146,16 @@ var gimlet = module.exports = {
     } else if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = refs.isRef(refToUpdateTo) ? refs.toHash(refToUpdateTo) : refToUpdateTo;
-      if (hash === undefined || !objects.exists(hash)) {
+      var hash;
+      if (refs.isRef(refToUpdateTo)) {
+        hash = refs.toHash(refToUpdateTo);
+      } else if (refs.exists(refs.nameToBranchRef(refToUpdateTo))) {
+        hash = refs.toHash(refs.nameToBranchRef(refToUpdateTo));
+      } else {
+        hash = refToUpdateTo;
+      }
+
+      if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
@@ -229,6 +237,12 @@ var refs = {
 
   localHeads: function() {
     return fs.readdirSync(nodePath.join(fileSystem.gimletDir(), "refs/heads/"));
+  },
+
+  exists: function(ref) {
+    return ref !== undefined &&
+      this.isLocalHeadRef(ref) &&
+      fs.existsSync(nodePath.join(fileSystem.gimletDir(), ref));
   }
 };
 
