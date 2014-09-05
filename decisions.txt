@@ -19,5 +19,4 @@ todo
 * sort out which unexpected results to throw for and which to just print for: error, fatal, or just message (eg commit when nothing to commit)
 * support detached head
 * test committing when other branch checked out
-* remove some non-demonstrative error handling to reduce line count
 * make sure merge does two parents
