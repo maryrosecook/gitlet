@@ -23,18 +23,14 @@ var gimlet = module.exports = {
   add: function(path) {
     fileSystem.assertInRepo();
 
-    if (util.isString(path)) {
-      var files = index.getWorkingCopyFilesFrom(path);
-      if (files.length === 0) {
-        throw "fatal: pathspec '" + fileSystem.pathFromRepoRoot(path) +
-          "' did not match any files";
-      } else {
-        for (var i = 0; i < files.length; i++) {
-          this.update_index(files[i], { add: true });
-        }
-      }
+    var files = index.getWorkingCopyFilesFrom(path);
+    if (files.length === 0) {
+      throw "fatal: pathspec '" + fileSystem.pathFromRepoRoot(path) +
+        "' did not match any files";
     } else {
-      throw "Nothing specified, nothing added.";
+      for (var i = 0; i < files.length; i++) {
+        this.update_index(files[i], { add: true });
+      }
     }
   },
 

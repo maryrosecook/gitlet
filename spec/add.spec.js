@@ -10,11 +10,6 @@ describe('add', function() {
       .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
   });
 
-  it('should throw if no pathspec passed', function() {
-    g.init();
-    expect(function() { g.add(); }).toThrow("Nothing specified, nothing added.");
-  });
-
   describe('pathspec matching', function() {
     it('should throw rel path if in root and pathspec does not match files', function() {
       g.init();
