@@ -1,7 +1,7 @@
 var fs = require('fs');
 var nodePath = require('path');
 
-var gimlet = module.exports = {
+var gimletApi = module.exports = {
   init: function() {
     if (files.inRepo()) { return; }
 
@@ -243,7 +243,7 @@ var index = {
   addFile: function(path) {
     var index = this.get();
     index[path] = util.hash(fs.readFileSync(nodePath.join(files.repoDir(), path), "utf8"));
-    gimlet.hash_object(path, { w: true });
+    gimletApi.hash_object(path, { w: true });
     this.set(index);
   },
 
