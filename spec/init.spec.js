@@ -1,5 +1,5 @@
 var fs = require('fs');
-var g = require('../gimlet-api');
+var ga = require('../gimlet-api');
 var testUtil = require('./test-util');
 
 describe('init', function() {
@@ -16,13 +16,13 @@ describe('init', function() {
   };
 
   it('should create .gimlet/ and all required dirs', function() {
-    g.init();
+    ga.init();
     expectGimletFilesAndDirectories();
   });
 
   it('should not change anything if init run twice', function() {
-    g.init();
-    g.init();
+    ga.init();
+    ga.init();
     expectGimletFilesAndDirectories();
   });
 });
