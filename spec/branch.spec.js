@@ -4,6 +4,8 @@ var testUtil = require('./test-util');
 
 describe('branch', function() {
   beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.pinDate);
+  afterEach(testUtil.unpinDate);
 
   it('should throw if not in repo', function() {
     expect(function() { ga.branch(); })
@@ -20,7 +22,7 @@ describe('branch', function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
     ga.add("1/filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     ga.branch("woo");
     testUtil.expectFile(".gimlet/refs/heads/woo", "48946d55");
   });
@@ -29,7 +31,7 @@ describe('branch', function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
     ga.add("1/filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     testUtil.expectFile(".gimlet/refs/heads/master", "48946d55");
     ga.branch("woo");
     testUtil.expectFile(".gimlet/refs/heads/master", "48946d55");
@@ -39,7 +41,7 @@ describe('branch', function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
     ga.add("1/filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     ga.branch("woo");
     ga.branch("boo");
     expect(ga.branch()).toEqual("  boo\n* master\n  woo\n");

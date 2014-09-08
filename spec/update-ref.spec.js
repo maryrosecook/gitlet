@@ -4,6 +4,8 @@ var testUtil = require('./test-util');
 
 describe('update-ref', function() {
   beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.pinDate);
+  afterEach(testUtil.unpinDate);
 
   it('should throw if not in repo', function() {
     expect(function() { ga.update_ref(); })
@@ -57,9 +59,9 @@ describe('update-ref', function() {
                                             { "filef": "filef", "fileg": "fileg"}}}});
 
     ga.add("1/2/3a");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     ga.add("1/2/3b");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
@@ -75,12 +77,12 @@ describe('update-ref', function() {
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
     ga.add("filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
 
     ga.branch("other-branch");
 
     ga.add("fileb");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
     ga.update_ref("HEAD", "refs/heads/other-branch");
@@ -96,9 +98,9 @@ describe('update-ref', function() {
                                             { "filef": "filef", "fileg": "fileg"}}}});
 
     ga.add("1/2/3a");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     ga.add("1/2/3b");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
     ga.update_ref("refs/heads/master", "343b3d02");
@@ -110,12 +112,12 @@ describe('update-ref', function() {
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
     ga.add("filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
 
     ga.branch("other-branch");
 
     ga.add("fileb");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
     ga.update_ref("refs/heads/master", "refs/heads/other-branch");
@@ -127,12 +129,12 @@ describe('update-ref', function() {
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
     ga.add("filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
 
     ga.branch("other-branch");
 
     ga.add("fileb");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
     ga.update_ref("refs/heads/master", "other-branch");
@@ -144,12 +146,12 @@ describe('update-ref', function() {
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
     ga.add("filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
 
     ga.branch("other-branch");
 
     ga.add("fileb");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
     expect(fs.readFileSync(".gimlet/refs/heads/other-branch", "utf8")).toEqual("98d541a");

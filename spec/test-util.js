@@ -1,6 +1,8 @@
 var fs = require('fs');
 var nodePath = require('path');
 
+var originalDateToString = Date.prototype.toString;
+
 var testUtil = module.exports = {
   expectFile: function(path, content) {
     expect(fs.readFileSync(path, "utf8")).toEqual(content);
@@ -54,5 +56,16 @@ var testUtil = module.exports = {
     process.chdir(tmpDir); // switch working dir to test repo root
 
     expect(fs.readdirSync(process.cwd()).length).toEqual(0);
+  },
+
+  pinDate: function() {
+    var pinnedValue = new Date(1409404605356).toString();
+    global.Date.prototype.toString = function() {
+      return pinnedValue;
+    };
+  },
+
+  unpinDate: function() {
+    global.Date.prototype.toString = originalDateToString;
   }
 };

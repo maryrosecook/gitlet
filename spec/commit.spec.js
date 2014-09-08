@@ -5,6 +5,8 @@ var testUtil = require('./test-util');
 
 describe('commit', function() {
   beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.pinDate);
+  afterEach(testUtil.unpinDate);
 
   it('should throw if not in repo', function() {
     expect(function() { ga.commit(); })
@@ -21,12 +23,11 @@ describe('commit', function() {
 
   it('should create commit file when initially commiting', function() {
     ga.init();
-    var date = new Date(1409404605356);
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                           { "filec": "filec", "3":
                                             { "filed": "filed", "filee": "filee"}}}});
     ga.add("1");
-    ga.commit({ m: "first", date: date });
+    ga.commit({ m: "first" });
 
     var commitFile = fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8");
     expect(commitFile.split("\n")[0]).toEqual("commit 7afc965a");
@@ -42,7 +43,7 @@ describe('commit', function() {
                                           { "filec": "filec", "3":
                                             { "filed": "filed", "filee": "filee"}}}});
     ga.add("1");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8").split("\n")[1].match("Date:");
   });
 
@@ -51,15 +52,15 @@ describe('commit', function() {
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb", filec: "filec" });
 
     ga.add("filea");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     var firstHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
 
     ga.add("fileb");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
     var secondHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
 
     ga.add("filec");
-    ga.commit({ m: "third", date: new Date(1409404605356) });
+    ga.commit({ m: "third" });
     var thirdHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
 
     expect(fs.readFileSync(".gimlet/objects/" + secondHash, "utf8").split("\n")[1]).toEqual("parent " + firstHash);
@@ -72,7 +73,7 @@ describe('commit', function() {
                                           { "filec": "filec", "3":
                                             { "filed": "filed", "filee": "filee"}}}});
     ga.add("1");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("1ff21fcc");
   });
 
@@ -83,9 +84,9 @@ describe('commit', function() {
                                             { "filed": "filed", "filee": "filee"}, "3b":
                                             { "filef": "filef", "fileg": "fileg"}}}});
     ga.add("1/2/3a");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     ga.add("1/2/3b");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
 
     var commitFileLines1 = fs.readFileSync(".gimlet/objects/343b3d02", "utf8").split("\n");
     expect(commitFileLines1[0]).toEqual("commit 59431df");
@@ -103,11 +104,11 @@ describe('commit', function() {
                                             { "filed": "filed", "filee": "filee"}, "3b":
                                             { "filef": "filef", "fileg": "fileg"}}}});
     ga.add("1/2/3a");
-    ga.commit({ m: "first", date: new Date(1409404605356) });
+    ga.commit({ m: "first" });
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
 
     ga.add("1/2/3b");
-    ga.commit({ m: "second", date: new Date(1409404605356) });
+    ga.commit({ m: "second" });
     expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
   });
 
