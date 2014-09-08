@@ -409,6 +409,7 @@ function Commit(content) {
 };
 
 function Tree(content) {
+  this.tree = hash(content);
   this.entries = content.split("\n") // may need to break this up further
 };
 
