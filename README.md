@@ -2,6 +2,6 @@
 
 Git implemented in JavaScript.
 
-* By Mary Rose Cook
-* http://maryrosecook.com
-* maryrosecook@maryrosecook.com
+## Contact
+
+Mary Rose Cook - http://maryrosecook.com
