@@ -20,3 +20,4 @@ todo
 * support detached head
 * test committing when other branch checked out
 * make sure merge does two parents
+* use same quote style throughout
