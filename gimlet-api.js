@@ -137,10 +137,10 @@ var gimletApi = module.exports = {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
-          refs.toTerminalRef(refToUpdate) + "\n" +
+          refs.toLocalHead(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
       } else {
-        refs.set(refs.toTerminalRef(refToUpdate), hash);
+        refs.set(refs.toLocalHead(refToUpdate), hash);
       }
     }
   },
@@ -186,7 +186,7 @@ var refs = {
     return ref === "HEAD" || this.isLocalHeadRef(ref);
   },
 
-  toTerminalRef: function(ref) {
+  toLocalHead: function(ref) {
     if (ref === "HEAD") {
       return head.get();
     } else if (this.isLocalHeadRef(ref)) {
@@ -199,8 +199,8 @@ var refs = {
   toHash: function(ref) {
     if (objects.exists(ref)) {
       return ref;
-    } else if (this.exists(this.toTerminalRef(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), this.toTerminalRef(ref)));
+    } else if (this.exists(this.toLocalHead(ref))) {
+      return files.read(nodePath.join(files.gimletDir(), this.toLocalHead(ref)));
     } else if (this.exists(this.nameToBranchRef(ref))) {
       return files.read(nodePath.join(files.gimletDir(), this.nameToBranchRef(ref)));
     }
