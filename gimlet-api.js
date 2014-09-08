@@ -132,15 +132,7 @@ var gimletApi = module.exports = {
     if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash;
-      if (refs.isRef(refToUpdateTo)) {
-        hash = refs.toHash(refToUpdateTo);
-      } else if (refs.exists(refs.nameToBranchRef(refToUpdateTo))) {
-        hash = refs.toHash(refs.nameToBranchRef(refToUpdateTo));
-      } else {
-        hash = refToUpdateTo;
-      }
-
+      var hash = refs.toHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
@@ -199,15 +191,18 @@ var refs = {
       return head.get();
     } else if (this.isLocalHeadRef(ref)) {
       return ref;
+    } else {
+      return this.nameToBranchRef(ref);
     }
   },
 
   toHash: function(ref) {
-    if (this.isRef(ref) && this.toTerminalRef(ref) !== undefined) {
-      var path = nodePath.join(files.gimletDir(), this.toTerminalRef(ref));
-      if (fs.existsSync(path)) {
-        return fs.readFileSync(path, "utf8");
-      }
+    if (objects.exists(ref)) {
+      return ref;
+    } else if (this.exists(this.toTerminalRef(ref))) {
+      return files.read(nodePath.join(files.gimletDir(), this.toTerminalRef(ref)));
+    } else if (this.exists(this.nameToBranchRef(ref))) {
+      return files.read(nodePath.join(files.gimletDir(), this.nameToBranchRef(ref)));
     }
   },
 
@@ -400,6 +395,10 @@ var files = {
         files.createFilesFromTree(structure[name], path);
       }
     });
+  },
+
+  read: function(path) {
+    return fs.readFileSync(path, "utf8");
   }
 };
 
