@@ -403,19 +403,16 @@ var files = {
 };
 
 function Commit(content) {
-  this.type = "commit";
   this.tree = content.split(" ")[1];
   this.date = new Date(content.split("\n")[1].split(" ")[1]);
   this.message = content.split("\n")[3].split(" ")[1];
 };
 
 function Tree(content) {
-  this.type = "tree";
   this.entries = content.split("\n") // may need to break this up further
 };
 
 function Blob(content) {
-  this.type = "blob";
   this.content = content;
 };
 
