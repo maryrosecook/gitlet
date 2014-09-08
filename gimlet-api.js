@@ -60,7 +60,7 @@ var gimletApi = module.exports = {
     if (!fs.existsSync(file)) {
       throw "fatal: Cannot open '" + file + "': No such file or directory"
     } else {
-      var fileContents = fs.readFileSync(file, "utf8");
+      var fileContents = files.read(file);
       if (opts.w) {
         return objects.writeObject(fileContents);
       }
@@ -165,7 +165,7 @@ var head = {
   },
 
   get: function() {
-    var content = fs.readFileSync(nodePath.join(files.gimletDir(), "HEAD"), "utf8");
+    var content = files.read(nodePath.join(files.gimletDir(), "HEAD"));
     var refMatch = content.match("ref: (refs/heads/.+)");
     return refMatch ? refMatch[1] : content;
   },
@@ -234,13 +234,13 @@ var index = {
 
   addFile: function(path) {
     var index = this.get();
-    index[path] = util.hash(fs.readFileSync(nodePath.join(files.repoDir(), path), "utf8"));
+    index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
     gimletApi.hash_object(path, { w: true });
     this.set(index);
   },
 
   get: function() {
-    return fs.readFileSync(nodePath.join(files.gimletDir(), "index"), "utf8")
+    return files.read(nodePath.join(files.gimletDir(), "index"))
       .split("\n")
       .slice(0, -1) // chuck last empty line
       .reduce(function(index, blobStr) {
@@ -276,7 +276,7 @@ var index = {
     Object.keys(this.get()).forEach(function(wholePath) {
       (function addPathToTree(subTree, subPathParts) {
         if (subPathParts.length === 1) {
-          subTree[subPathParts[0]] = fs.readFileSync(wholePath, "utf8");
+          subTree[subPathParts[0]] = files.read(wholePath);
         } else {
           addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
                         subPathParts.slice(1));
@@ -331,7 +331,7 @@ var objects = {
   readObject: function(objectHash) {
     var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
     if (fs.existsSync(objectPath)) {
-      return fs.readFileSync(objectPath, "utf8");
+      return files.read(objectPath);
     }
   },
 
