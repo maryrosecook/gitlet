@@ -83,13 +83,13 @@ var gimletApi = module.exports = {
     } else {
       var treeHash = this.write_tree();
 
-      if (refs.toHash("HEAD") !== undefined &&
-          treeHash === objects.parseObject(refs.toHash("HEAD")).hash) {
+      if (refs.toExistentHash("HEAD") !== undefined &&
+          treeHash === objects.parseObject(refs.toExistentHash("HEAD")).hash) {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
-        var isFirstCommit = refs.toHash("HEAD") === undefined;
-        var parentHashes = isFirstCommit ? [] : [refs.toHash("HEAD")];
+        var isFirstCommit = refs.toExistentHash("HEAD") === undefined;
+        var parentHashes = isFirstCommit ? [] : [refs.toExistentHash("HEAD")];
         var commmitHash = objects.writeCommit(treeHash, opts.m, parentHashes);
         this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
@@ -105,10 +105,10 @@ var gimletApi = module.exports = {
         var marker = branchName === head.currentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
-    } else if (refs.toHash("HEAD") === undefined) {
+    } else if (refs.toExistentHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
     } else {
-      refs.set(refs.nameToBranchRef(name), refs.toHash("HEAD"));
+      refs.set(refs.nameToBranchRef(name), refs.toExistentHash("HEAD"));
     }
   },
 
@@ -132,7 +132,7 @@ var gimletApi = module.exports = {
     if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = refs.toHash(refToUpdateTo);
+      var hash = refs.toExistentHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
@@ -196,7 +196,7 @@ var refs = {
     }
   },
 
-  toHash: function(ref) {
+  toExistentHash: function(ref) {
     if (objects.exists(ref)) {
       return ref;
     } else if (this.exists(this.toLocalHead(ref))) {
