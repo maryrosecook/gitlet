@@ -81,10 +81,11 @@ var gimletApi = module.exports = {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
     } else {
+      var headHash = refs.toExistentHash("HEAD");
       var treeHash = this.write_tree();
 
-      if (refs.toExistentHash("HEAD") !== undefined &&
-          treeHash === objects.parseObject(refs.toExistentHash("HEAD")).hash) {
+      if (headHash !== undefined &&
+          treeHash === objects.getTreeHash(objects.readObject(headHash))) {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
@@ -343,6 +344,25 @@ var objects = {
       return new Tree(content);
     } else {
       return new Blob(content);
+    }
+  },
+
+  type: function(content) {
+    var firstToken = content.split(" ")[0];
+    if (firstToken === "commit") {
+      return "commit";
+    } else if (firstToken === "tree" || firstToken === "blob") {
+      return "tree";
+    } else {
+      return "blob";
+    }
+  },
+
+  getTreeHash: function(content) {
+    if (this.type(content) === "commit") {
+      return content.split(/\s/)[1];
+    } else if (this.type(content) === "tree") {
+      return hash(content);
     }
   }
 };
