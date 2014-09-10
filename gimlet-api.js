@@ -136,7 +136,7 @@ var gimletApi = module.exports = {
       var hash = refs.toExistentHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
-      } else if (!(objects.parseObject(objects.readObject(hash)) instanceof Commit)) {
+      } else if (!(objects.type(objects.readObject(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toLocalHead(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
@@ -336,17 +336,6 @@ var objects = {
     }
   },
 
-  parseObject: function(content) {
-    var firstToken = content.split(" ")[0];
-    if (firstToken === "commit") {
-      return new Commit(content);
-    } else if (firstToken === "tree" || firstToken === "blob") {
-      return new Tree(content);
-    } else {
-      return new Blob(content);
-    }
-  },
-
   type: function(content) {
     var firstToken = content.split(" ")[0];
     if (firstToken === "commit") {
@@ -420,21 +409,6 @@ var files = {
   read: function(path) {
     return fs.readFileSync(path, "utf8");
   }
-};
-
-function Commit(content) {
-  this.tree = content.split(" ")[1];
-  this.date = new Date(content.split("\n")[1].split(" ")[1]);
-  this.message = content.split("\n")[3].split(" ")[1];
-};
-
-function Tree(content) {
-  this.tree = hash(content);
-  this.entries = content.split("\n") // may need to break this up further
-};
-
-function Blob(content) {
-  this.content = content;
 };
 
 var util = {
