@@ -21,6 +21,20 @@ describe('commit', function() {
                "nothing to commit (create/copy files and use 'git add' to track)");
   });
 
+  it('should throw if nothing to commit now, but there were previous commits', function() {
+    testUtil.createFilesFromTree({ "1": { filea: "filea", fileb: "fileb", "2":
+                                          { filec: "filec", "3":
+                                            { filed: "filed", filee: "filee"}}}});
+    ga.init();
+    ga.add("1");
+    ga.commit({ m: "first" });
+
+    expect(function() {
+      ga.commit();
+    }).toThrow("# On master\n" +
+               "nothing to commit, working directory clean");
+  });
+
   it('should create commit file when initially commiting', function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
