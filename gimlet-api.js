@@ -23,7 +23,7 @@ var gimletApi = module.exports = {
   add: function(path) {
     files.assertInRepo();
 
-    var addedFiles = index.getWorkingCopyFilesFrom(path);
+    var addedFiles = files.recursiveList(path);
     if (addedFiles.length === 0) {
       throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
     } else {
@@ -259,19 +259,6 @@ var index = {
     fs.writeFileSync(nodePath.join(files.gimletDir(), "index"), indexStr);
   },
 
-  getWorkingCopyFilesFrom: function(path) {
-    if (!fs.existsSync(path)) {
-      return [];
-    } else if (fs.statSync(path).isFile()) {
-      return [path];
-    } else if (fs.statSync(path).isDirectory()) {
-      var self = this;
-      return fs.readdirSync(path).reduce(function(files, dirChild) {
-        return files.concat(self.getWorkingCopyFilesFrom(nodePath.join(path, dirChild)));
-      }, []);
-    }
-  },
-
   toTree: function() {
     var tree = {};
     Object.keys(this.get()).forEach(function(wholePath) {
@@ -401,6 +388,19 @@ var files = {
 
   read: function(path) {
     return fs.readFileSync(path, "utf8");
+  },
+
+  recursiveList: function(path) {
+    if (!fs.existsSync(path)) {
+      return [];
+    } else if (fs.statSync(path).isFile()) {
+      return [path];
+    } else if (fs.statSync(path).isDirectory()) {
+      var self = this;
+      return fs.readdirSync(path).reduce(function(files, dirChild) {
+        return files.concat(self.recursiveList(nodePath.join(path, dirChild)));
+      }, []);
+    }
   }
 };
 
