@@ -275,14 +275,7 @@ var index = {
   toTree: function() {
     var tree = {};
     Object.keys(this.get()).forEach(function(wholePath) {
-      (function addPathToTree(subTree, subPathParts) {
-        if (subPathParts.length === 1) {
-          subTree[subPathParts[0]] = files.read(wholePath);
-        } else {
-          addPathToTree(subTree[subPathParts[0]] = subTree[subPathParts[0]] || {},
-                        subPathParts.slice(1));
-        }
-      })(tree, wholePath.split(nodePath.sep));
+      util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
     });
 
     return tree;
@@ -424,5 +417,14 @@ var util = {
     }
 
     return Math.abs(hashInt).toString(16);
+  },
+
+  assocIn: function(obj, arr) {
+    if (arr.length === 2) {
+      obj[arr[0]] = arr[1];
+    } else if (arr.length > 2) {
+      obj[arr[0]] = obj[arr[0]] || {};
+      this.assocIn(obj[arr[0]], arr.slice(1));
+    }
   }
 };
