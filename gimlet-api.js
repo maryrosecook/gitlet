@@ -167,7 +167,7 @@ var head = {
 
   set: function(ref) {
     if (refs.isLocalHeadRef(ref)) {
-      fs.writeFileSync(nodePath.join(files.gimletDir(), "HEAD"), "ref: " + ref + "\n");
+      files.write(nodePath.join(files.gimletDir(), "HEAD"), "ref: " + ref + "\n");
     }
   }
 };
@@ -207,7 +207,7 @@ var refs = {
 
   set: function(ref, content) {
     if (this.isLocalHeadRef(ref)) {
-      fs.writeFileSync(nodePath.join(files.gimletDir(), ref), content);
+      files.write(nodePath.join(files.gimletDir(), ref), content);
     }
   },
 
@@ -250,7 +250,7 @@ var index = {
         .map(function(path) { return path + " " + index[path]; })
         .join("\n")
         .concat("\n"); // trailing new line
-    fs.writeFileSync(nodePath.join(files.gimletDir(), "index"), indexStr);
+    files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
   },
 
   toTree: function() {
@@ -368,7 +368,7 @@ var files = {
     Object.keys(structure).forEach(function(name) {
       var path = nodePath.join(prefix, name);
       if (util.isString(structure[name])) {
-        fs.writeFileSync(path, structure[name]);
+        files.write(path, structure[name]);
       } else {
         fs.mkdirSync(path, "777");
         files.createFilesFromTree(structure[name], path);
