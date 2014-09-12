@@ -140,6 +140,10 @@ var gimletApi = module.exports = {
 
     if (!objects.exists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to git."
+  },
+
+  diff: function(ref1, ref2, opts) {
+    files.assertInRepo();
     }
   }
 };
