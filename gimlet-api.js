@@ -154,12 +154,12 @@ var gimletApi = module.exports = {
 
 var head = {
   currentBranchName: function() {
-    if (this.get().match("refs")) {
-      return this.get().match("refs/heads/(.+)")[1];
+    if (this.read().match("refs")) {
+      return this.read().match("refs/heads/(.+)")[1];
     }
   },
 
-  get: function() {
+  read: function() {
     var content = files.read(nodePath.join(files.gimletDir(), "HEAD"));
     var refMatch = content.match("ref: (refs/heads/.+)");
     return refMatch ? refMatch[1] : content;
@@ -183,7 +183,7 @@ var refs = {
 
   toLocalHead: function(ref) {
     if (ref === "HEAD") {
-      return head.get();
+      return head.read();
     } else if (this.isLocalHeadRef(ref)) {
       return ref;
     } else {
