@@ -9,4 +9,9 @@ describe('diff', function() {
     expect(function() { ga.diff(); })
       .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
   });
+
+  it('should throw if do not pass --name-only option', function() {
+    ga.init();
+    expect(function() { ga.diff(undefined, undefined, {}); }).toThrow("unsupported");
+  });
 });

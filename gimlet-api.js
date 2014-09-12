@@ -144,6 +144,9 @@ var gimletApi = module.exports = {
 
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
+
+    if (opts["name-only"] !== true) {
+      throw "unsupported"; // for now
     }
   }
 };
