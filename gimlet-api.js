@@ -113,20 +113,6 @@ var gimletApi = module.exports = {
     }
   },
 
-  symbolic_ref: function(symbolicRef, refToUpdateTo) {
-    files.assertInRepo();
-
-    if (symbolicRef !== "HEAD") {
-      throw "fatal: ref " + symbolicRef + " is not a symbolic ref";
-    } else if (refToUpdateTo === undefined) {
-      return head.get();
-    } else if (refs.isLocalHeadRef(refToUpdateTo)) {
-      head.set(refToUpdateTo);
-    } else {
-      throw "fatal: Refusing to point " + symbolicRef + " outside of refs/heads/";
-    }
-  },
-
   update_ref: function(refToUpdate, refToUpdateTo) {
     files.assertInRepo();
 

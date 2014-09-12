@@ -52,12 +52,6 @@ describe('gimlet cli', function() {
       testUtil.expectFile(".gimlet/objects/5ceba65", "filea");
     });
 
-    it('create symbolic ref from HEAD to woo branch', function() {
-      ga.init();
-      g(["node", "gimlet.js", "symbolic-ref", "HEAD", "refs/heads/woo"]);
-      testUtil.expectFile(".gimlet/HEAD", "ref: refs/heads/woo\n");
-    });
-
     it('update HEAD ref to prior commit', function() {
       testUtil.pinDate();
 
