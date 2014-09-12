@@ -122,10 +122,10 @@ var gimletApi = module.exports = {
       var hash = refs.toExistentHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
+      } else if (!(objects.type(objects.read(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toLocalHead(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
-      } else if (!(objects.type(objects.read(hash)) === "commit")) {
       } else {
         refs.set(refs.toLocalHead(refToUpdate), hash);
       }
