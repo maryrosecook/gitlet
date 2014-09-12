@@ -165,7 +165,7 @@ var head = {
     return refMatch ? refMatch[1] : content;
   },
 
-  set: function(ref) {
+  write: function(ref) {
     if (refs.isLocalHeadRef(ref)) {
       files.write(nodePath.join(files.gimletDir(), "HEAD"), "ref: " + ref + "\n");
     }
