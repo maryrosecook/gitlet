@@ -231,7 +231,7 @@ var index = {
     var index = this.read();
     index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
     gimletApi.hash_object(path, { w: true });
-    this.set(index);
+    this.write(index);
   },
 
   read: function() {
@@ -245,7 +245,7 @@ var index = {
       }, {});
   },
 
-  set: function(index) {
+  write: function(index) {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
         .join("\n")
