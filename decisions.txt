@@ -23,3 +23,4 @@ todo
 * make sure merge does two parents
 * use same quote style throughout
 * reconcile mix of pure/impure functions in the function bags
+* shorten error messages - no need to ape the git ones fully
