@@ -62,7 +62,7 @@ var gimletApi = module.exports = {
     } else {
       var fileContents = files.read(file);
       if (opts.w) {
-        return objects.writeObject(fileContents);
+        return objects.write(fileContents);
       }
 
       return util.hash(fileContents);
@@ -85,13 +85,13 @@ var gimletApi = module.exports = {
       var treeHash = this.write_tree();
 
       if (headHash !== undefined &&
-          treeHash === objects.getTreeHash(objects.readObject(headHash))) {
+          treeHash === objects.getTreeHash(objects.read(headHash))) {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
         var isFirstCommit = refs.toExistentHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.toExistentHash("HEAD")];
-        var commmitHash = objects.writeCommit(treeHash, opts.m, parentHashes);
+        var commmitHash = objects.write(objects.commitContent(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
       }
@@ -122,10 +122,10 @@ var gimletApi = module.exports = {
       var hash = refs.toExistentHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
-      } else if (!(objects.type(objects.readObject(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
           refs.toLocalHead(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
+      } else if (!(objects.type(objects.read(hash)) === "commit")) {
       } else {
         refs.set(refs.toLocalHead(refToUpdate), hash);
       }
@@ -273,26 +273,22 @@ var objects = {
       }
     }).join("\n") + "\n";
 
-    return this.writeObject(treeObject);
+    return this.write(treeObject);
   },
 
-  writeCommit: function(treeHash, message, parentHashes) {
-    var parentLines = parentHashes.map(function(h) {
-      return "parent " + h + "\n";
-    }).join("");
-
-    return this.writeObject("commit " + treeHash + "\n" +
-                            parentLines +
-                            "Date:  " + new Date().toString() + "\n" +
-                            "\n" +
-                            "    " + message);
+  commitContent: function(treeHash, message, parentHashes) {
+    return "commit " + treeHash + "\n" +
+      parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
+      "Date:  " + new Date().toString() + "\n" +
+      "\n" +
+      "    " + message;
   },
 
-  writeObject: function(content) {
+  write: function(content) {
     var contentHash = util.hash(content);
-    if (this.readObject(contentHash) === undefined) {
+    if (this.read(contentHash) === undefined) {
       var filePath = nodePath.join(files.gimletDir(), "objects", contentHash);
-      fs.writeFileSync(filePath, content);
+      files.write(filePath, content);
     }
 
     return contentHash;
@@ -303,7 +299,7 @@ var objects = {
       fs.existsSync(nodePath.join(files.gimletDir(), "objects", objectHash));
   },
 
-  readObject: function(objectHash) {
+  read: function(objectHash) {
     var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
     if (fs.existsSync(objectPath)) {
       return files.read(objectPath);
