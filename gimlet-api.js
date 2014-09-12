@@ -109,7 +109,7 @@ var gimletApi = module.exports = {
     } else if (refs.toExistentHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
     } else {
-      refs.set(refs.nameToBranchRef(name), refs.toExistentHash("HEAD"));
+      refs.write(refs.nameToBranchRef(name), refs.toExistentHash("HEAD"));
     }
   },
 
@@ -127,7 +127,7 @@ var gimletApi = module.exports = {
           refs.toLocalHead(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
       } else {
-        refs.set(refs.toLocalHead(refToUpdate), hash);
+        refs.write(refs.toLocalHead(refToUpdate), hash);
       }
     }
   },
@@ -205,7 +205,7 @@ var refs = {
     return "refs/heads/" + name;
   },
 
-  set: function(ref, content) {
+  write: function(ref, content) {
     if (this.isLocalHeadRef(ref)) {
       files.write(nodePath.join(files.gimletDir(), ref), content);
     }
