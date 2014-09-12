@@ -380,6 +380,10 @@ var files = {
     return fs.readFileSync(path, "utf8");
   },
 
+  write: function(path, content) {
+    fs.writeFileSync(path, content);
+  },
+
   recursiveList: function(path) {
     if (!fs.existsSync(path)) {
       return [];
