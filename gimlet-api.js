@@ -23,7 +23,7 @@ var gimletApi = module.exports = {
   add: function(path) {
     files.assertInRepo();
 
-    var addedFiles = files.recursiveList(path);
+    var addedFiles = files.lsRecursive(path);
     if (addedFiles.length === 0) {
       throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
     } else {
@@ -384,7 +384,7 @@ var files = {
     fs.writeFileSync(path, content);
   },
 
-  recursiveList: function(path) {
+  lsRecursive: function(path) {
     if (!fs.existsSync(path)) {
       return [];
     } else if (fs.statSync(path).isFile()) {
@@ -392,7 +392,7 @@ var files = {
     } else if (fs.statSync(path).isDirectory()) {
       var self = this;
       return fs.readdirSync(path).reduce(function(files, dirChild) {
-        return files.concat(self.recursiveList(nodePath.join(path, dirChild)));
+        return files.concat(self.lsRecursive(nodePath.join(path, dirChild)));
       }, []);
     }
   }
