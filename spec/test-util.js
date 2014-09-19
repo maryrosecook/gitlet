@@ -59,9 +59,8 @@ var testUtil = module.exports = {
   },
 
   pinDate: function() {
-    var pinnedValue = new Date(1409404605356).toString();
     global.Date.prototype.toString = function() {
-      return pinnedValue;
+      return "Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)";
     };
   },
 
