@@ -227,6 +227,10 @@ var index = {
     return index.read()[path] !== undefined;
   },
 
+  read: function() {
+    return files.read(nodePath.join(files.gimletDir(), "index"));
+  },
+
   addFile: function(path) {
     var index = this.read();
     index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
@@ -234,10 +238,8 @@ var index = {
     this.write(index);
   },
 
-  read: function() {
-    return files.read(nodePath.join(files.gimletDir(), "index"))
-      .split("\n")
-      .slice(0, -1) // chuck last empty line
+  strToObj: function(content) { // CHUCK THIS WHEN REFACTOR DONE
+    return util.lines(content)
       .reduce(function(index, blobStr) {
         var blobData = blobStr.split(/ /);
         index[blobData[0]] = blobData[1];
@@ -420,5 +422,9 @@ var util = {
       obj[arr[0]] = obj[arr[0]] || {};
       this.assocIn(obj[arr[0]], arr.slice(1));
     }
+  },
+
+  lines: function(str) {
+    return str.split("\n").slice(0, -1); // last is empty
   }
 };
