@@ -44,7 +44,7 @@ var gimletApi = module.exports = {
     } else if (fs.statSync(path).isDirectory()) {
       throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
         "fatal: Unable to process path " + pathFromRoot;
-    } else if (!index.hasFile(path) && opts.add === undefined) {
+    } else if (!index.readHasFile(path) && opts.add === undefined) {
       throw "error: " + pathFromRoot  +
         ": cannot add to the index - missing --add option?\n" +
         "fatal: Unable to process path " + pathFromRoot;
@@ -223,7 +223,7 @@ var refs = {
 };
 
 var index = {
-  hasFile: function(path) {
+  readHasFile: function(path) {
     return this.strToObj(this.read())[path] !== undefined;
   },
 
