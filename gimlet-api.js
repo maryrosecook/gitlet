@@ -102,7 +102,7 @@ var gimletApi = module.exports = {
     files.assertInRepo();
 
     if (name === undefined) {
-      return refs.localHeads().map(function(branchName) {
+      return refs.readLocalHeads().map(function(branchName) {
         var marker = branchName === head.currentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
@@ -211,7 +211,7 @@ var refs = {
     }
   },
 
-  localHeads: function() {
+  readLocalHeads: function() {
     return fs.readdirSync(nodePath.join(files.gimletDir(), "refs/heads/"));
   },
 
