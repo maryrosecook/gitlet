@@ -81,7 +81,7 @@ var gimletApi = module.exports = {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
     } else {
-      var headHash = refs.toExistentHash("HEAD");
+      var headHash = refs.readExistentHash("HEAD");
       var treeHash = this.write_tree();
 
       if (headHash !== undefined &&
@@ -89,8 +89,8 @@ var gimletApi = module.exports = {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
-        var isFirstCommit = refs.toExistentHash("HEAD") === undefined;
-        var parentHashes = isFirstCommit ? [] : [refs.toExistentHash("HEAD")];
+        var isFirstCommit = refs.readExistentHash("HEAD") === undefined;
+        var parentHashes = isFirstCommit ? [] : [refs.readExistentHash("HEAD")];
         var commmitHash = objects.write(objects.commitContent(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
         return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
@@ -106,10 +106,10 @@ var gimletApi = module.exports = {
         var marker = branchName === head.currentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
-    } else if (refs.toExistentHash("HEAD") === undefined) {
+    } else if (refs.readExistentHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
     } else {
-      refs.write(refs.nameToBranchRef(name), refs.toExistentHash("HEAD"));
+      refs.write(refs.nameToBranchRef(name), refs.readExistentHash("HEAD"));
     }
   },
 
@@ -119,7 +119,7 @@ var gimletApi = module.exports = {
     if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = refs.toExistentHash(refToUpdateTo);
+      var hash = refs.readExistentHash(refToUpdateTo);
       if (!objects.exists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.type(objects.read(hash)) === "commit")) {
@@ -191,7 +191,7 @@ var refs = {
     }
   },
 
-  toExistentHash: function(ref) {
+  readExistentHash: function(ref) {
     if (objects.exists(ref)) {
       return ref;
     } else if (this.exists(this.toLocalHead(ref))) {
