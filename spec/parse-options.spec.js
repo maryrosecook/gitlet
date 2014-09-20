@@ -45,6 +45,21 @@ describe('parse-options', function() {
       .toEqual({ _: ["command-1"], message: "blah" });
   });
 
+  it('should parse two long opts that do not have values', function() {
+    expect(p(["command", "--flag1", "--flag2"]))
+      .toEqual({ _: ["command"], flag1: true, flag2: true });
+  });
+
+  it('should parse long opt without value and long opt with value', function() {
+    expect(p(["command", "--flag1", "--flag2", "woo"]))
+      .toEqual({ _: ["command"], flag1: true, flag2: "woo" });
+  });
+
+  it('should parse long opt with value and long opt with value', function() {
+    expect(p(["command", "--flag1", "--flag2", "woo"]))
+      .toEqual({ _: ["command"], flag1: true, flag2: "woo" });
+  });
+
   describe('gimlet commands', function() {
     it('should parse "node gimlet.js add a/b.js"', function() {
       expect(p(["node", "gimlet.js", "add", "a/b.js"]))
