@@ -250,8 +250,7 @@ var index = {
   write: function(index) {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
-        .join("\n")
-        .concat("\n"); // trailing new line
+        .join("\n") + "\n";
     files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
   },
 
