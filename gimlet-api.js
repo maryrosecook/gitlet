@@ -194,9 +194,9 @@ var refs = {
   readExistentHash: function(ref) {
     if (objects.exists(ref)) {
       return ref;
-    } else if (this.exists(this.toLocalHead(ref))) {
+    } else if (this.readExists(this.toLocalHead(ref))) {
       return files.read(nodePath.join(files.gimletDir(), this.toLocalHead(ref)));
-    } else if (this.exists(this.nameToBranchRef(ref))) {
+    } else if (this.readExists(this.nameToBranchRef(ref))) {
       return files.read(nodePath.join(files.gimletDir(), this.nameToBranchRef(ref)));
     }
   },
@@ -215,7 +215,7 @@ var refs = {
     return fs.readdirSync(nodePath.join(files.gimletDir(), "refs/heads/"));
   },
 
-  exists: function(ref) {
+  readExists: function(ref) {
     return ref !== undefined &&
       this.isLocalHeadRef(ref) &&
       fs.existsSync(nodePath.join(files.gimletDir(), ref));
