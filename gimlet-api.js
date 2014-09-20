@@ -120,7 +120,7 @@ var gimletApi = module.exports = {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
       var hash = refs.readExistentHash(refToUpdateTo);
-      if (!objects.exists(hash)) {
+      if (!objects.readExists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.type(objects.read(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
@@ -138,7 +138,7 @@ var gimletApi = module.exports = {
     var finalRef = refs.isRef(ref) ? ref : refs.toFinalRef(ref);
     var hash = refs.toHash(finalRef);
 
-    if (!objects.exists(hash)) {
+    if (!objects.readExists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to git."
     }
   },
@@ -192,7 +192,7 @@ var refs = {
   },
 
   readExistentHash: function(ref) {
-    if (objects.exists(ref)) {
+    if (objects.readExists(ref)) {
       return ref;
     } else if (this.readExists(this.toLocalHead(ref))) {
       return files.read(nodePath.join(files.gimletDir(), this.toLocalHead(ref)));
@@ -296,7 +296,7 @@ var objects = {
     return contentHash;
   },
 
-  exists: function(objectHash) {
+  readExists: function(objectHash) {
     return objectHash !== undefined &&
       fs.existsSync(nodePath.join(files.gimletDir(), "objects", objectHash));
   },
