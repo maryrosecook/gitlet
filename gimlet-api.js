@@ -253,9 +253,9 @@ var index = {
     files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
   },
 
-  toTree: function() {
+  objToTree: function(obj) {
     var tree = {};
-    Object.keys(this.read()).forEach(function(wholePath) {
+    Object.keys(obj).forEach(function(wholePath) {
       util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
     });
 
