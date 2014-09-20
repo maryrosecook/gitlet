@@ -91,7 +91,7 @@ var gimletApi = module.exports = {
       } else {
         var isFirstCommit = refs.readExistentHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.readExistentHash("HEAD")];
-        var commmitHash = objects.write(objects.commitContent(treeHash, opts.m, parentHashes));
+        var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
         return "[" + head.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
       }
@@ -278,7 +278,7 @@ var objects = {
     return this.write(treeObject);
   },
 
-  commitContent: function(treeHash, message, parentHashes) {
+  composeCommit: function(treeHash, message, parentHashes) {
     return "commit " + treeHash + "\n" +
       parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
       "Date:  " + new Date().toString() + "\n" +
