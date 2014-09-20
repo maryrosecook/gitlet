@@ -86,14 +86,14 @@ var gimletApi = module.exports = {
 
       if (headHash !== undefined &&
           treeHash === objects.readTreeHash(objects.read(headHash))) {
-        throw "# On " + head.currentBranchName() + "\n" +
+        throw "# On " + head.readCurrentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
         var isFirstCommit = refs.readExistentHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.readExistentHash("HEAD")];
         var commmitHash = objects.write(objects.commitContent(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
-        return "[" + head.currentBranchName() + " " + commmitHash + "] " + opts.m;
+        return "[" + head.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
       }
     }
   },
@@ -103,11 +103,11 @@ var gimletApi = module.exports = {
 
     if (name === undefined) {
       return refs.readLocalHeads().map(function(branchName) {
-        var marker = branchName === head.currentBranchName() ? "* " : "  ";
+        var marker = branchName === head.readCurrentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
     } else if (refs.readExistentHash("HEAD") === undefined) {
-      throw "fatal: Not a valid object name: '" + head.currentBranchName() + "'.";
+      throw "fatal: Not a valid object name: '" + head.readCurrentBranchName() + "'.";
     } else {
       refs.write(refs.nameToBranchRef(name), refs.readExistentHash("HEAD"));
     }
@@ -153,7 +153,7 @@ var gimletApi = module.exports = {
 };
 
 var head = {
-  currentBranchName: function() {
+  readCurrentBranchName: function() {
     if (this.read().match("refs")) {
       return this.read().match("refs/heads/(.+)")[1];
     }
