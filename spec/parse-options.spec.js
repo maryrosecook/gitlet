@@ -25,7 +25,7 @@ describe('parse-options', function() {
     expect(p(["command", "--message", "blah"])).toEqual({ _: ["command"], message: 'blah' });
   });
 
-  it('should three strings in right order', function() {
+  it('should parse three strings in right order', function() {
     expect(p(["command1", "command2", "command3"]))
       .toEqual({ _: ["command1", "command2", "command3"] });
   });
