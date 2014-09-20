@@ -49,7 +49,7 @@ var gimletApi = module.exports = {
         ": cannot add to the index - missing --add option?\n" +
         "fatal: Unable to process path " + pathFromRoot;
     } else {
-      index.addFile(path);
+      index.writeFile(path);
     }
   },
 
@@ -231,7 +231,7 @@ var index = {
     return files.read(nodePath.join(files.gimletDir(), "index"));
   },
 
-  addFile: function(path) {
+  writeFile: function(path) {
     var index = this.strToObj(this.read());
     index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
     gimletApi.hash_object(path, { w: true });
