@@ -24,8 +24,5 @@ todo
 * use same quote style throughout
 * reconcile mix of pure/impure functions in the function bags
 * shorten error messages - no need to ape the git ones fully
-* use read/write consistently, rather than get/set
-* as part of head.set, will need to remove isLocalHeadRef check
-* changed .concat("\n") to + "\n"
 * split files into files and workingcopy
 * replace all instances of content w str?
