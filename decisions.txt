@@ -31,3 +31,4 @@ todo
 * rename commitContent to something that doesn't sound like its committing
 * rename toExistentHash to readHash?
 * replace all instances of content w str?
+* make all read/write fns have read/write in name
