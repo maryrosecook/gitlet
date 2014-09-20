@@ -238,8 +238,8 @@ var index = {
     this.write(index);
   },
 
-  strToObj: function(content) { // CHUCK THIS WHEN REFACTOR DONE
-    return util.lines(content)
+  strToObj: function(str) { // CHUCK THIS WHEN REFACTOR DONE
+    return util.lines(str)
       .reduce(function(index, blobStr) {
         var blobData = blobStr.split(/ /);
         index[blobData[0]] = blobData[1];
@@ -285,11 +285,11 @@ var objects = {
       "    " + message;
   },
 
-  write: function(content) {
-    var contentHash = util.hash(content);
+  write: function(str) {
+    var contentHash = util.hash(str);
     if (this.read(contentHash) === undefined) {
       var filePath = nodePath.join(files.gimletDir(), "objects", contentHash);
-      files.write(filePath, content);
+      files.write(filePath, str);
     }
 
     return contentHash;
@@ -307,8 +307,8 @@ var objects = {
     }
   },
 
-  type: function(content) {
-    var firstToken = content.split(" ")[0];
+  type: function(str) {
+    var firstToken = str.split(" ")[0];
     if (firstToken === "commit") {
       return "commit";
     } else if (firstToken === "tree" || firstToken === "blob") {
@@ -318,11 +318,11 @@ var objects = {
     }
   },
 
-  treeHash: function(content) {
-    if (this.type(content) === "commit") {
-      return content.split(/\s/)[1];
-    } else if (this.type(content) === "tree") {
-      return hash(content);
+  treeHash: function(str) {
+    if (this.type(str) === "commit") {
+      return str.split(/\s/)[1];
+    } else if (this.type(str) === "tree") {
+      return hash(str);
     }
   }
 };
@@ -381,8 +381,8 @@ var files = {
     return fs.readFileSync(path, "utf8");
   },
 
-  write: function(path, content) {
-    fs.writeFileSync(path, content);
+  write: function(path, str) {
+    fs.writeFileSync(path, str);
   },
 
   lsRecursive: function(path) {
