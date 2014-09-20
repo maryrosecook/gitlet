@@ -71,13 +71,13 @@ var gimletApi = module.exports = {
 
   write_tree: function() {
     files.assertInRepo();
-    return objects.writeTree(index.toTree());
+    return objects.writeTree(index.objToTree(index.strToObj(index.read())));
   },
 
   commit: function(opts) {
     files.assertInRepo();
 
-    if (Object.keys(index.read()).length === 0) {
+    if (Object.keys(index.strToObj(index.read())).length === 0) {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
     } else {
@@ -224,7 +224,7 @@ var refs = {
 
 var index = {
   hasFile: function(path) {
-    return index.read()[path] !== undefined;
+    return this.strToObj(this.read())[path] !== undefined;
   },
 
   read: function() {
@@ -232,7 +232,7 @@ var index = {
   },
 
   addFile: function(path) {
-    var index = this.read();
+    var index = this.strToObj(this.read());
     index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
     gimletApi.hash_object(path, { w: true });
     this.write(index);
