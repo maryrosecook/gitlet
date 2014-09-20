@@ -85,7 +85,7 @@ var gimletApi = module.exports = {
       var treeHash = this.write_tree();
 
       if (headHash !== undefined &&
-          treeHash === objects.getTreeHash(objects.read(headHash))) {
+          treeHash === objects.readTreeHash(objects.read(headHash))) {
         throw "# On " + head.currentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
@@ -319,7 +319,7 @@ var objects = {
     }
   },
 
-  getTreeHash: function(content) {
+  readTreeHash: function(content) {
     if (this.type(content) === "commit") {
       return content.split(/\s/)[1];
     } else if (this.type(content) === "tree") {
