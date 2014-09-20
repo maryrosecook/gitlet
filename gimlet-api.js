@@ -5,7 +5,7 @@ var gimletApi = module.exports = {
   init: function() {
     if (files.inRepo()) { return; }
 
-    files.createFilesFromTree({
+    files.writeFilesFromTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
         index: "",
@@ -362,9 +362,9 @@ var files = {
     return nodePath.relative(this.repoDir(), nodePath.join(process.cwd(), path));
   },
 
-  createFilesFromTree: function(structure, prefix) {
+  writeFilesFromTree: function(structure, prefix) {
     if (prefix === undefined) {
-      return files.createFilesFromTree(structure, process.cwd());
+      return files.writeFilesFromTree(structure, process.cwd());
     }
 
     Object.keys(structure).forEach(function(name) {
@@ -373,7 +373,7 @@ var files = {
         files.write(path, structure[name]);
       } else {
         fs.mkdirSync(path, "777");
-        files.createFilesFromTree(structure[name], path);
+        files.writeFilesFromTree(structure[name], path);
       }
     });
   },
