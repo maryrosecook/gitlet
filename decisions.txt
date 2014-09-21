@@ -25,3 +25,6 @@ todo
 * reconcile mix of pure/impure functions in the function bags
 * shorten error messages - no need to ape the git ones fully
 * split files into files and workingcopy
+* make sure all non read/write fns are functional
+* try and model tree dir structure, path:str dir structure as separate things?
+* model refs/trees/commits/blobs as objs w/ methods?
