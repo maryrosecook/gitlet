@@ -1,3 +1,4 @@
+var fs = require('fs');
 var nodePath = require('path');
 var files = require('./files');
 var objects = require('./objects');
@@ -9,7 +10,8 @@ var index = module.exports = {
   },
 
   read: function() {
-    return files.read(nodePath.join(files.gimletDir(), "index"));
+    var path = nodePath.join(files.gimletDir(), "index");
+    return fs.existsSync(path) ? files.read(path) : "";
   },
 
   writeFile: function(path) {

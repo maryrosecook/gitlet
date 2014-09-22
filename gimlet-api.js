@@ -12,7 +12,6 @@ var gimletApi = module.exports = {
     files.writeFilesFromTree({
       ".gimlet": {
         HEAD: "ref: refs/heads/master\n",
-        index: "",
         objects: {},
         refs: {
           heads: {},
