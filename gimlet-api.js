@@ -1,5 +1,9 @@
 var fs = require('fs');
-var nodePath = require('path');
+var files = require('./files');
+var index = require('./index');
+var objects = require('./objects');
+var refs = require('./refs');
+var util = require('./util');
 
 var gimletApi = module.exports = {
   init: function() {
@@ -86,14 +90,14 @@ var gimletApi = module.exports = {
 
       if (headHash !== undefined &&
           treeHash === objects.treeHash(objects.read(headHash))) {
-        throw "# On " + head.readCurrentBranchName() + "\n" +
+        throw "# On " + refs.readCurrentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
         var isFirstCommit = refs.readExistentHash("HEAD") === undefined;
         var parentHashes = isFirstCommit ? [] : [refs.readExistentHash("HEAD")];
         var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
-        return "[" + head.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
+        return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
       }
     }
   },
@@ -103,11 +107,11 @@ var gimletApi = module.exports = {
 
     if (name === undefined) {
       return refs.readLocalHeads().map(function(branchName) {
-        var marker = branchName === head.readCurrentBranchName() ? "* " : "  ";
+        var marker = branchName === refs.readCurrentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
     } else if (refs.readExistentHash("HEAD") === undefined) {
-      throw "fatal: Not a valid object name: '" + head.readCurrentBranchName() + "'.";
+      throw "fatal: Not a valid object name: '" + refs.readCurrentBranchName() + "'.";
     } else {
       refs.write(refs.nameToBranchRef(name), refs.readExistentHash("HEAD"));
     }
@@ -149,281 +153,5 @@ var gimletApi = module.exports = {
     if (opts["name-only"] !== true) {
       throw "unsupported"; // for now
     }
-  }
-};
-
-var head = {
-  readCurrentBranchName: function() {
-    if (this.read().match("refs")) {
-      return this.read().match("refs/heads/(.+)")[1];
-    }
-  },
-
-  read: function() {
-    var content = files.read(nodePath.join(files.gimletDir(), "HEAD"));
-    var refMatch = content.match("ref: (refs/heads/.+)");
-    return refMatch ? refMatch[1] : content;
-  },
-
-  write: function(ref) {
-    if (refs.isLocalHeadRef(ref)) {
-      files.write(nodePath.join(files.gimletDir(), "HEAD"), "ref: " + ref + "\n");
-    }
-  }
-};
-
-var refs = {
-  isLocalHeadRef: function(ref) {
-    return ref.match("refs/heads/[A-Za-z-]+");
-  },
-
-  isRef: function(ref) {
-    return ref === "HEAD" || this.isLocalHeadRef(ref);
-  },
-
-  toLocalHead: function(ref) {
-    if (ref === "HEAD") {
-      return head.read();
-    } else if (this.isLocalHeadRef(ref)) {
-      return ref;
-    } else {
-      return this.nameToBranchRef(ref);
-    }
-  },
-
-  readExistentHash: function(ref) {
-    if (objects.readExists(ref)) {
-      return ref;
-    } else if (this.readExists(this.toLocalHead(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), this.toLocalHead(ref)));
-    } else if (this.readExists(this.nameToBranchRef(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), this.nameToBranchRef(ref)));
-    }
-  },
-
-  nameToBranchRef: function(name) {
-    return "refs/heads/" + name;
-  },
-
-  write: function(ref, content) {
-    if (this.isLocalHeadRef(ref)) {
-      files.write(nodePath.join(files.gimletDir(), ref), content);
-    }
-  },
-
-  readLocalHeads: function() {
-    return fs.readdirSync(nodePath.join(files.gimletDir(), "refs/heads/"));
-  },
-
-  readExists: function(ref) {
-    return ref !== undefined &&
-      this.isLocalHeadRef(ref) &&
-      fs.existsSync(nodePath.join(files.gimletDir(), ref));
-  }
-};
-
-var index = {
-  readHasFile: function(path) {
-    return this.strToObj(this.read())[path] !== undefined;
-  },
-
-  read: function() {
-    return files.read(nodePath.join(files.gimletDir(), "index"));
-  },
-
-  writeFile: function(path) {
-    var index = this.strToObj(this.read());
-    index[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
-    gimletApi.hash_object(path, { w: true });
-    this.write(index);
-  },
-
-  strToObj: function(str) { // CHUCK THIS WHEN REFACTOR DONE
-    return util.lines(str)
-      .reduce(function(index, blobStr) {
-        var blobData = blobStr.split(/ /);
-        index[blobData[0]] = blobData[1];
-        return index;
-      }, {});
-  },
-
-  write: function(index) {
-    var indexStr = Object.keys(index)
-        .map(function(path) { return path + " " + index[path]; })
-        .join("\n") + "\n";
-    files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
-  },
-
-  objToTree: function(obj) {
-    var tree = {};
-    Object.keys(obj).forEach(function(wholePath) {
-      util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
-    });
-
-    return tree;
-  }
-};
-
-var objects = {
-  writeTree: function(tree) {
-    var treeObject = Object.keys(tree).map(function(key) {
-      if (util.isString(tree[key])) {
-        return "blob " + util.hash(tree[key]) + " " + key;
-      } else {
-        return "tree " + objects.writeTree(tree[key]) + " " + key;
-      }
-    }).join("\n") + "\n";
-
-    return this.write(treeObject);
-  },
-
-  composeCommit: function(treeHash, message, parentHashes) {
-    return "commit " + treeHash + "\n" +
-      parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
-      "Date:  " + new Date().toString() + "\n" +
-      "\n" +
-      "    " + message;
-  },
-
-  write: function(str) {
-    var contentHash = util.hash(str);
-    if (this.read(contentHash) === undefined) {
-      var filePath = nodePath.join(files.gimletDir(), "objects", contentHash);
-      files.write(filePath, str);
-    }
-
-    return contentHash;
-  },
-
-  readExists: function(objectHash) {
-    return objectHash !== undefined &&
-      fs.existsSync(nodePath.join(files.gimletDir(), "objects", objectHash));
-  },
-
-  read: function(objectHash) {
-    var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
-    if (fs.existsSync(objectPath)) {
-      return files.read(objectPath);
-    }
-  },
-
-  type: function(str) {
-    var firstToken = str.split(" ")[0];
-    if (firstToken === "commit") {
-      return "commit";
-    } else if (firstToken === "tree" || firstToken === "blob") {
-      return "tree";
-    } else {
-      return "blob";
-    }
-  },
-
-  treeHash: function(str) {
-    if (this.type(str) === "commit") {
-      return str.split(/\s/)[1];
-    } else if (this.type(str) === "tree") {
-      return hash(str);
-    }
-  }
-};
-
-var files = {
-  gimletDir: function(dir) {
-    if (dir === undefined) { return this.gimletDir(process.cwd()); }
-
-    if (fs.existsSync(dir)) {
-      var potentialGimletDir = nodePath.join(dir, ".gimlet");
-      if (fs.existsSync(potentialGimletDir)) {
-        return potentialGimletDir;
-      } else if (dir !== "/") {
-        return this.gimletDir(nodePath.join(dir, ".."));
-      }
-    }
-  },
-
-  repoDir: function() {
-    if (this.gimletDir() !== undefined) {
-      return nodePath.join(this.gimletDir(), "..")
-    }
-  },
-
-  inRepo: function(cwd) {
-    return this.gimletDir(cwd) !== undefined;
-  },
-
-  assertInRepo: function() {
-    if (!this.inRepo()) {
-      throw "fatal: Not a gimlet repository (or any of the parent directories): .gimlet";
-    }
-  },
-
-  pathFromRepoRoot: function(path) {
-    return nodePath.relative(this.repoDir(), nodePath.join(process.cwd(), path));
-  },
-
-  writeFilesFromTree: function(structure, prefix) {
-    if (prefix === undefined) {
-      return files.writeFilesFromTree(structure, process.cwd());
-    }
-
-    Object.keys(structure).forEach(function(name) {
-      var path = nodePath.join(prefix, name);
-      if (util.isString(structure[name])) {
-        files.write(path, structure[name]);
-      } else {
-        fs.mkdirSync(path, "777");
-        files.writeFilesFromTree(structure[name], path);
-      }
-    });
-  },
-
-  read: function(path) {
-    return fs.readFileSync(path, "utf8");
-  },
-
-  write: function(path, str) {
-    fs.writeFileSync(path, str);
-  },
-
-  lsRecursive: function(path) {
-    if (!fs.existsSync(path)) {
-      return [];
-    } else if (fs.statSync(path).isFile()) {
-      return [path];
-    } else if (fs.statSync(path).isDirectory()) {
-      var self = this;
-      return fs.readdirSync(path).reduce(function(files, dirChild) {
-        return files.concat(self.lsRecursive(nodePath.join(path, dirChild)));
-      }, []);
-    }
-  }
-};
-
-var util = {
-  isString: function(thing) {
-    return typeof thing === "string";
-  },
-
-  hash: function(string) {
-    var hashInt = 0;
-    for (var i = 0; i < string.length; i++) {
-      hashInt = hashInt * 31 + string.charCodeAt(i);
-      hashInt = hashInt | 0;
-    }
-
-    return Math.abs(hashInt).toString(16);
-  },
-
-  assocIn: function(obj, arr) {
-    if (arr.length === 2) {
-      obj[arr[0]] = arr[1];
-    } else if (arr.length > 2) {
-      obj[arr[0]] = obj[arr[0]] || {};
-      this.assocIn(obj[arr[0]], arr.slice(1));
-    }
-  },
-
-  lines: function(str) {
-    return str.split("\n").slice(0, -1); // last is empty
   }
 };
