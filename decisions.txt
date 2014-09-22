@@ -28,3 +28,5 @@ todo
 * make sure all non read/write fns are functional
 * try and model tree dir structure, path:str dir structure as separate things?
 * model refs/trees/commits/blobs as objs w/ methods?
+* rm CHUCK THIS comment
+* do not create index during init
