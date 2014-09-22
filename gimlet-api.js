@@ -84,7 +84,7 @@ var gimletApi = module.exports = {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
     } else {
-      var headHash = refs.readExistentHash("HEAD");
+      var headHash = refs.readHash("HEAD");
       var treeHash = this.write_tree();
 
       if (headHash !== undefined &&
@@ -92,8 +92,8 @@ var gimletApi = module.exports = {
         throw "# On " + refs.readCurrentBranchName() + "\n" +
           "nothing to commit, working directory clean";
       } else {
-        var isFirstCommit = refs.readExistentHash("HEAD") === undefined;
-        var parentHashes = isFirstCommit ? [] : [refs.readExistentHash("HEAD")];
+        var isFirstCommit = refs.readHash("HEAD") === undefined;
+        var parentHashes = isFirstCommit ? [] : [refs.readHash("HEAD")];
         var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
         this.update_ref("HEAD", commmitHash);
         return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
@@ -109,10 +109,10 @@ var gimletApi = module.exports = {
         var marker = branchName === refs.readCurrentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
-    } else if (refs.readExistentHash("HEAD") === undefined) {
+    } else if (refs.readHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + refs.readCurrentBranchName() + "'.";
     } else {
-      refs.write(refs.nameToBranchRef(name), refs.readExistentHash("HEAD"));
+      refs.write(refs.nameToBranchRef(name), refs.readHash("HEAD"));
     }
   },
 
@@ -122,15 +122,15 @@ var gimletApi = module.exports = {
     if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = refs.readExistentHash(refToUpdateTo);
+      var hash = objects.read(refToUpdateTo) ? refToUpdateTo : refs.readHash(refToUpdateTo);
       if (!objects.readExists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.type(objects.read(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
-          refs.toLocalHead(refToUpdate) + "\n" +
+          refs.readTerminalRef(refToUpdate) + "\n" +
           "fatal: Cannot update the ref " + refToUpdate;
       } else {
-        refs.write(refs.toLocalHead(refToUpdate), hash);
+        refs.write(refs.readTerminalRef(refToUpdate), hash);
       }
     }
   },

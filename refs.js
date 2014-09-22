@@ -8,7 +8,7 @@ var refs = module.exports = {
     return ref === "HEAD" || isLocalHeadRef(ref);
   },
 
-  toLocalHead: function(ref) {
+  readTerminalRef: function(ref) {
     if (ref === "HEAD") {
       return readHead();
     } else if (isLocalHeadRef(ref)) {
@@ -18,11 +18,9 @@ var refs = module.exports = {
     }
   },
 
-  readExistentHash: function(ref) {
-    if (objects.readExists(ref)) {
-      return ref;
-    } else if (refs.readExists(refs.toLocalHead(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), refs.toLocalHead(ref)));
+  readHash: function(ref) {
+    if (refs.readExists(refs.readTerminalRef(ref))) {
+      return files.read(nodePath.join(files.gimletDir(), refs.readTerminalRef(ref)));
     } else if (refs.readExists(refs.nameToBranchRef(ref))) {
       return files.read(nodePath.join(files.gimletDir(), refs.nameToBranchRef(ref)));
     }
