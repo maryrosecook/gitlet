@@ -20,7 +20,7 @@ var index = module.exports = {
     index.write(idx);
   },
 
-  strToObj: function(str) { // CHUCK THIS WHEN REFACTOR DONE
+  strToObj: function(str) {
     return util.lines(str)
       .reduce(function(idx, blobStr) {
         var blobData = blobStr.split(/ /);
