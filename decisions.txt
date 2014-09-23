@@ -27,3 +27,4 @@ todo
 * split files into files and workingcopy
 * try and model tree dir structure, path:str dir structure as separate things?
 * model refs/trees/commits/blobs as objs w/ methods?
+* remove code that allows diffing/checking out a tree
