@@ -3,6 +3,7 @@ var files = require('./files');
 var index = require('./index');
 var objects = require('./objects');
 var refs = require('./refs');
+var diff = require('./diff');
 var util = require('./util');
 
 var gimletApi = module.exports = {
@@ -151,6 +152,10 @@ var gimletApi = module.exports = {
 
     if (opts["name-only"] !== true) {
       throw "unsupported"; // for now
+    } else if (diff.readIsDiffableRef(ref1)) {
+      throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
+    } else if (diff.readIsDiffableRef(ref2)) {
+      throw "fatal: ambiguous argument " + ref2 + ": unknown revision";
     }
   }
 };
