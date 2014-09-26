@@ -36,7 +36,7 @@ var index = module.exports = {
     return Object.keys(index.read())
       .filter(function(path) { return fs.existsSync(nodePath.join(files.repoDir(), path)); })
       .reduce(function(idx, path) {
-        idx[path] = hash(files.read(nodePath.join(files.repoDir(), path)));
+        idx[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
         return idx;
       }, {});
   }
