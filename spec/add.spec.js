@@ -82,5 +82,17 @@ describe('add', function() {
       expect(testUtil.index()[3].path).toEqual("1/2/3b/fileg");
       expect(testUtil.index().length).toEqual(4);
     });
+
+    it('should complain that file does not exist even if in index', function() {
+      // git 1.8.2.3 does not complain that file does not exist,
+      // presumably because it is in the index.  git 2.0 will complain.
+
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      fs.unlink("1a/filea");
+      expect(function() { ga.add("1a/filea"); })
+        .toThrow("fatal: pathspec '1a/filea' did not match any files");
+    });
   });
 });
