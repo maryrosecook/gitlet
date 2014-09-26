@@ -70,5 +70,15 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true }))
         .toEqual("M 1a/filea\n");
     });
+
+    it('should not include commited file w staged changes', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a");
+      ga.commit({ m: "first" });
+      fs.writeFileSync("1a/filea", "somethingelse");
+      ga.add("1a");
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+    });
   });
 });
