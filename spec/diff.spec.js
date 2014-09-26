@@ -89,5 +89,12 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true }))
         .toEqual("D 1a/filea\n");
     });
+
+    it('should not include file that was created, deleted but never staged', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      fs.unlink("1a/filea");
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+    });
   });
 });
