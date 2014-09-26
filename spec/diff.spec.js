@@ -48,7 +48,7 @@ describe('diff', function() {
 
       testUtil.createStandardFileStructure();
       ga.init();
-      ga.add("1a");
+      ga.add("1a/filea");
       expect(testUtil.index()[0].path).toEqual("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
@@ -56,7 +56,7 @@ describe('diff', function() {
     it('should not include commited file w no changes', function() {
       testUtil.createStandardFileStructure();
       ga.init();
-      ga.add("1a");
+      ga.add("1a/filea");
       ga.commit({ m: "first" });
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
@@ -64,7 +64,7 @@ describe('diff', function() {
     it('should include commited file w unstaged changes', function() {
       testUtil.createStandardFileStructure();
       ga.init();
-      ga.add("1a");
+      ga.add("1a/filea");
       ga.commit({ m: "first" });
       fs.writeFileSync("1a/filea", "somethingelse");
       expect(ga.diff(undefined, undefined, { "name-status": true }))
@@ -74,10 +74,10 @@ describe('diff', function() {
     it('should not include commited file w staged changes', function() {
       testUtil.createStandardFileStructure();
       ga.init();
-      ga.add("1a");
+      ga.add("1a/filea");
       ga.commit({ m: "first" });
       fs.writeFileSync("1a/filea", "somethingelse");
-      ga.add("1a");
+      ga.add("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
   });
