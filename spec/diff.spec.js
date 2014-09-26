@@ -52,5 +52,13 @@ describe('diff', function() {
       expect(testUtil.index()[0].path).toEqual("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
+
+    it('should not include commited file w no changes', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a");
+      ga.commit({ m: "first" });
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+    });
   });
 });
