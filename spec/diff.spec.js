@@ -32,5 +32,25 @@ describe('diff', function() {
       ga.init();
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
+
+    it('should not include unstaged files', function() {
+      // this is because the file is never mentioned by the index,
+      // which is to say: it doesn't compare absence against the WC hash.
+
+      testUtil.createStandardFileStructure();
+      ga.init();
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+    });
+
+    it('should not include new file that is staged', function() {
+      // this is because the file is in the index, but the version
+      // in the WC is the same
+
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a");
+      expect(testUtil.index()[0].path).toEqual("1a/filea");
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+    });
   });
 });
