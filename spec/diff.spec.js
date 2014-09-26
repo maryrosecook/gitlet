@@ -17,12 +17,14 @@ describe('diff', function() {
 
   it('should throw unknown revision if ref1 not in objects', function() {
     ga.init();
-    ga.diff("ou.nch3thountounchcn3", undefined, { "name-only": true });
+    expect(function() { ga.diff("blah1", undefined, { "name-only": true }) })
+      .toThrow("fatal: ambiguous argument blah1: unknown revision");
   });
 
   it('should throw unknown revision if ref2 not in objects', function() {
     ga.init();
-    ga.diff(undefined, "ou.nch3thountounchcn3", { "name-only": true });
+    expect(function() { ga.diff("blah2", undefined, { "name-only": true }) })
+      .toThrow("fatal: ambiguous argument blah2: unknown revision");
   });
 
 });

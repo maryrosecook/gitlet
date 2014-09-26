@@ -150,11 +150,9 @@ var gimletApi = module.exports = {
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
 
-    if (opts["name-only"] !== true) {
-      throw "unsupported"; // for now
-    } else if (diff.readIsDiffableRef(ref1)) {
+    if (ref1 !== undefined && refs.readHash(ref1) === undefined) {
       throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
-    } else if (diff.readIsDiffableRef(ref2)) {
+    } else if (ref2 !== undefined && refs.readHash(ref2) === undefined) {
       throw "fatal: ambiguous argument " + ref2 + ": unknown revision";
     }
   }
