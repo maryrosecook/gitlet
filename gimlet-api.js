@@ -75,13 +75,13 @@ var gimletApi = module.exports = {
 
   write_tree: function() {
     files.assertInRepo();
-    return objects.writeTree(files.nestFlatTree(index.strToObj(index.read())));
+    return objects.writeTree(files.nestFlatTree(index.read()));
   },
 
   commit: function(opts) {
     files.assertInRepo();
 
-    if (Object.keys(index.strToObj(index.read())).length === 0) {
+    if (Object.keys(index.read()).length === 0) {
       throw "# On branch master\n#\n# Initial commit\n#\n" +
         "nothing to commit (create/copy files and use 'git add' to track)";
     } else {
