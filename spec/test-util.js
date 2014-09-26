@@ -35,6 +35,14 @@ var testUtil = module.exports = {
     });
   },
 
+  createStandardFileStructure: function() {
+    testUtil.createFilesFromTree({ "1a": { filea: "filea" },
+                                   "1b": { fileb: "fileb",
+                                           "2a": { filec: "filec" },
+                                           "2b": { filed: "filed",
+                                                   "3a": { filee: "filee" }}}});
+  },
+
   index: function() {
     return fs.readFileSync(".gimlet/index", "utf8")
       .split("\n")
