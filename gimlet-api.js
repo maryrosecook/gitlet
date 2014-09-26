@@ -154,6 +154,14 @@ var gimletApi = module.exports = {
       throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
     } else if (ref2 !== undefined && refs.readHash(ref2) === undefined) {
       throw "fatal: ambiguous argument " + ref2 + ": unknown revision";
+    } else {
+      if (opts["name-status"] !== true) {
+        throw "unsupported"; // for now
+      } else {
+        if (ref1 === undefined && ref2 === undefined) {
+          return diff.toString(diff.nameStatus(index.read(), index.readWorkingCopyIndex()));
+        }
+      }
     }
   }
 };

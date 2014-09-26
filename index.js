@@ -30,5 +30,14 @@ var index = module.exports = {
         .map(function(path) { return path + " " + index[path]; })
         .join("\n") + "\n";
     files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
+  },
+
+  readWorkingCopyIndex: function() {
+    return Object.keys(index.read())
+      .filter(function(path) { return fs.existsSync(nodePath.join(files.repoDir(), path)); })
+      .reduce(function(idx, path) {
+        idx[path] = hash(files.read(nodePath.join(files.repoDir(), path)));
+        return idx;
+      }, {});
   }
 };
