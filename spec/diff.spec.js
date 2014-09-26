@@ -27,6 +27,20 @@ describe('diff', function() {
       .toThrow("fatal: ambiguous argument blah2: unknown revision");
   });
 
+  it('should include several files with changes', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+    ga.add("1a/filea");
+    ga.add("1b/fileb");
+    ga.add("1b/2a/filec");
+    ga.commit({ m: "first" });
+    fs.writeFileSync("1a/filea", "somethingelsea");
+    fs.writeFileSync("1b/fileb", "somethingelseb");
+    fs.writeFileSync("1b/2a/filec", "somethingelsec");
+    expect(ga.diff(undefined, undefined, { "name-status": true }))
+      .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2a/filec\n");
+  });
+
   describe('no refs passed (index and WC)', function() {
     it('should show nothing for repo w no commits', function() {
       ga.init();
