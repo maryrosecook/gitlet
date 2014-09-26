@@ -71,5 +71,14 @@ var files = module.exports = {
         return fileList.concat(files.lsRecursive(nodePath.join(path, dirChild)));
       }, []);
     }
+  },
+
+  nestFlatTree: function(obj) {
+    var tree = {};
+    Object.keys(obj).forEach(function(wholePath) {
+      util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
+    });
+
+    return tree;
   }
 };

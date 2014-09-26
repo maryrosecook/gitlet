@@ -34,14 +34,5 @@ var index = module.exports = {
         .map(function(path) { return path + " " + index[path]; })
         .join("\n") + "\n";
     files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
-  },
-
-  objToTree: function(obj) {
-    var tree = {};
-    Object.keys(obj).forEach(function(wholePath) {
-      util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
-    });
-
-    return tree;
   }
 };

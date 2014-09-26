@@ -75,7 +75,7 @@ var gimletApi = module.exports = {
 
   write_tree: function() {
     files.assertInRepo();
-    return objects.writeTree(index.objToTree(index.strToObj(index.read())));
+    return objects.writeTree(files.nestFlatTree(index.strToObj(index.read())));
   },
 
   commit: function(opts) {
