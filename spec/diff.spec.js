@@ -27,7 +27,7 @@ describe('diff', function() {
       .toThrow("fatal: ambiguous argument blah2: unknown revision");
   });
 
-  describe('no refs passed', function() {
+  describe('no refs passed (index and WC)', function() {
     it('should show nothing for repo w no commits', function() {
       ga.init();
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
