@@ -96,5 +96,14 @@ describe('diff', function() {
       fs.unlink("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
+
+    it('should say commited file that has now been deleted has been deleted', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      fs.unlink("1a/filea");
+      expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("D 1a/filea\n");
+    });
   });
 });
