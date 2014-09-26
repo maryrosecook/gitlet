@@ -15,6 +15,7 @@
 * update-ref supports branch name for second arg
 * all flags w/o values come at end of command when run from command line (eg node gimlet.js hash-object file.txt -w) so that we don't need per-command command line arg parsing
 * diff cannot take paths, only refs and hashes (eg can't take git diff master:src/ or git diff src/)
+* complain if do echo a > a; git add a; rm a; git add a; - git 1.8.2.3 does not complain that file does not exist, presumably because it is in the index.  git 2.0 will complain.
 
 todo
 * cd back to repo root for all commands
