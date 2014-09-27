@@ -45,6 +45,11 @@ describe('parse-options', function() {
       .toEqual({ _: ["command-1"], message: "blah" });
   });
 
+  it('should parse option with dash in the middle', function() {
+    expect(p(["command", "--name-status"]))
+      .toEqual({ _: ["command"], "name-status": true });
+  });
+
   it('should parse two long opts that do not have values', function() {
     expect(p(["command", "--flag1", "--flag2"]))
       .toEqual({ _: ["command"], flag1: true, flag2: true });
