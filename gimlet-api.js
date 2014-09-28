@@ -7,7 +7,7 @@ var diff = require('./diff');
 var util = require('./util');
 
 var gimletApi = module.exports = {
-  init: function() {
+  init: function(_) {
     if (files.inRepo()) { return; }
 
     files.writeFilesFromTree({
@@ -24,7 +24,7 @@ var gimletApi = module.exports = {
     });
   },
 
-  add: function(path) {
+  add: function(path, _) {
     files.assertInRepo();
 
     var addedFiles = files.lsRecursive(path);
@@ -73,7 +73,7 @@ var gimletApi = module.exports = {
     }
   },
 
-  write_tree: function() {
+  write_tree: function(_) {
     files.assertInRepo();
     return objects.writeTree(files.nestFlatTree(index.read()));
   },
@@ -102,7 +102,7 @@ var gimletApi = module.exports = {
     }
   },
 
-  branch: function(name) {
+  branch: function(name, _) {
     files.assertInRepo();
 
     if (name === undefined) {
@@ -117,7 +117,7 @@ var gimletApi = module.exports = {
     }
   },
 
-  update_ref: function(refToUpdate, refToUpdateTo) {
+  update_ref: function(refToUpdate, refToUpdateTo, _) {
     files.assertInRepo();
 
     if (!refs.isRef(refToUpdate)) {
@@ -136,7 +136,7 @@ var gimletApi = module.exports = {
     }
   },
 
-  checkout: function(ref) {
+  checkout: function(ref, _) {
     files.assertInRepo();
 
     var finalRef = refs.isRef(ref) ? ref : refs.toFinalRef(ref);
