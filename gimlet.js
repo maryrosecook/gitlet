@@ -3,9 +3,13 @@ var parseOptions = require('./parse-options');
 
 var gimlet = module.exports = function(argv) {
   var rawArgs = parseOptions(argv);
-  var command = rawArgs._[2].replace(/-/g, "_");
+  var commandFnName = rawArgs._[2].replace(/-/g, "_");
+  var fn = gimletApi[commandFnName];
   var commandArgs = rawArgs._.slice(3);
-  return gimletApi[command].apply(gimletApi, commandArgs.concat(rawArgs));
+  var unspecifiedArgs = Array
+      .apply(null, new Array(fn.length - commandArgs.length - 1))
+      .map(function() { return undefined; });
+  return fn.apply(gimletApi, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
 };
 
 if (require.main === module) {
