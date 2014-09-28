@@ -6,6 +6,13 @@ var testUtil = require('./test-util');
 describe('gimlet cli', function() {
   beforeEach(testUtil.createEmptyRepo);
 
+  describe('missing args', function() {
+    it('should allow two missing args (ref1 and ref2)', function() {
+      ga.init();
+      expect(g(["node", "gimlet.js", "diff", "--name-status"])).toEqual("\n");
+    });
+  });
+
   describe('running each gimlet command under normal circs', function() {
     it('gimlet init a repo', function() {
       g(["node", "gimlet.js", "init"]);
