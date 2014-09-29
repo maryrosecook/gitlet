@@ -306,6 +306,17 @@ describe('diff', function() {
         ga.branch("b");
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
       });
+
+      it('should not include staged changes', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        ga.branch("b");
+        ga.add("1b/fileb");
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("\n");
+      });
     });
 
     describe('reversing order of ref args', function() {
