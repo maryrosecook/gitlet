@@ -130,6 +130,14 @@ describe('diff', function() {
         expect(function() { ga.diff("HEAD", undefined, { "name-status": true }) })
           .toThrow("fatal: ambiguous argument HEAD: unknown revision");
       });
+
+      it('should not include unstaged files', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+      });
     });
 
     describe('non-head commits passed (compared with WC)', function() {
