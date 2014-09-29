@@ -28,7 +28,12 @@ var diff = module.exports = {
   },
 
   readCommitIndex: function(commitHash) {
-    return files.flattenNestedTree(objects.readTree(objects.treeHash(
+    var idxWithContent = files.flattenNestedTree(objects.readTree(objects.treeHash(
       objects.read(commitHash))));
+
+    return Object.keys(idxWithContent).reduce(function(idxWithHashes, path) {
+      idxWithHashes[path] = util.hash(idxWithContent[path]);
+      return idxWithHashes;
+    }, {});
   },
 };
