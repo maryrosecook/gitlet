@@ -25,5 +25,10 @@ var diff = module.exports = {
     return Object.keys(nameToStatus)
       .map(function(path) { return nameToStatus[path] + " " + path; })
       .join("\n") + "\n";
-  }
+  },
+
+  readCommitIndex: function(commitHash) {
+    return files.flattenNestedTree(objects.readTree(objects.treeHash(
+      objects.read(commitHash))));
+  },
 };
