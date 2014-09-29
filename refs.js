@@ -19,10 +19,12 @@ var refs = module.exports = {
   },
 
   readHash: function(ref) {
-    if (refs.readExists(refs.readTerminalRef(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), refs.readTerminalRef(ref)));
-    } else if (refs.readExists(refs.nameToBranchRef(ref))) {
-      return files.read(nodePath.join(files.gimletDir(), refs.nameToBranchRef(ref)));
+    if (ref !== undefined) {
+      if (refs.readExists(refs.readTerminalRef(ref))) {
+        return files.read(nodePath.join(files.gimletDir(), refs.readTerminalRef(ref)));
+      } else if (refs.readExists(refs.nameToBranchRef(ref))) {
+        return files.read(nodePath.join(files.gimletDir(), refs.nameToBranchRef(ref)));
+      }
     }
   },
 
