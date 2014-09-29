@@ -139,9 +139,6 @@ var gimletApi = module.exports = {
   checkout: function(ref, _) {
     files.assertInRepo();
 
-    var finalRef = refs.isRef(ref) ? ref : refs.toFinalRef(ref);
-    var hash = refs.toHash(finalRef);
-
     if (!objects.readExists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to git."
     }
