@@ -237,28 +237,75 @@ describe('diff', function() {
   });
 
   describe('two refs passed', function() {
-    it('should blow up with two refs if no commits', function() {
-      ga.init();
-      expect(function() { ga.diff("a", "b", { "name-status": true }) })
-        .toThrow("fatal: ambiguous argument a: unknown revision");
-    });
+    describe('basic changes', function() {
+      it('should blow up with two refs if no commits', function() {
+        ga.init();
+        expect(function() { ga.diff("a", "b", { "name-status": true }) })
+          .toThrow("fatal: ambiguous argument a: unknown revision");
+      });
 
-    it('should blow up for HEAD and other ref if no commits', function() {
-      ga.init();
-      expect(function() { ga.diff("HEAD", "b", { "name-status": true }) })
-        .toThrow("fatal: ambiguous argument HEAD: unknown revision");
-    });
+      it('should blow up for HEAD and other ref if no commits', function() {
+        ga.init();
+        expect(function() { ga.diff("HEAD", "b", { "name-status": true }) })
+          .toThrow("fatal: ambiguous argument HEAD: unknown revision");
+      });
 
-    it('should blow up if either ref does not exist', function() {
-      testUtil.createStandardFileStructure();
-      ga.init();
-      ga.add("1a/filea");
-      ga.commit({ m: "first" });
-      expect(function() { ga.diff("blah1", "blah2", { "name-status": true }) })
-        .toThrow("fatal: ambiguous argument blah1: unknown revision");
+      it('should blow up if either ref does not exist', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        expect(function() { ga.diff("blah1", "blah2", { "name-status": true }) })
+          .toThrow("fatal: ambiguous argument blah1: unknown revision");
 
-      expect(function() { ga.diff("HEAD", "blah2", { "name-status": true }) })
-        .toThrow("fatal: ambiguous argument blah2: unknown revision");
+        expect(function() { ga.diff("HEAD", "blah2", { "name-status": true }) })
+          .toThrow("fatal: ambiguous argument blah2: unknown revision");
+      });
+
+      it('should not include unstaged files', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        ga.branch("b");
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("\n");
+      });
+
+      it('should not include committed file w no changes', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        ga.branch("b");
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("\n");
+      });
+
+      it('should include added file', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        ga.add("1b/fileb");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("A 1b/fileb\n");
+      });
+
+      it('should include changed file', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
+      });
     });
   });
 });
