@@ -248,5 +248,17 @@ describe('diff', function() {
       expect(function() { ga.diff("HEAD", "b", { "name-status": true }) })
         .toThrow("fatal: ambiguous argument HEAD: unknown revision");
     });
+
+    it('should blow up if either ref does not exist', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      expect(function() { ga.diff("blah1", "blah2", { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument blah1: unknown revision");
+
+      expect(function() { ga.diff("HEAD", "blah2", { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument blah2: unknown revision");
+    });
   });
 });
