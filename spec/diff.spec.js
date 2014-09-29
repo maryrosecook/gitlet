@@ -307,5 +307,36 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
       });
     });
+
+    describe('reversing order of ref args', function() {
+      it('should see deletion as addition and vice versa', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        ga.add("1b/fileb");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("A 1b/fileb\n");
+        expect(ga.diff("b", "a", { "name-status": true })).toEqual("D 1b/fileb\n");
+      });
+
+      it('should see modification in both directions', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(ga.diff("b", "a", { "name-status": true })).toEqual("M 1a/filea\n");
+      });
+    });
   });
 });
