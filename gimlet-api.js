@@ -163,6 +163,9 @@ var gimletApi = module.exports = {
         } else if (ref2 === undefined) {
           return diff.toString(diff.nameStatus(diff.readCommitIndex(hash1),
                                                index.readWorkingCopyIndex()));
+        } else {
+          return diff.toString(diff.nameStatus(diff.readCommitIndex(hash1),
+                                               diff.readCommitIndex(hash2)));
         }
       }
     }
