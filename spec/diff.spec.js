@@ -226,4 +226,18 @@ describe('diff', function() {
       });
     });
   });
+
+  describe('two refs passed', function() {
+    it('should blow up with two refs if no commits', function() {
+      ga.init();
+      expect(function() { ga.diff("a", "b", { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument a: unknown revision");
+    });
+
+    it('should blow up for HEAD and other ref if no commits', function() {
+      ga.init();
+      expect(function() { ga.diff("HEAD", "b", { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument HEAD: unknown revision");
+    });
+  });
 });
