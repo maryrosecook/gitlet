@@ -156,6 +156,52 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
+      it('should include committed file w unstaged changes', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        fs.writeFileSync("1a/filea", "somethingelse");
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+      });
+
+      it('should include committed file w staged changes', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+      });
+
+      it('should not include file that was created, staged, deleted', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.add("1b/fileb");
+        fs.unlink("1b/fileb");
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+      });
+
+      it('should not include file that was created, deleted but never staged', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        fs.unlink("1b/fileb");
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+      });
+
+      it('should say commited file that has now been deleted has been deleted', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        fs.unlink("1a/filea");
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("D 1a/filea\n");
+      });
     });
 
     describe('non-head commits passed (compared with WC)', function() {
