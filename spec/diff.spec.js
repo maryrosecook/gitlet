@@ -224,6 +224,15 @@ describe('diff', function() {
         fs.writeFileSync("1a/filea", "somethingelse");
         expect(ga.diff("other", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
       });
+
+      it('should blow up if non existent ref passed', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        expect(function() { ga.diff("blah", undefined, { "name-status": true }) })
+          .toThrow("fatal: ambiguous argument blah: unknown revision");
+      });
     });
   });
 
