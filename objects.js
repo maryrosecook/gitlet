@@ -7,7 +7,7 @@ var objects = module.exports = {
   writeTree: function(tree) {
     var treeObject = Object.keys(tree).map(function(key) {
       if (util.isString(tree[key])) {
-        return "blob " + util.hash(tree[key]) + " " + key;
+        return "blob " + tree[key] + " " + key;
       } else {
         return "tree " + objects.writeTree(tree[key]) + " " + key;
       }
