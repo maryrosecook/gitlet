@@ -1,6 +1,6 @@
-# Gimlet
+# Little Git
 
-Git implemented in JavaScript.
+A toy Git implemented in JavaScript.
 
 ## Contact
 
