@@ -124,11 +124,14 @@ describe('diff', function() {
   });
 
   describe('one ref passed (someref and WC)', function() {
+    describe('HEAD passed (compared with WC)', function() {
       it('should blow up for HEAD if no commits', function() {
         ga.init();
         expect(function() { ga.diff("HEAD", undefined, { "name-status": true }) })
           .toThrow("fatal: ambiguous argument HEAD: unknown revision");
       });
+    });
+
     describe('non-head commits passed (compared with WC)', function() {
       it('should include committed file modified in WC if HEAD hash passed', function() {
         testUtil.createStandardFileStructure();
