@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var testUtil = require('./test-util');
 
 describe('hash-object', function() {
@@ -7,7 +7,7 @@ describe('hash-object', function() {
 
   it('should throw if not in repo', function() {
     expect(function() { ga.hash_object(); })
-      .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   it('should throw if file specified does not exist', function() {
@@ -31,7 +31,7 @@ describe('hash-object', function() {
     ga.init();
     fs.writeFileSync("a.txt", content);
     expect(ga.hash_object("a.txt", { w:true })).toEqual("7f9f2dae");
-    testUtil.expectFile(__dirname + "/tmp/.gimlet/objects/7f9f2dae", content);
+    testUtil.expectFile(__dirname + "/tmp/.gitlet/objects/7f9f2dae", content);
   });
 
   it('should not store blob when -w not passed', function() {
@@ -39,7 +39,7 @@ describe('hash-object', function() {
     ga.init();
     fs.writeFileSync("a.txt", content);
 
-    var objectPath = __dirname + "/tmp/.gimlet/objects/" + ga.hash_object("a.txt");
+    var objectPath = __dirname + "/tmp/.gitlet/objects/" + ga.hash_object("a.txt");
     expect(fs.existsSync(objectPath, "utf8")).toEqual(false);
 
     // check that file is stored with -w

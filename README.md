@@ -1,4 +1,4 @@
-# Little Git
+# Gitlet
 
 A toy Git implemented in JavaScript.
 

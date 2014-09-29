@@ -1,11 +1,11 @@
 {
-  "name": "gimlet",
+  "name": "gitlet",
   "description": "A toy Git.",
   "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maryrosecook/gimlet.git"
+    "url": "https://github.com/maryrosecook/gitlet.git"
   },
 
   "scripts": {

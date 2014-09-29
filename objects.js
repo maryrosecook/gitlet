@@ -40,7 +40,7 @@ var objects = module.exports = {
   write: function(str) {
     var contentHash = util.hash(str);
     if (objects.read(contentHash) === undefined) {
-      var filePath = nodePath.join(files.gimletDir(), "objects", contentHash);
+      var filePath = nodePath.join(files.gitletDir(), "objects", contentHash);
       files.write(filePath, str);
     }
 
@@ -49,12 +49,12 @@ var objects = module.exports = {
 
   readExists: function(objectHash) {
     return objectHash !== undefined &&
-      fs.existsSync(nodePath.join(files.gimletDir(), "objects", objectHash));
+      fs.existsSync(nodePath.join(files.gitletDir(), "objects", objectHash));
   },
 
   read: function(objectHash) {
     if (objectHash !== undefined) {
-      var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
+      var objectPath = nodePath.join(files.gitletDir(), "objects", objectHash);
       if (fs.existsSync(objectPath)) {
         return files.read(objectPath);
       }

@@ -1,4 +1,4 @@
-* Running git init is idempotent.  The real behaviour is not idempotent, but it is as far as the features of gimlet are concerned: https://www.kernel.org/pub/software/scm/git/docs/git-init.html
+* Running git init is idempotent.  The real behaviour is not idempotent, but it is as far as the features of gitlet are concerned: https://www.kernel.org/pub/software/scm/git/docs/git-init.html
 * no description file
 * only well-formed -w like command-line flags, and each one separate: -w -b, and no data for any args
 * hash function as simple as possible for brevity - real git uses sha1
@@ -13,7 +13,7 @@
 * only support HEAD for symbolic ref
 * do not support non-symbolic (non HEAD) refs pointing at other refs
 * update-ref supports branch name for second arg
-* all flags w/o values come at end of command when run from command line (eg node gimlet.js hash-object file.txt -w) so that we don't need per-command command line arg parsing
+* all flags w/o values come at end of command when run from command line (eg node gitlet.js hash-object file.txt -w) so that we don't need per-command command line arg parsing
 * diff cannot take paths, only refs and hashes (eg can't take git diff master:src/ or git diff src/)
 * complain if do echo a > a; git add a; rm a; git add a; - git 1.8.2.3 does not complain that file does not exist, presumably because it is in the index.  git 2.0 will complain.
 
@@ -31,3 +31,4 @@ todo
 * remove code that allows diffing/checking out a tree
 * finish tests in commit.spec
 * look for other unfinished tests
+* rm js from all instances of node gitlet.js

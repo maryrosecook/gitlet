@@ -1,41 +1,41 @@
 var fs = require('fs');
-var g = require('../gimlet');
-var ga = require('../gimlet-api');
+var g = require('../gitlet');
+var ga = require('../gitlet-api');
 var testUtil = require('./test-util');
 
-describe('gimlet cli', function() {
+describe('gitlet cli', function() {
   beforeEach(testUtil.createEmptyRepo);
 
   describe('missing args', function() {
     it('should allow two missing args (ref1 and ref2)', function() {
       ga.init();
-      expect(g(["node", "gimlet.js", "diff", "--name-status"])).toEqual("\n");
+      expect(g(["node", "gitlet.js", "diff", "--name-status"])).toEqual("\n");
     });
   });
 
-  describe('running each gimlet command under normal circs', function() {
-    it('gimlet init a repo', function() {
-      g(["node", "gimlet.js", "init"]);
-      testUtil.expectFile(__dirname + "/tmp/.gimlet/HEAD", "ref: refs/heads/master\n");
+  describe('running each gitlet command under normal circs', function() {
+    it('gitlet init a repo', function() {
+      g(["node", "gitlet.js", "init"]);
+      testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
     });
 
-    it('gimlet add a file', function() {
+    it('gitlet add a file', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
-      g(["node", "gimlet.js", "add", "1/filea"]);
+      g(["node", "gitlet.js", "add", "1/filea"]);
       expect(testUtil.index()[0].path).toEqual("1/filea");
       expect(testUtil.index().length).toEqual(1);
     });
 
-    it('gimlet make new branch', function() {
+    it('gitlet make new branch', function() {
       testUtil.pinDate();
 
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
       ga.add("1/filea");
       ga.commit({ m: "blah" });
-      g(["node", "gimlet.js", "branch", "woo"]);
-      testUtil.expectFile(".gimlet/refs/heads/woo", "6db3fd6a");
+      g(["node", "gitlet.js", "branch", "woo"]);
+      testUtil.expectFile(".gitlet/refs/heads/woo", "6db3fd6a");
 
       testUtil.unpinDate();
     });
@@ -46,8 +46,8 @@ describe('gimlet cli', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
       ga.add("1/filea");
-      g(["node", "gimlet.js", "commit", "-m", "blah"]);
-      testUtil.expectFile(".gimlet/refs/heads/master", "6db3fd6a");
+      g(["node", "gitlet.js", "commit", "-m", "blah"]);
+      testUtil.expectFile(".gitlet/refs/heads/master", "6db3fd6a");
 
       testUtil.unpinDate();
     });
@@ -55,8 +55,8 @@ describe('gimlet cli', function() {
     it('hash-object and write', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
-      g(["node", "gimlet.js", "hash-object", "1/filea", "-w"]);
-      testUtil.expectFile(".gimlet/objects/5ceba65", "filea");
+      g(["node", "gitlet.js", "hash-object", "1/filea", "-w"]);
+      testUtil.expectFile(".gitlet/objects/5ceba65", "filea");
     });
 
     it('update HEAD ref to prior commit', function() {
@@ -73,9 +73,9 @@ describe('gimlet cli', function() {
       ga.add("1/2/3b");
       ga.commit({ m: "second" });
 
-      g(["node", "gimlet.js", "update-ref", "HEAD", "343b3d02"]);
+      g(["node", "gitlet.js", "update-ref", "HEAD", "343b3d02"]);
 
-      expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
+      expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("343b3d02");
 
       testUtil.unpinDate();
     });
@@ -86,7 +86,7 @@ describe('gimlet cli', function() {
                                             { filec: "filec", "3":
                                               { filed: "filed", filee: "filee"}}}});
       ga.add("1");
-      expect(g(["node", "gimlet.js", "write-tree"])).toEqual("7afc965a");
+      expect(g(["node", "gitlet.js", "write-tree"])).toEqual("7afc965a");
     });
   });
 });

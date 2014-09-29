@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var nodePath = require('path');
 var testUtil = require('./test-util');
 
@@ -8,7 +8,7 @@ describe('update-index', function() {
 
   it('should throw if not in repo', function() {
     expect(function() { ga.update_index(); })
-      .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   describe('pathspec stipulations', function() {
@@ -43,7 +43,7 @@ describe('update-index', function() {
       ga.update_index("README.md", { add: true });
 
       var readmeHash = ga.hash_object("README.md");
-      testUtil.expectFile(nodePath.join(".gimlet/objects", readmeHash), "this is a readme");
+      testUtil.expectFile(nodePath.join(".gitlet/objects", readmeHash), "this is a readme");
 
       expect(testUtil.index()[0].path).toEqual("README.md");
     });
@@ -54,9 +54,9 @@ describe('update-index', function() {
       ga.update_index("README1.md", { add: true });
       ga.update_index("README2.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gimlet/objects", ga.hash_object("README1.md")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", ga.hash_object("README1.md")),
                           "this is a readme1");
-      testUtil.expectFile(nodePath.join(".gimlet/objects", ga.hash_object("README2.md")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", ga.hash_object("README2.md")),
                           "this is a readme2");
 
       expect(testUtil.index()[0].path).toEqual("README1.md");
@@ -96,7 +96,7 @@ describe('update-index', function() {
 
       var newVersionHash = testUtil.index()[0].hash;
 
-      testUtil.expectFile(nodePath.join(".gimlet/objects", newVersionHash), "this is a readme1");
+      testUtil.expectFile(nodePath.join(".gitlet/objects", newVersionHash), "this is a readme1");
       expect(newVersionHash).toEqual(ga.hash_object("README.md"));
     });
   });

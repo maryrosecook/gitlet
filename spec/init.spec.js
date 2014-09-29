@@ -1,28 +1,28 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var testUtil = require('./test-util');
 
 describe('init', function() {
   beforeEach(testUtil.createEmptyRepo);
 
-  function expectGimletFilesAndDirectories() {
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/objects/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/heads/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gimlet/refs/remotes/origin/")).toEqual(true);
+  function expectGitletFilesAndDirectories() {
+    expect(fs.existsSync(__dirname + "/tmp/.gitlet/objects/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/heads/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/remotes/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/remotes/origin/")).toEqual(true);
 
-    testUtil.expectFile(__dirname + "/tmp/.gimlet/HEAD", "ref: refs/heads/master\n");
+    testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
   };
 
-  it('should create .gimlet/ and all required dirs', function() {
+  it('should create .gitlet/ and all required dirs', function() {
     ga.init();
-    expectGimletFilesAndDirectories();
+    expectGitletFilesAndDirectories();
   });
 
   it('should not change anything if init run twice', function() {
     ga.init();
     ga.init();
-    expectGimletFilesAndDirectories();
+    expectGitletFilesAndDirectories();
   });
 });

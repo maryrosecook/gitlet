@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var testUtil = require('./test-util');
 
 describe('branch', function() {
@@ -9,7 +9,7 @@ describe('branch', function() {
 
   it('should throw if not in repo', function() {
     expect(function() { ga.branch(); })
-      .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   it('should throw if master has not been created', function() {
@@ -24,7 +24,7 @@ describe('branch', function() {
     ga.add("1/filea");
     ga.commit({ m: "first" });
     ga.branch("woo");
-    testUtil.expectFile(".gimlet/refs/heads/woo", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/woo", "48946d55");
   });
 
   it('should should leave master pointed at orig hash after branching', function() {
@@ -32,9 +32,9 @@ describe('branch', function() {
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
     ga.add("1/filea");
     ga.commit({ m: "first" });
-    testUtil.expectFile(".gimlet/refs/heads/master", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/master", "48946d55");
     ga.branch("woo");
-    testUtil.expectFile(".gimlet/refs/heads/master", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/master", "48946d55");
   });
 
   it('should return list of branches when called with no args', function() {

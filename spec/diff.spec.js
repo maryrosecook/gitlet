@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var testUtil = require('./test-util');
 
 describe('diff', function() {
@@ -9,7 +9,7 @@ describe('diff', function() {
 
   it('should throw if not in repo', function() {
     expect(function() { ga.diff(); })
-      .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   it('should throw if do not pass --name-status option', function() {

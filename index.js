@@ -10,7 +10,7 @@ var index = module.exports = {
   },
 
   read: function() {
-    var indexFilePath = nodePath.join(files.gimletDir(), "index");
+    var indexFilePath = nodePath.join(files.gitletDir(), "index");
     return util.lines(fs.existsSync(indexFilePath) ? files.read(indexFilePath) : "")
       .reduce(function(idx, blobStr) {
         var blobData = blobStr.split(/ /);
@@ -29,7 +29,7 @@ var index = module.exports = {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
         .join("\n") + "\n";
-    files.write(nodePath.join(files.gimletDir(), "index"), indexStr);
+    files.write(nodePath.join(files.gitletDir(), "index"), indexStr);
   },
 
   readWorkingCopyIndex: function() {

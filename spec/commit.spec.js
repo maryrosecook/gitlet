@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gimlet-api');
+var ga = require('../gitlet-api');
 var nodePath = require('path');
 var testUtil = require('./test-util');
 
@@ -10,7 +10,7 @@ describe('commit', function() {
 
   it('should throw if not in repo', function() {
     expect(function() { ga.commit(); })
-      .toThrow("fatal: Not a gimlet repository (or any of the parent directories): .gimlet");
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   it('should throw and explain how to stage if index empty', function() {
@@ -43,7 +43,7 @@ describe('commit', function() {
     ga.add("1");
     ga.commit({ m: "first" });
 
-    var commitFile = fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8");
+    var commitFile = fs.readFileSync(".gitlet/objects/1ff21fcc", "utf8");
     expect(commitFile.split("\n")[0]).toEqual("commit 7afc965a");
     expect(commitFile.split("\n")[1])
       .toEqual("Date:  Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)");
@@ -58,7 +58,7 @@ describe('commit', function() {
                                             { "filed": "filed", "filee": "filee"}}}});
     ga.add("1");
     ga.commit({ m: "first" });
-    fs.readFileSync(".gimlet/objects/1ff21fcc", "utf8").split("\n")[1].match("Date:");
+    fs.readFileSync(".gitlet/objects/1ff21fcc", "utf8").split("\n")[1].match("Date:");
   });
 
   it('should store parent on all commits after first', function() {
@@ -67,18 +67,18 @@ describe('commit', function() {
 
     ga.add("filea");
     ga.commit({ m: "first" });
-    var firstHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+    var firstHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
     ga.add("fileb");
     ga.commit({ m: "second" });
-    var secondHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+    var secondHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
     ga.add("filec");
     ga.commit({ m: "third" });
-    var thirdHash = fs.readFileSync(".gimlet/refs/heads/master", "utf8");
+    var thirdHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
-    expect(fs.readFileSync(".gimlet/objects/" + secondHash, "utf8").split("\n")[1]).toEqual("parent " + firstHash);
-    expect(fs.readFileSync(".gimlet/objects/" + thirdHash, "utf8").split("\n")[1]).toEqual("parent " + secondHash);
+    expect(fs.readFileSync(".gitlet/objects/" + secondHash, "utf8").split("\n")[1]).toEqual("parent " + firstHash);
+    expect(fs.readFileSync(".gitlet/objects/" + thirdHash, "utf8").split("\n")[1]).toEqual("parent " + secondHash);
   });
 
   it('should point current branch at commit when committing', function() {
@@ -88,7 +88,7 @@ describe('commit', function() {
                                             { "filed": "filed", "filee": "filee"}}}});
     ga.add("1");
     ga.commit({ m: "first" });
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("1ff21fcc");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("1ff21fcc");
   });
 
   it('should record subsequent commit object', function() {
@@ -102,11 +102,11 @@ describe('commit', function() {
     ga.add("1/2/3b");
     ga.commit({ m: "second" });
 
-    var commitFileLines1 = fs.readFileSync(".gimlet/objects/343b3d02", "utf8").split("\n");
+    var commitFileLines1 = fs.readFileSync(".gitlet/objects/343b3d02", "utf8").split("\n");
     expect(commitFileLines1[0]).toEqual("commit 59431df");
     expect(commitFileLines1[3]).toEqual("    first");
 
-    var commitFileLines2 = fs.readFileSync(".gimlet/objects/5e0b3550", "utf8").split("\n");
+    var commitFileLines2 = fs.readFileSync(".gitlet/objects/5e0b3550", "utf8").split("\n");
     expect(commitFileLines2[0]).toEqual("commit 53d8eab5");
     expect(commitFileLines2[4]).toEqual("    second");
   });
@@ -119,11 +119,11 @@ describe('commit', function() {
                                             { "filef": "filef", "fileg": "fileg"}}}});
     ga.add("1/2/3a");
     ga.commit({ m: "first" });
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("343b3d02");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("343b3d02");
 
     ga.add("1/2/3b");
     ga.commit({ m: "second" });
-    expect(fs.readFileSync(".gimlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("5e0b3550");
   });
 
   it('should create commit without passing date', function() {
@@ -132,8 +132,8 @@ describe('commit', function() {
     ga.add("1");
     ga.commit({ m: "first" });
 
-    fs.readdirSync(".gimlet/objects/").forEach(function(filename) {
-      var contents = fs.readFileSync(nodePath.join(".gimlet/objects", filename), "utf8");
+    fs.readdirSync(".gitlet/objects/").forEach(function(filename) {
+      var contents = fs.readFileSync(nodePath.join(".gitlet/objects", filename), "utf8");
       if (contents.split(" ")[0] === "commit") {
         var lines = contents.split("\n");
 

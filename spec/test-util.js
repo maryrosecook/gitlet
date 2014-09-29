@@ -44,7 +44,7 @@ var testUtil = module.exports = {
   },
 
   index: function() {
-    return fs.readFileSync(".gimlet/index", "utf8")
+    return fs.readFileSync(".gitlet/index", "utf8")
       .split("\n")
       .slice(0, -1)
       .map(function(blobStr) {

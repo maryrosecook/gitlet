@@ -6,12 +6,12 @@ var refs = require('./refs');
 var diff = require('./diff');
 var util = require('./util');
 
-var gimletApi = module.exports = {
+var gitletApi = module.exports = {
   init: function(_) {
     if (files.inRepo()) { return; }
 
     files.writeFilesFromTree({
-      ".gimlet": {
+      ".gitlet": {
         HEAD: "ref: refs/heads/master\n",
         objects: {},
         refs: {

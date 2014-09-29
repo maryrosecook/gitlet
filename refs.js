@@ -21,9 +21,9 @@ var refs = module.exports = {
   readHash: function(ref) {
     if (ref !== undefined) {
       if (refs.readExists(refs.readTerminalRef(ref))) {
-        return files.read(nodePath.join(files.gimletDir(), refs.readTerminalRef(ref)));
+        return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(ref)));
       } else if (refs.readExists(refs.nameToBranchRef(ref))) {
-        return files.read(nodePath.join(files.gimletDir(), refs.nameToBranchRef(ref)));
+        return files.read(nodePath.join(files.gitletDir(), refs.nameToBranchRef(ref)));
       }
     }
   },
@@ -34,18 +34,18 @@ var refs = module.exports = {
 
   write: function(ref, content) {
     if (isLocalHeadRef(ref)) {
-      files.write(nodePath.join(files.gimletDir(), ref), content);
+      files.write(nodePath.join(files.gitletDir(), ref), content);
     }
   },
 
   readLocalHeads: function() {
-    return fs.readdirSync(nodePath.join(files.gimletDir(), "refs/heads/"));
+    return fs.readdirSync(nodePath.join(files.gitletDir(), "refs/heads/"));
   },
 
   readExists: function(ref) {
     return ref !== undefined &&
       isLocalHeadRef(ref) &&
-      fs.existsSync(nodePath.join(files.gimletDir(), ref));
+      fs.existsSync(nodePath.join(files.gitletDir(), ref));
   },
 
   readCurrentBranchName: function() {
@@ -56,7 +56,7 @@ var refs = module.exports = {
 };
 
 function readHead() {
-  var content = files.read(nodePath.join(files.gimletDir(), "HEAD"));
+  var content = files.read(nodePath.join(files.gitletDir(), "HEAD"));
   var refMatch = content.match("ref: (refs/heads/.+)");
   return refMatch ? refMatch[1] : content;
 };
