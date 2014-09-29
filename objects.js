@@ -40,9 +40,11 @@ var objects = module.exports = {
   },
 
   read: function(objectHash) {
-    var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
-    if (fs.existsSync(objectPath)) {
-      return files.read(objectPath);
+    if (objectHash !== undefined) {
+      var objectPath = nodePath.join(files.gimletDir(), "objects", objectHash);
+      if (fs.existsSync(objectPath)) {
+        return files.read(objectPath);
+      }
     }
   },
 
