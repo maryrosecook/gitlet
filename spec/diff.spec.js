@@ -338,5 +338,78 @@ describe('diff', function() {
         expect(ga.diff("b", "a", { "name-status": true })).toEqual("M 1a/filea\n");
       });
     });
+
+    describe('diffing commits with intervening commits where a lot happened', function() {
+      it('should see additions', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+
+        ga.add("1b/fileb");
+        ga.commit({ m: "second" });
+
+        ga.add("1b/2a/filec");
+        ga.commit({ m: "third" });
+
+        ga.add("1b/2b/filed");
+        ga.commit({ m: "fourth" });
+        ga.branch("b");
+
+        expect(ga.diff("a", "b", { "name-status": true }))
+          .toEqual("A 1b/fileb\nA 1b/2a/filec\nA 1b/2b/filed\n");
+      });
+
+      it('should see deletions', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+
+        ga.add("1b/fileb");
+        ga.commit({ m: "second" });
+
+        ga.add("1b/2a/filec");
+        ga.commit({ m: "third" });
+
+        ga.add("1b/2b/filed");
+        ga.commit({ m: "fourth" });
+        ga.branch("b");
+
+        expect(ga.diff("b", "a", { "name-status": true }))
+          .toEqual("D 1b/fileb\nD 1b/2a/filec\nD 1b/2b/filed\n");
+      });
+
+      it('should see modifications', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+
+        ga.add("1a/filea");
+        ga.add("1b/fileb");
+        ga.add("1b/2a/filec");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        ga.commit({ m: "second" });
+
+        fs.writeFileSync("1b/fileb", "somethingelse");
+        ga.add("1b/fileb");
+        ga.commit({ m: "third" });
+
+        fs.writeFileSync("1b/2a/filec", "somethingelse");
+        ga.add("1b/2a/filec");
+        ga.commit({ m: "fourth" });
+        ga.branch("b");
+
+        expect(ga.diff("a", "b", { "name-status": true }))
+          .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2a/filec\n");
+      });
+    });
   });
 });
