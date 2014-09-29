@@ -120,4 +120,14 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("D 1a/filea\n");
     });
   });
+
+  describe('one ref passed (someref and WC)', function() {
+    it('should blow up for HEAD or any ref because no refs in repo', function() {
+      ga.init();
+      expect(function() { ga.diff("HEAD", undefined, { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument HEAD: unknown revision");
+      expect(function() { ga.diff("blah", undefined, { "name-status": true }) })
+        .toThrow("fatal: ambiguous argument blah: unknown revision");
+    });
+  });
 });
