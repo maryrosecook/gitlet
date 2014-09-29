@@ -147,6 +147,15 @@ describe('diff', function() {
         ga.add("1b/fileb");
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("A 1b/fileb\n");
       });
+
+      it('should not include committed file w no changes', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+      });
+
     });
 
     describe('non-head commits passed (compared with WC)', function() {
