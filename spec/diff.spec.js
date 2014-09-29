@@ -411,5 +411,39 @@ describe('diff', function() {
           .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2a/filec\n");
       });
     });
+
+    describe('diffs in which several different types of thing happened', function() {
+      it('should record additions and modifications', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+
+        ga.add("1b/fileb");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+
+        expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\nA 1b/fileb\n");
+      });
+
+      it('should record deletions and modifications', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("a");
+
+        ga.add("1b/fileb");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        ga.add("1a/filea");
+        ga.commit({ m: "second" });
+        ga.branch("b");
+
+        expect(ga.diff("b", "a", { "name-status": true })).toEqual("M 1a/filea\nD 1b/fileb\n");
+      });
+    });
   });
 });
