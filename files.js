@@ -76,7 +76,7 @@ var files = module.exports = {
   nestFlatTree: function(obj) {
     var tree = {};
     Object.keys(obj).forEach(function(wholePath) {
-      util.assocIn(tree, wholePath.split(nodePath.sep).concat(files.read(wholePath)));
+      util.assocIn(tree, wholePath.split(nodePath.sep).concat(obj[wholePath]));
     });
 
     return tree;
