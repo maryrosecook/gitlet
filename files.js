@@ -80,5 +80,20 @@ var files = module.exports = {
     });
 
     return tree;
+  },
+
+  flattenNestedTree: function(tree, obj, prefix) {
+    if (obj === undefined) { return files.flattenNestedTree(tree, {}, ""); }
+
+    Object.keys(tree).forEach(function(dir) {
+      var path = nodePath.join(prefix, dir);
+      if (util.isString(tree[dir])) {
+        obj[path] = tree[dir];
+      } else {
+        files.flattenNestedTree(tree[dir], obj, path);
+      }
+    });
+
+    return obj;
   }
 };
