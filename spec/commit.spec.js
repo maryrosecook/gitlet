@@ -146,6 +146,16 @@ describe('commit', function() {
     });
   });
 
+  it('should complain nothing to commit if only changes are unstaged', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+    fs.writeFileSync("1a/filea", "somethingelse");
+    expect(function() { ga.commit({ m: "second" }); })
+      .toThrow("# On master\nnothing to commit, working directory clean");
+  });
+
   // it('should allow checking out commit', function() {
   // });
 
