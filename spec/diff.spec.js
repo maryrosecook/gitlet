@@ -130,6 +130,26 @@ describe('diff', function() {
         .toThrow("fatal: ambiguous argument HEAD: unknown revision");
       expect(function() { ga.diff("blah", undefined, { "name-status": true }) })
         .toThrow("fatal: ambiguous argument blah: unknown revision");
+    describe('non-head commits passed (compared with WC)', function() {
+      it('should include committed file modified in WC if HEAD hash passed', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        fs.writeFileSync("1a/filea", "somethingelse");
+        expect(ga.diff("21cb63f6", undefined, { "name-status": true }))
+          .toEqual("M 1a/filea\n");
+      });
+
+      it('should incl committed file modified in WC if branch from head passed', function() {
+        testUtil.createStandardFileStructure();
+        ga.init();
+        ga.add("1a/filea");
+        ga.commit({ m: "first" });
+        ga.branch("other");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        expect(ga.diff("other", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+      });
     });
   });
 });
