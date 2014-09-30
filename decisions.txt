@@ -33,3 +33,4 @@ todo
 * git status?
 * should be able to checkout head, branch, hash
 * spelling of committed...
+* new Date().getTime() to Date.now
