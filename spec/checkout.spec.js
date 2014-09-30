@@ -18,15 +18,23 @@ describe('checkout', function() {
       .toThrow("error: pathspec woo did not match any file(s) known to gitlet.");
   });
 
-  // it('should throw if passed ref points to a blob', function() {
-  //   ga.init();
-  //   testUtil.createStandardFileStructure();
+  it('should throw if passed ref points to blob', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+    expect(function() { ga.checkout("5ceba65") })
+      .toThrow("fatal: reference is not a tree: 5ceba65")
+  });
 
-  //   ga.add("1a/filea");
-  //   ga.commit({ m: "first" });
-  //   expect(function() { ga.checkout("5ceba65") })
-  //     .toThrow("fatal: reference is not a tree: 5ceba65")
-  // });
+  it('should throw if passed ref points to tree', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+    expect(function() { ga.checkout("17653b6d") })
+      .toThrow("fatal: reference is not a tree: 17653b6d")
+  });
 
   // it('should throw if file has changes w/o common orig content with c/o branch', function() {
   //   ga.init();
