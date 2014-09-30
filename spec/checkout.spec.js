@@ -147,4 +147,8 @@ describe('checkout', function() {
 
   // });
 
+  // it('should remove old dirs', function() {
+
+  // });
+
 });
