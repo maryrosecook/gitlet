@@ -36,25 +36,25 @@ describe('checkout', function() {
       .toThrow("fatal: reference is not a tree: 17653b6d")
   });
 
-  // it('should throw if file has changes w/o common orig content with c/o branch', function() {
-  //   ga.init();
-  //   testUtil.createStandardFileStructure();
+  it('should throw if file has changes w/o common orig content with c/o branch', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
 
-  //   ga.add("1a/filea");
-  //   ga.commit({ m: "first" });
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
 
-  //   ga.branch("other");
+    ga.branch("other");
 
-  //   fs.writeFileSync("1a/filea", "fileachange1");
-  //   ga.add("1a/filea");
-  //   ga.commit({ m: "second" });
+    fs.writeFileSync("1a/filea", "fileachange1");
+    ga.add("1a/filea");
+    ga.commit({ m: "second" });
 
-  //   fs.writeFileSync("1a/filea", "fileachange2");
+    fs.writeFileSync("1a/filea", "fileachange2");
 
-  //   expect(function() { ga.checkout("other"); })
-  //     .toThrow("error: Aborting. Your local changes to these files would be overwritten:\n" +
-	//              "1a/filea\n");
-  // });
+    expect(function() { ga.checkout("other"); })
+      .toThrow("error: Aborting. Your local changes to these files would be overwritten:\n" +
+	             "1a/filea\n");
+  });
 
   // it('should remove commited files in previous working copy', function() {
   //   ga.init();
