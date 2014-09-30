@@ -150,6 +150,9 @@ var gitletApi = module.exports = {
       if (paths.length > 0) {
         throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	        paths.join("\n") + "\n";
+      } else {
+        checkout.writeCheckout(hash);
+        return "Switched to branch '" + ref + "'\n";
       }
     }
   },
