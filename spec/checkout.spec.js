@@ -56,8 +56,6 @@ describe('checkout', function() {
 	             "1a/filea\n");
   });
 
-  // it('should remove commited files in previous working copy', function() {
-  //   ga.init();
   it('should list all files that would be overwritten when throwing', function() {
     testUtil.createStandardFileStructure();
     ga.init();
@@ -98,17 +96,26 @@ describe('checkout', function() {
 
     ga.checkout("other"); // does not throw
   });
-  //   testUtil.createStandardFileStructure();
 
-  //   ga.add("1a/filea");
-  //   ga.commit({ m: "first" });
-  //   ga.branch("other");
+  describe('successful checkout', function() {
+    it('should remove committed files in previous working copy', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
 
-  //   ga.add("1b/fileb");
-  //   ga.commit({ m: "second" });
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.branch("other");
 
-  //   ga.checkout("other");
-  //   expect(fs.existsSync("1b/fileb")).toEqual(false);
+      ga.add("1b/fileb");
+      ga.commit({ m: "second" });
+
+      ga.checkout("other");
+      expect(fs.existsSync("1b/fileb")).toEqual(false);
+    });
+  });
+
+  // it('should keep local changes to files w common original content', function() {
+
   // });
 
   // it('should allow a commit hash to be passed', function() {
