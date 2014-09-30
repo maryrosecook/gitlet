@@ -30,6 +30,5 @@ todo
 * remove code that allows diffing/checking out a tree
 * finish tests in commit.spec
 * look for other unfinished tests
-* rm js from all instances of node gitlet.js
 * git status?
 * should be able to checkout head, branch, hash
