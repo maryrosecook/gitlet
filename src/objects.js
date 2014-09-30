@@ -75,8 +75,6 @@ var objects = module.exports = {
   treeHash: function(str) {
     if (objects.type(str) === "commit") {
       return str.split(/\s/)[1];
-    } else if (objects.type(str) === "tree") {
-      return util.hash(str);
     }
   }
 };
