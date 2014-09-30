@@ -71,10 +71,6 @@ describe('checkout', function() {
   //   expect(fs.existsSync("1b/fileb")).toEqual(false);
   // });
 
-  // it('should allow a tree hash to be passed', function() {
-
-  // });
-
   // it('should allow a commit hash to be passed', function() {
 
   // });
