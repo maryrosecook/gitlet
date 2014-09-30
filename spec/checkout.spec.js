@@ -12,11 +12,11 @@ describe('checkout', function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  // it('should throw if pass ref that does not resolve to a hash', function() {
-  //   ga.init();
-  //   expect(function() { ga.checkout("woo"); })
-  //     .toThrow("error: pathspec woo did not match any file(s) known to git.");
-  // });
+  it('should throw if pass ref that does not resolve to a hash', function() {
+    ga.init();
+    expect(function() { ga.checkout("woo"); })
+      .toThrow("error: pathspec woo did not match any file(s) known to gitlet.");
+  });
 
   // it('should throw if passed ref points to a blob', function() {
   //   ga.init();
