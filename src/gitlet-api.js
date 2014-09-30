@@ -139,8 +139,10 @@ var gitletApi = module.exports = {
   checkout: function(ref, _) {
     files.assertInRepo();
 
+    var hash = objects.read(ref) ? ref : refs.readHash(ref);
+
     if (!objects.readExists(hash)) {
-      throw "error: pathspec " + ref + " did not match any file(s) known to git."
+      throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
     }
   },
 
