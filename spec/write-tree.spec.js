@@ -1,5 +1,5 @@
 var fs = require('fs');
-var ga = require('../gitlet-api');
+var ga = require('../src/gitlet-api');
 var testUtil = require('./test-util');
 
 describe('write-tree', function() {

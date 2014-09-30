@@ -1,6 +1,6 @@
 var fs = require('fs');
-var g = require('../gitlet');
-var ga = require('../gitlet-api');
+var g = require('../src/gitlet');
+var ga = require('../src/gitlet-api');
 var testUtil = require('./test-util');
 
 describe('gitlet cli', function() {

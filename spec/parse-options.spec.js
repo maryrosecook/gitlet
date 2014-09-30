@@ -1,4 +1,4 @@
-var p = require('../parse-options');
+var p = require('../src/parse-options');
 
 describe('parse-options', function() {
   it('should set short option to true if no value', function() {
