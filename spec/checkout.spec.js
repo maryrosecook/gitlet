@@ -58,6 +58,34 @@ describe('checkout', function() {
 
   // it('should remove commited files in previous working copy', function() {
   //   ga.init();
+  it('should list all files that would be overwritten when throwing', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+
+    ga.add("1a/filea");
+    ga.add("1b/fileb");
+    ga.add("1b/2a/filec");
+    ga.commit({ m: "first" });
+
+    ga.branch("other");
+
+    fs.writeFileSync("1a/filea", "fileachange1");
+    fs.writeFileSync("1b/fileb", "fileachange1");
+    fs.writeFileSync("1b/2a/filec", "fileachange1");
+    ga.add("1a/filea");
+    ga.add("1b/fileb");
+    ga.add("1b/2a/filec");
+    ga.commit({ m: "second" });
+
+    fs.writeFileSync("1a/filea", "fileachange2");
+    fs.writeFileSync("1b/fileb", "fileachange2");
+    fs.writeFileSync("1b/2a/filec", "fileachange2");
+
+    expect(function() { ga.checkout("other"); })
+      .toThrow("error: Aborting. Your local changes to these files would be overwritten:\n" +
+	             "1a/filea\n1b/fileb\n1b/2a/filec\n");
+  });
+
   it('should not throw if file has changes w/ common orig content w/ c/o branch', function() {
     testUtil.createStandardFileStructure();
     ga.init();
