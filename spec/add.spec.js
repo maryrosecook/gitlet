@@ -90,7 +90,7 @@ describe('add', function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
-      fs.unlink("1a/filea");
+      fs.unlinkSync("1a/filea");
       expect(function() { ga.add("1a/filea"); })
         .toThrow("fatal: pathspec '1a/filea' did not match any files");
     });

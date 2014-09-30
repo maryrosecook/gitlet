@@ -101,7 +101,7 @@ describe('diff', function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
-      fs.unlink("1a/filea");
+      fs.unlinkSync("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true }))
         .toEqual("D 1a/filea\n");
     });
@@ -109,7 +109,7 @@ describe('diff', function() {
     it('should not include file that was created, deleted but never staged', function() {
       testUtil.createStandardFileStructure();
       ga.init();
-      fs.unlink("1a/filea");
+      fs.unlinkSync("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
@@ -118,7 +118,7 @@ describe('diff', function() {
       ga.init();
       ga.add("1a/filea");
       ga.commit({ m: "first" });
-      fs.unlink("1a/filea");
+      fs.unlinkSync("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("D 1a/filea\n");
     });
   });
@@ -181,7 +181,7 @@ describe('diff', function() {
         ga.add("1a/filea");
         ga.commit({ m: "first" });
         ga.add("1b/fileb");
-        fs.unlink("1b/fileb");
+        fs.unlinkSync("1b/fileb");
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
@@ -190,7 +190,7 @@ describe('diff', function() {
         ga.init();
         ga.add("1a/filea");
         ga.commit({ m: "first" });
-        fs.unlink("1b/fileb");
+        fs.unlinkSync("1b/fileb");
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
@@ -199,7 +199,7 @@ describe('diff', function() {
         ga.init();
         ga.add("1a/filea");
         ga.commit({ m: "first" });
-        fs.unlink("1a/filea");
+        fs.unlinkSync("1a/filea");
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("D 1a/filea\n");
       });
     });
