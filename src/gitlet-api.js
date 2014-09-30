@@ -150,26 +150,18 @@ var gitletApi = module.exports = {
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
 
-    var hash1 = refs.readHash(ref1);
-    var hash2 = refs.readHash(ref2);
-
-    if (ref1 !== undefined && hash1 === undefined) {
+    if (ref1 !== undefined && refs.readHash(ref1) === undefined) {
       throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
-    } else if (ref2 !== undefined && hash2 === undefined) {
+    } else if (ref2 !== undefined && refs.readHash(ref2) === undefined) {
       throw "fatal: ambiguous argument " + ref2 + ": unknown revision";
     } else {
       if (opts["name-status"] !== true) {
         throw "unsupported"; // for now
       } else {
-        if (ref1 === undefined && ref2 === undefined) {
-          return diff.toString(diff.nameStatus(index.read(), index.readWorkingCopyIndex()));
-        } else if (ref2 === undefined) {
-          return diff.toString(diff.nameStatus(diff.readCommitIndex(hash1),
-                                               index.readWorkingCopyIndex()));
-        } else {
-          return diff.toString(diff.nameStatus(diff.readCommitIndex(hash1),
-                                               diff.readCommitIndex(hash2)));
-        }
+        var nameToStatus = diff.diff(ref1, ref2);
+        return Object.keys(nameToStatus)
+          .map(function(path) { return nameToStatus[path] + " " + path; })
+          .join("\n") + "\n";
       }
     }
   }
