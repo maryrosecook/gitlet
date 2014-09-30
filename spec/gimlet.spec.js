@@ -9,20 +9,20 @@ describe('gitlet cli', function() {
   describe('missing args', function() {
     it('should allow two missing args (ref1 and ref2)', function() {
       ga.init();
-      expect(g(["node", "gitlet.js", "diff", "--name-status"])).toEqual("\n");
+      expect(g(["node", "gitlet", "diff", "--name-status"])).toEqual("\n");
     });
   });
 
   describe('running each gitlet command under normal circs', function() {
     it('gitlet init a repo', function() {
-      g(["node", "gitlet.js", "init"]);
+      g(["node", "gitlet", "init"]);
       testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
     });
 
     it('gitlet add a file', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
-      g(["node", "gitlet.js", "add", "1/filea"]);
+      g(["node", "gitlet", "add", "1/filea"]);
       expect(testUtil.index()[0].path).toEqual("1/filea");
       expect(testUtil.index().length).toEqual(1);
     });
@@ -34,7 +34,7 @@ describe('gitlet cli', function() {
       ga.init();
       ga.add("1/filea");
       ga.commit({ m: "blah" });
-      g(["node", "gitlet.js", "branch", "woo"]);
+      g(["node", "gitlet", "branch", "woo"]);
       testUtil.expectFile(".gitlet/refs/heads/woo", "6db3fd6a");
 
       testUtil.unpinDate();
@@ -46,7 +46,7 @@ describe('gitlet cli', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
       ga.add("1/filea");
-      g(["node", "gitlet.js", "commit", "-m", "blah"]);
+      g(["node", "gitlet", "commit", "-m", "blah"]);
       testUtil.expectFile(".gitlet/refs/heads/master", "6db3fd6a");
 
       testUtil.unpinDate();
@@ -55,7 +55,7 @@ describe('gitlet cli', function() {
     it('hash-object and write', function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       ga.init();
-      g(["node", "gitlet.js", "hash-object", "1/filea", "-w"]);
+      g(["node", "gitlet", "hash-object", "1/filea", "-w"]);
       testUtil.expectFile(".gitlet/objects/5ceba65", "filea");
     });
 
@@ -73,7 +73,7 @@ describe('gitlet cli', function() {
       ga.add("1/2/3b");
       ga.commit({ m: "second" });
 
-      g(["node", "gitlet.js", "update-ref", "HEAD", "343b3d02"]);
+      g(["node", "gitlet", "update-ref", "HEAD", "343b3d02"]);
 
       expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("343b3d02");
 
@@ -86,7 +86,7 @@ describe('gitlet cli', function() {
                                             { filec: "filec", "3":
                                               { filed: "filed", filee: "filee"}}}});
       ga.add("1");
-      expect(g(["node", "gitlet.js", "write-tree"])).toEqual("7afc965a");
+      expect(g(["node", "gitlet", "write-tree"])).toEqual("7afc965a");
     });
   });
 });

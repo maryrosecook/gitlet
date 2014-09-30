@@ -66,39 +66,39 @@ describe('parse-options', function() {
   });
 
   describe('gitlet commands', function() {
-    it('should parse "node gitlet.js add a/b.js"', function() {
-      expect(p(["node", "gitlet.js", "add", "a/b.js"]))
-        .toEqual({ _: ["node", "gitlet.js", "add", "a/b.js"] });
+    it('should parse "node gitlet add a/b.js"', function() {
+      expect(p(["node", "gitlet", "add", "a/b.js"]))
+        .toEqual({ _: ["node", "gitlet", "add", "a/b.js"] });
     });
 
-    it('should parse "node gitlet.js init"', function() {
-      expect(p(["node", "gitlet.js", "init"]))
-        .toEqual({ _: ["node", "gitlet.js", "init"] });
+    it('should parse "node gitlet init"', function() {
+      expect(p(["node", "gitlet", "init"]))
+        .toEqual({ _: ["node", "gitlet", "init"] });
     });
 
-    it('should parse "node gitlet.js update-index a/b.js"', function() {
-      expect(p(["node", "gitlet.js", "update-index", "a/b.js"]))
-        .toEqual({ _: ["node", "gitlet.js", "update-index", "a/b.js"] });
+    it('should parse "node gitlet update-index a/b.js"', function() {
+      expect(p(["node", "gitlet", "update-index", "a/b.js"]))
+        .toEqual({ _: ["node", "gitlet", "update-index", "a/b.js"] });
     });
 
-    it('should parse "node gitlet.js update-index a/b.js --add"', function() {
-      expect(p(["node", "gitlet.js", "update-index", "a/b.js", "--add"]))
-        .toEqual({ _: ["node", "gitlet.js", "update-index", "a/b.js"], add: true });
+    it('should parse "node gitlet update-index a/b.js --add"', function() {
+      expect(p(["node", "gitlet", "update-index", "a/b.js", "--add"]))
+        .toEqual({ _: ["node", "gitlet", "update-index", "a/b.js"], add: true });
     });
 
-    it('should parse "node gitlet.js hash-object a/b.js -w"', function() {
-      expect(p(["node", "gitlet.js", "hash-object", "a/b.js", "-w"]))
-        .toEqual({ _: ["node", "gitlet.js", "hash-object", "a/b.js"], w: true });
+    it('should parse "node gitlet hash-object a/b.js -w"', function() {
+      expect(p(["node", "gitlet", "hash-object", "a/b.js", "-w"]))
+        .toEqual({ _: ["node", "gitlet", "hash-object", "a/b.js"], w: true });
     });
 
-    it('should parse "node gitlet.js commit -m "blah""', function() {
-      expect(p(["node", "gitlet.js", "commit", "-m", "blah"]))
-        .toEqual({ _: ["node", "gitlet.js", "commit"], m: "blah" });
+    it('should parse "node gitlet commit -m "blah""', function() {
+      expect(p(["node", "gitlet", "commit", "-m", "blah"]))
+        .toEqual({ _: ["node", "gitlet", "commit"], m: "blah" });
     });
 
-    it('should parse "node gitlet.js update-ref HEAD 21thuntoonet"', function() {
-      expect(p(["node", "gitlet.js", "update-ref", "HEAD", "21thuntoonet"]))
-        .toEqual({ _: ["node", "gitlet.js", "update-ref", "HEAD", "21thuntoonet"] });
+    it('should parse "node gitlet update-ref HEAD 21thuntoonet"', function() {
+      expect(p(["node", "gitlet", "update-ref", "HEAD", "21thuntoonet"]))
+        .toEqual({ _: ["node", "gitlet", "update-ref", "HEAD", "21thuntoonet"] });
     });
   });
 });
