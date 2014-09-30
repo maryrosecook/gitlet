@@ -123,7 +123,7 @@ var gitletApi = module.exports = {
     if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
     } else {
-      var hash = objects.read(refToUpdateTo) ? refToUpdateTo : refs.readHash(refToUpdateTo);
+      var hash = refs.readHash(refToUpdateTo);
       if (!objects.readExists(hash)) {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.type(objects.read(hash)) === "commit")) {
@@ -139,8 +139,7 @@ var gitletApi = module.exports = {
   checkout: function(ref, _) {
     files.assertInRepo();
 
-    var hash = objects.read(ref) ? ref : refs.readHash(ref);
-
+    var hash = refs.readHash(ref);
     if (!objects.readExists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
     } else if (objects.type(objects.read(hash)) !== "commit") {
@@ -151,8 +150,8 @@ var gitletApi = module.exports = {
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
 
-    var hash1 = objects.read(ref1) ? ref1 : refs.readHash(ref1);
-    var hash2 = objects.read(ref2) ? ref2 : refs.readHash(ref2);
+    var hash1 = refs.readHash(ref1);
+    var hash2 = refs.readHash(ref2);
 
     if (ref1 !== undefined && hash1 === undefined) {
       throw "fatal: ambiguous argument " + ref1 + ": unknown revision";

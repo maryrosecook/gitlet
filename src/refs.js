@@ -18,12 +18,14 @@ var refs = module.exports = {
     }
   },
 
-  readHash: function(ref) {
-    if (ref !== undefined) {
-      if (refs.readExists(refs.readTerminalRef(ref))) {
-        return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(ref)));
-      } else if (refs.readExists(refs.nameToBranchRef(ref))) {
-        return files.read(nodePath.join(files.gitletDir(), refs.nameToBranchRef(ref)));
+  readHash: function(refOrHash) {
+    if (refOrHash !== undefined) {
+      if (objects.readExists(refOrHash)) {
+        return refOrHash;
+      } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
+        return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
+      } else if (refs.readExists(refs.nameToBranchRef(refOrHash))) {
+        return files.read(nodePath.join(files.gitletDir(), refs.nameToBranchRef(refOrHash)));
       }
     }
   },
