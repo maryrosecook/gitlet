@@ -4,6 +4,7 @@ var index = require('./index');
 var objects = require('./objects');
 var refs = require('./refs');
 var diff = require('./diff');
+var checkout = require('./checkout');
 var util = require('./util');
 
 var gitletApi = module.exports = {
@@ -144,6 +145,12 @@ var gitletApi = module.exports = {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
     } else if (objects.type(objects.read(hash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
+    } else {
+      var paths = checkout.readChangedFilesCheckoutWouldOverwrite(hash);
+      if (paths.length > 0) {
+        throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
+	        paths.join("\n") + "\n";
+      }
     }
   },
 
