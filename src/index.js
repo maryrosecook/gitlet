@@ -39,5 +39,10 @@ var index = module.exports = {
         idx[path] = util.hash(files.read(nodePath.join(files.repoDir(), path)));
         return idx;
       }, {});
+  },
+
+  readCommitIndex: function(commitHash) {
+    return files.flattenNestedTree(objects.readTree(objects.treeHash(
+      objects.read(commitHash))));
   }
 };

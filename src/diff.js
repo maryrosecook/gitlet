@@ -14,9 +14,9 @@ var diff = module.exports = {
     if (ref1 === undefined && ref2 === undefined) {
       return diff.nameStatus(index.read(), index.readWorkingCopyIndex());
     } else if (ref2 === undefined) {
-      return diff.nameStatus(diff.readCommitIndex(hash1), index.readWorkingCopyIndex());
+      return diff.nameStatus(index.readCommitIndex(hash1), index.readWorkingCopyIndex());
     } else {
-      return diff.nameStatus(diff.readCommitIndex(hash1), diff.readCommitIndex(hash2));
+      return diff.nameStatus(index.readCommitIndex(hash1), index.readCommitIndex(hash2));
     }
   },
 
@@ -33,10 +33,5 @@ var diff = module.exports = {
 
         return obj;
       }, {});
-  },
-
-  readCommitIndex: function(commitHash) {
-    return files.flattenNestedTree(objects.readTree(objects.treeHash(
-      objects.read(commitHash))));
   }
 };
