@@ -32,3 +32,4 @@ todo
 * look for other unfinished tests
 * git status?
 * should be able to checkout head, branch, hash
+* spelling of committed...
