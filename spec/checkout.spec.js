@@ -1,22 +1,16 @@
-// var fs = require('fs');
-// var ga = require('../src/gitlet-api');
-// var testUtil = require('./test-util');
+var fs = require('fs');
+var ga = require('../src/gitlet-api');
+var testUtil = require('./test-util');
 
-// function createStandardFileStructure() {
-//   testUtil.createFilesFromTree({ "1a": { filea: "filea" },
-//                                  "1b": { fileb: "fileb",
-//                                          "2a": { filec: "filec" },
-//                                          "2b": { filed: "filed",
-//                                                  "3a": { filee: "filee" }}}});
-// };
+describe('checkout', function() {
+  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.pinDate);
+  afterEach(testUtil.unpinDate);
 
-// describe('checkout', function() {
-//   beforeEach(testUtil.createEmptyRepo);
-
-  // it('should throw if not in repo', function() {
-  //   expect(function() { ga.checkout(); })
-  //     .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
-  // });
+  it('should throw if not in repo', function() {
+    expect(function() { ga.checkout(); })
+      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+  });
 
   // it('should throw if pass ref that does not resolve to a hash', function() {
   //   ga.init();
@@ -26,7 +20,7 @@
 
   // it('should throw if passed ref points to a blob', function() {
   //   ga.init();
-  //   createStandardFileStructure();
+  //   testUtil.createStandardFileStructure();
 
   //   ga.add("1a/filea");
   //   ga.commit({ m: "first" });
@@ -36,7 +30,7 @@
 
   // it('should throw if file has changes w/o common orig content with c/o branch', function() {
   //   ga.init();
-  //   createStandardFileStructure();
+  //   testUtil.createStandardFileStructure();
 
   //   ga.add("1a/filea");
   //   ga.commit({ m: "first" });
@@ -56,7 +50,7 @@
 
   // it('should remove commited files in previous working copy', function() {
   //   ga.init();
-  //   createStandardFileStructure();
+  //   testUtil.createStandardFileStructure();
 
   //   ga.add("1a/filea");
   //   ga.commit({ m: "first" });
@@ -102,4 +96,4 @@
 
   // });
 
-// });
+});
