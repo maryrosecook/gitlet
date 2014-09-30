@@ -143,6 +143,8 @@ var gitletApi = module.exports = {
 
     if (!objects.readExists(hash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
+    } else if (objects.type(objects.read(hash)) !== "commit") {
+      throw "fatal: reference is not a tree: " + ref;
     }
   },
 
