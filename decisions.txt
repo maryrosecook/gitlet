@@ -32,3 +32,4 @@ todo
 * finish tests in commit.spec
 * look for other unfinished tests
 * rm js from all instances of node gitlet.js
+* git status?
