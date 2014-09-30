@@ -58,6 +58,18 @@ describe('checkout', function() {
 
   // it('should remove commited files in previous working copy', function() {
   //   ga.init();
+  it('should not throw if file has changes w/ common orig content w/ c/o branch', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+
+    ga.branch("other");
+    fs.writeFileSync("1a/filea", "fileachange2");
+
+    ga.checkout("other"); // does not throw
+  });
   //   testUtil.createStandardFileStructure();
 
   //   ga.add("1a/filea");
