@@ -23,7 +23,7 @@ var objects = module.exports = {
       var lineTokens = line.split(/ /);
       tree[lineTokens[2]] = lineTokens[0] === "tree" ?
         objects.readTree(lineTokens[1], {}) :
-        tree[lineTokens[2]] = objects.read(lineTokens[1]);
+        tree[lineTokens[2]] = lineTokens[1];
     });
 
     return tree;
