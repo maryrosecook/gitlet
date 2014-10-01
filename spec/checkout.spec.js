@@ -233,9 +233,6 @@ describe('checkout', function() {
     testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
   });
 
-  it('should warn that leaving detached head behind if checkout from det head', function() {
-
-  });
 
 
 
