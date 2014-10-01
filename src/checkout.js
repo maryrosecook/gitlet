@@ -17,6 +17,7 @@ var checkout = module.exports = {
 
   writeCheckout: function(ref) {
     addModifyDelete("HEAD", refs.readHash(ref));
+    refs.write("HEAD", objects.read(ref) ? ref : refs.nameToBranchRef(ref));
   }
 };
 
