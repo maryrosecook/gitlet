@@ -146,6 +146,20 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/2b/3b")).toEqual(false);
     });
 
+    it('should not remove folders that have unindexed files', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.branch("other");
+
+      ga.add("1b/2b/3b/4b/5b/filef");
+      ga.commit({ m: "second" });
+
+      ga.checkout("other");
+      expect(fs.existsSync("1b/2b/3a/filee")).toEqual(true);
+    });
   });
 
   // it('should keep local changes to files w common original content', function() {
