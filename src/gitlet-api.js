@@ -113,6 +113,8 @@ var gitletApi = module.exports = {
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: '" + refs.readCurrentBranchName() + "'.";
+    } else if (refs.readLocalHeads().filter(function(h) { return h === name; }).length > 0) {
+      throw "fatal: A branch named '" + name + "' already exists.";
     } else {
       refs.write(refs.nameToBranchRef(name), refs.readHash("HEAD"));
     }
