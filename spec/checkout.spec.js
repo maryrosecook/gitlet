@@ -97,6 +97,20 @@ describe('checkout', function() {
     ga.checkout("other"); // does not throw
   });
 
+  it('should keep uncommitted changes compatible w checked out branch', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+
+    ga.branch("other");
+    fs.writeFileSync("1a/filea", "fileachange2");
+
+    ga.checkout("other");
+    testUtil.expectFile("1a/filea", "fileachange2");
+  });
+
   describe('successful checkout', function() {
     it('should remove committed files in previous working copy', function() {
       testUtil.createStandardFileStructure();
@@ -162,9 +176,6 @@ describe('checkout', function() {
     });
   });
 
-  // it('should keep local changes to files w common original content', function() {
-
-  // });
 
   // it('should allow a commit hash to be passed', function() {
 
