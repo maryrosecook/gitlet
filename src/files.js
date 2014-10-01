@@ -46,7 +46,10 @@ var files = module.exports = {
       if (util.isString(structure[name])) {
         files.write(path, structure[name]);
       } else {
-        fs.mkdirSync(path, "777");
+        if (!fs.existsSync(path)) {
+          fs.mkdirSync(path, "777");
+        }
+
         files.writeFilesFromTree(structure[name], path);
       }
     });
