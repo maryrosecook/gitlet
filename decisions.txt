@@ -39,3 +39,4 @@ todo
 * remove files.write()
 * make writeFilesFromTree not default prefix - just pass it
 * make writeFilesFromTree structure called tree
+* use readIsHash wherever possible
