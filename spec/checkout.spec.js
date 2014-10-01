@@ -112,6 +112,24 @@ describe('checkout', function() {
       ga.checkout("other");
       expect(fs.existsSync("1b/fileb")).toEqual(false);
     });
+
+    it('should add committed files in checked out ref', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.branch("other");
+
+      ga.add("1b/fileb");
+      ga.commit({ m: "second" });
+
+      ga.checkout("other");
+      expect(fs.existsSync("1b/fileb")).toEqual(false); // sanity check
+
+      ga.checkout("master");
+      expect(fs.existsSync("1b/fileb")).toEqual(true); // sanity check
+    });
   });
 
   // it('should keep local changes to files w common original content', function() {
