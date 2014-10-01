@@ -245,11 +245,4 @@ describe('checkout', function() {
     ga.checkout("other");
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
   });
-
-
-
-  // it('should remove old dirs', function() {
-
-  // });
-
 });
