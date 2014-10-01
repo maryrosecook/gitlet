@@ -237,7 +237,7 @@ describe('checkout', function() {
 
   });
 
-  // it('should checkout from both tree ref and commit ref', function() {
+  // it('should remove old dirs', function() {
 
   // });
 
