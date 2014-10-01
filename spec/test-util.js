@@ -40,7 +40,10 @@ var testUtil = module.exports = {
                                    "1b": { fileb: "fileb",
                                            "2a": { filec: "filec" },
                                            "2b": { filed: "filed",
-                                                   "3a": { filee: "filee" }}}});
+                                                   "3a": { filee: "filee" },
+                                                   "3b": {
+                                                     "4b": {
+                                                       "5b": { filef: "filef" }}}}}});
   },
 
   index: function() {
