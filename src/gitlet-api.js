@@ -151,6 +151,7 @@ var gitletApi = module.exports = {
         throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	        paths.join("\n") + "\n";
       } else {
+        process.chdir(files.repoDir());
         checkout.writeCheckout(ref);
         return "Switched to branch '" + ref + "'\n";
       }
