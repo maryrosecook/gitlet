@@ -237,9 +237,7 @@ describe('checkout', function() {
 
   });
 
-  // it('should remove old dirs', function() {
 
-  // });
 
   // it('should remove old dirs', function() {
 
