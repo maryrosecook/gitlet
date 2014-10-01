@@ -176,10 +176,17 @@ describe('checkout', function() {
     });
   });
 
+  it('should allow a commit hash to be passed', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
 
-  // it('should allow a commit hash to be passed', function() {
-
-  // });
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+    ga.add("1b/fileb");
+    ga.commit({ m: "second" });
+    ga.checkout("21cb63f6");
+    testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
+  });
 
 
   // it('should point head at passed ref', function() {
