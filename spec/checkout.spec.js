@@ -237,14 +237,6 @@ describe('checkout', function() {
 
   });
 
-  // it('should abort on staged changed file w dif content from checkout(ref)', function() {
-
-  // });
-
-  // it('should abort on unstaged changed file w dif content from checkout(ref)', function() {
-
-  // });
-
   // it('should checkout from both tree ref and commit ref', function() {
 
   // });
