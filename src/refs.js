@@ -9,7 +9,7 @@ var refs = module.exports = {
   },
 
   readTerminalRef: function(ref) {
-    if (ref === "HEAD") {
+    if (ref === "HEAD" && isLocalHeadRef(readHead())) {
       return readHead();
     } else if (isLocalHeadRef(ref)) {
       return ref;
