@@ -174,6 +174,21 @@ describe('checkout', function() {
       ga.checkout("other");
       expect(fs.existsSync("1b/2b/3a/filee")).toEqual(true);
     });
+
+    it('should point head at checked out branch', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.branch("other");
+
+      ga.add("1b/fileb");
+      ga.commit({ m: "second" });
+
+      ga.checkout("other");
+      testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
+    });
   });
 
   it('should allow a commit hash to be passed', function() {
