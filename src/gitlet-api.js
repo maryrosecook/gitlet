@@ -153,7 +153,9 @@ var gitletApi = module.exports = {
       } else {
         process.chdir(files.repoDir());
         checkout.writeCheckout(ref);
-        return "Switched to branch '" + ref + "'\n";
+        return refs.readIsHash(ref) ?
+          "Note: checking out " + ref + "\nYou are in 'detached HEAD' state." :
+          "Switched to branch '" + ref + "'\n";
       }
     }
   },
