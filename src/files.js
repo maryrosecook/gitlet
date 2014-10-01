@@ -55,6 +55,16 @@ var files = module.exports = {
     });
   },
 
+  deleteEmptyDirs: function(path) {
+    fs.readdirSync(path)
+      .filter(function(c) { return fs.statSync(nodePath.join(path, c)).isDirectory(); })
+      .forEach(function(c) { files.deleteEmptyDirs(nodePath.join(path, c)); });
+
+    if (fs.readdirSync(path).length === 0) {
+      fs.rmdirSync(path);
+    }
+  },
+
   read: function(path) {
     return fs.readFileSync(path, "utf8");
   },
