@@ -20,6 +20,8 @@ var util = module.exports = {
       obj[arr[0]] = obj[arr[0]] || {};
       util.assocIn(obj[arr[0]], arr.slice(1));
     }
+
+    return obj;
   },
 
   lines: function(str) {
