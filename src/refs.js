@@ -34,6 +34,10 @@ var refs = module.exports = {
     return objects.read(possibleHash) !== undefined;
   },
 
+  readIsHeadDetached: function() {
+    return readHead().match("refs") === null;
+  },
+
   nameToBranchRef: function(name) {
     return "refs/heads/" + name;
   },
