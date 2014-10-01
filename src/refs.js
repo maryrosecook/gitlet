@@ -22,6 +22,8 @@ var refs = module.exports = {
     if (refOrHash !== undefined) {
       if (objects.readExists(refOrHash)) {
         return refOrHash;
+      } else if (refOrHash === "HEAD" && refs.readIsHeadDetached()) {
+        return readHead();
       } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
         return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
       } else if (refs.readExists(refs.nameToBranchRef(refOrHash))) {
