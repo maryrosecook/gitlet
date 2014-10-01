@@ -46,4 +46,14 @@ describe('branch', function() {
     ga.branch("boo");
     expect(ga.branch()).toEqual("  boo\n* master\n  woo\n");
   });
+
+  it('should prevent branching if branch already exists', function() {
+    ga.init();
+    testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
+    ga.add("1/filea");
+    ga.commit({ m: "first" });
+    ga.branch("woo");
+    expect(function() { ga.branch("woo") })
+      .toThrow("fatal: A branch named 'woo' already exists.");
+  });
 });
