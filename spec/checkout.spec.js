@@ -36,7 +36,7 @@ describe('checkout', function() {
       .toThrow("fatal: reference is not a tree: 17653b6d")
   });
 
-  it('should throw if file has changes w/o common orig content with c/o branch', function() {
+  it('should throw if file has unstaged changes w/o common orig content with c/o', function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
