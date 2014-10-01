@@ -38,12 +38,9 @@ var testUtil = module.exports = {
   createStandardFileStructure: function() {
     testUtil.createFilesFromTree({ "1a": { filea: "filea" },
                                    "1b": { fileb: "fileb",
-                                           "2a": { filec: "filec" },
-                                           "2b": { filed: "filed",
-                                                   "3a": { filee: "filee" },
+                                           "2b": { filec: "filec",
                                                    "3b": {
-                                                     "4b": {
-                                                       "5b": { filef: "filef" }}}}}});
+                                                     "4b": { filed: "filed" }}}}});
   },
 
   index: function() {

@@ -83,26 +83,26 @@ describe('checkout', function() {
 
     ga.add("1a/filea");
     ga.add("1b/fileb");
-    ga.add("1b/2a/filec");
+    ga.add("1b/2b/filec");
     ga.commit({ m: "first" });
 
     ga.branch("other");
 
     fs.writeFileSync("1a/filea", "fileachange1");
     fs.writeFileSync("1b/fileb", "fileachange1");
-    fs.writeFileSync("1b/2a/filec", "fileachange1");
+    fs.writeFileSync("1b/2b/filec", "fileachange1");
     ga.add("1a/filea");
     ga.add("1b/fileb");
-    ga.add("1b/2a/filec");
+    ga.add("1b/2b/filec");
     ga.commit({ m: "second" });
 
     fs.writeFileSync("1a/filea", "fileachange2");
     fs.writeFileSync("1b/fileb", "fileachange2");
-    fs.writeFileSync("1b/2a/filec", "fileachange2");
+    fs.writeFileSync("1b/2b/filec", "fileachange2");
 
     expect(function() { ga.checkout("other"); })
       .toThrow("error: Aborting. Your local changes to these files would be overwritten:\n" +
-	             "1a/filea\n1b/fileb\n1b/2a/filec\n");
+	             "1a/filea\n1b/fileb\n1b/2b/filec\n");
   });
 
   it('should not throw if file has changes w/ common orig content w/ c/o branch', function() {
@@ -174,7 +174,7 @@ describe('checkout', function() {
       ga.commit({ m: "first" });
       ga.branch("other");
 
-      ga.add("1b/2b/3b/4b/5b/filef");
+      ga.add("1b/2b/3b/4b/filed");
       ga.commit({ m: "second" });
 
       ga.checkout("other");
@@ -189,11 +189,11 @@ describe('checkout', function() {
       ga.commit({ m: "first" });
       ga.branch("other");
 
-      ga.add("1b/2b/3b/4b/5b/filef");
+      ga.add("1b/2b/3b/4b/filed");
       ga.commit({ m: "second" });
 
       ga.checkout("other");
-      expect(fs.existsSync("1b/2b/3a/filee")).toEqual(true);
+      expect(fs.existsSync("1b/fileb")).toEqual(true);
     });
 
     it('should point head at checked out branch', function() {

@@ -34,13 +34,13 @@ describe('diff', function() {
     ga.init();
     ga.add("1a/filea");
     ga.add("1b/fileb");
-    ga.add("1b/2a/filec");
+    ga.add("1b/2b/filec");
     ga.commit({ m: "first" });
     fs.writeFileSync("1a/filea", "somethingelsea");
     fs.writeFileSync("1b/fileb", "somethingelseb");
-    fs.writeFileSync("1b/2a/filec", "somethingelsec");
+    fs.writeFileSync("1b/2b/filec", "somethingelsec");
     expect(ga.diff(undefined, undefined, { "name-status": true }))
-      .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2a/filec\n");
+      .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2b/filec\n");
   });
 
   describe('no refs passed (index and WC)', function() {
@@ -362,15 +362,15 @@ describe('diff', function() {
         ga.add("1b/fileb");
         ga.commit({ m: "second" });
 
-        ga.add("1b/2a/filec");
+        ga.add("1b/2b/filec");
         ga.commit({ m: "third" });
 
-        ga.add("1b/2b/filed");
+        ga.add("1b/2b/3b/4b/filed");
         ga.commit({ m: "fourth" });
         ga.branch("b");
 
         expect(ga.diff("a", "b", { "name-status": true }))
-          .toEqual("A 1b/fileb\nA 1b/2a/filec\nA 1b/2b/filed\n");
+          .toEqual("A 1b/fileb\nA 1b/2b/filec\nA 1b/2b/3b/4b/filed\n");
       });
 
       it('should see deletions', function() {
@@ -384,15 +384,15 @@ describe('diff', function() {
         ga.add("1b/fileb");
         ga.commit({ m: "second" });
 
-        ga.add("1b/2a/filec");
+        ga.add("1b/2b/filec");
         ga.commit({ m: "third" });
 
-        ga.add("1b/2b/filed");
+        ga.add("1b/2b/3b/4b/filed");
         ga.commit({ m: "fourth" });
         ga.branch("b");
 
         expect(ga.diff("b", "a", { "name-status": true }))
-          .toEqual("D 1b/fileb\nD 1b/2a/filec\nD 1b/2b/filed\n");
+          .toEqual("D 1b/fileb\nD 1b/2b/filec\nD 1b/2b/3b/4b/filed\n");
       });
 
       it('should see modifications', function() {
@@ -401,7 +401,7 @@ describe('diff', function() {
 
         ga.add("1a/filea");
         ga.add("1b/fileb");
-        ga.add("1b/2a/filec");
+        ga.add("1b/2b/filec");
         ga.commit({ m: "first" });
         ga.branch("a");
 
@@ -413,13 +413,13 @@ describe('diff', function() {
         ga.add("1b/fileb");
         ga.commit({ m: "third" });
 
-        fs.writeFileSync("1b/2a/filec", "somethingelse");
-        ga.add("1b/2a/filec");
+        fs.writeFileSync("1b/2b/filec", "somethingelse");
+        ga.add("1b/2b/filec");
         ga.commit({ m: "fourth" });
         ga.branch("b");
 
         expect(ga.diff("a", "b", { "name-status": true }))
-          .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2a/filec\n");
+          .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2b/filec\n");
       });
     });
 
