@@ -233,6 +233,18 @@ describe('checkout', function() {
     testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
   });
 
+  it('should be able to exit detached head state', function() {
+    testUtil.createStandardFileStructure();
+    ga.init();
+    ga.add("1a/filea");
+    ga.commit({ m: "first" });
+    ga.branch("other");
+    ga.add("1b/fileb");
+    ga.commit({ m: "second" });
+    ga.checkout("21cb63f6");
+    ga.checkout("other");
+    testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
+  });
 
 
 
