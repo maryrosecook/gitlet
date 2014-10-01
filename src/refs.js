@@ -35,7 +35,9 @@ var refs = module.exports = {
   },
 
   write: function(ref, content) {
-    if (isLocalHeadRef(ref)) {
+    if (ref === "HEAD") {
+      files.write(nodePath.join(files.gitletDir(), "HEAD"), content);
+    } else if (isLocalHeadRef(ref)) {
       files.write(nodePath.join(files.gitletDir(), ref), content);
     }
   },
