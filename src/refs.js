@@ -30,6 +30,10 @@ var refs = module.exports = {
     }
   },
 
+  readIsHash: function(possibleHash) {
+    return objects.read(possibleHash) !== undefined;
+  },
+
   nameToBranchRef: function(name) {
     return "refs/heads/" + name;
   },
