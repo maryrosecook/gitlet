@@ -1,8 +1,11 @@
 var fs = require('fs');
+var nodePath = require('path');
 var index = require('./index');
 var files = require('./files');
 var objects = require('./objects');
+var refs = require('./refs');
 var diff = require('./diff');
+var util = require('./util');
 
 var checkout = module.exports = {
   readChangedFilesCheckoutWouldOverwrite: function(checkoutHash) {
@@ -12,16 +15,22 @@ var checkout = module.exports = {
       .filter(function(path) { return path in headToBranchChanges; });
   },
 
-  writeCheckout: function(checkoutHash) {
-    var checkoutIndex = index.readCommitIndex(checkoutHash);
-    var changes = diff.readDiff("HEAD", checkoutHash);
-    Object.keys(changes).forEach(function(path) {
-      if (changes[path] === diff.FILE_STATUS.ADD ||
-          changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
-        files.write(nodePath.join(files.gitletDir(), path), objects.read(checkoutIndex[path]));
-      } else if (changes[path] === diff.FILE_STATUS.DELETE) {
-        fs.unlinkSync(path);
-      }
-    });
+  writeCheckout: function(ref) {
+    addModifyDelete("HEAD", refs.readHash(ref));
   }
+};
+
+function addModifyDelete(diffFromRef, diffToRef) {
+  var changes = diff.readDiff(diffFromRef, diffToRef);
+  var checkoutIndex = index.readCommitIndex(diffToRef);
+  Object.keys(changes).forEach(function(path) {
+    if (changes[path] === diff.FILE_STATUS.ADD ||
+        changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
+        var content = objects.read(checkoutIndex[path]);
+      files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)),
+                               files.repoDir());
+    } else if (changes[path] === diff.FILE_STATUS.DELETE) {
+      fs.unlinkSync(path);
+    }
+  });
 };
