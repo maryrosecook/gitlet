@@ -17,6 +17,11 @@ var checkout = module.exports = {
 
   writeCheckout: function(ref) {
     addModifyDelete("HEAD", refs.readHash(ref));
+    fs.readdirSync(files.repoDir())
+      .filter(function(dirChild) { return dirChild !== ".gitlet"; })
+      .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
+      .forEach(function(dirChild) { files.deleteEmptyDirs(dirChild); });
+
     refs.write("HEAD", objects.read(ref) ? ref : refs.nameToBranchRef(ref));
   }
 };
