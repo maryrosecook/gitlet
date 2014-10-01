@@ -189,6 +189,15 @@ describe('checkout', function() {
       ga.checkout("other");
       testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
     });
+
+    it('should warn in detached head state if checkout commit', function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      expect(ga.checkout("21cb63f6"))
+        .toEqual("Note: checking out 21cb63f6\nYou are in 'detached HEAD' state.");
+    });
   });
 
   it('should allow a commit hash to be passed', function() {
@@ -203,9 +212,9 @@ describe('checkout', function() {
     testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
   });
 
-  // it('should warn that leaving detached head behind if checkout from det head', function() {
+  it('should warn that leaving detached head behind if checkout from det head', function() {
 
-  // });
+  });
 
   // it('should abort on staged changed file w dif content from checkout(ref)', function() {
 
