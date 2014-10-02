@@ -33,7 +33,6 @@ todo
 * git status?
 * should be able to checkout head, branch, hash
 * spelling of committed...
-* new Date().getTime() to Date.now
 * check all file ops are done on absolute paths
 * turn unlink() into unlinkSync()
 * remove files.write()
