@@ -40,3 +40,4 @@ todo
 * make writeFilesFromTree not default prefix - just pass it
 * make writeFilesFromTree structure called tree
 * use readIsHash wherever possible
+* sort formatting of toThrow()s
