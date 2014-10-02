@@ -25,7 +25,6 @@ todo
 * test committing when other branch checked out
 * make sure merge does two parents
 * use same quote style throughout
-* shorten error messages - no need to ape the git ones fully
 * model refs/trees/commits/blobs as objs w/ methods?
 * finish tests in commit.spec
 * look for other unfinished tests
