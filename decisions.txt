@@ -28,5 +28,4 @@ todo
 * finish tests in commit.spec
 * look for other unfinished tests
 * git status?
-* should be able to checkout head, branch, hash
 * check all file ops are done on absolute paths
