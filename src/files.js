@@ -36,21 +36,21 @@ var files = module.exports = {
     return nodePath.relative(files.repoDir(), nodePath.join(process.cwd(), path));
   },
 
-  writeFilesFromTree: function(structure, prefix) {
+  writeFilesFromTree: function(tree, prefix) {
     if (prefix === undefined) {
-      return files.writeFilesFromTree(structure, process.cwd());
+      return files.writeFilesFromTree(tree, process.cwd());
     }
 
-    Object.keys(structure).forEach(function(name) {
+    Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
-      if (util.isString(structure[name])) {
-        files.write(path, structure[name]);
+      if (util.isString(tree[name])) {
+        files.write(path, tree[name]);
       } else {
         if (!fs.existsSync(path)) {
           fs.mkdirSync(path, "777");
         }
 
-        files.writeFilesFromTree(structure[name], path);
+        files.writeFilesFromTree(tree[name], path);
       }
     });
   },
