@@ -17,6 +17,7 @@
 * diff cannot take paths, only refs and hashes (eg can't take git diff master:src/ or git diff src/)
 * complain if do echo a > a; git add a; rm a; git add a; - git 1.8.2.3 does not complain that file does not exist, presumably because it is in the index.  git 2.0 will complain.
 * not supporting git checkout HEAD
+* not supporting error message if try and checkout to branch already on
 
 todo
 * cd back to repo root for all commands
