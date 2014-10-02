@@ -25,7 +25,6 @@ todo
 * use same quote style throughout
 * shorten error messages - no need to ape the git ones fully
 * model refs/trees/commits/blobs as objs w/ methods?
-* remove code that allows diffing/checking out a tree
 * finish tests in commit.spec
 * look for other unfinished tests
 * git status?
