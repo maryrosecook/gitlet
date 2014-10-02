@@ -24,7 +24,6 @@ todo
 * make sure merge does two parents
 * use same quote style throughout
 * shorten error messages - no need to ape the git ones fully
-* split files into files and workingcopy
 * model refs/trees/commits/blobs as objs w/ methods?
 * remove code that allows diffing/checking out a tree
 * finish tests in commit.spec
