@@ -113,7 +113,7 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should say commited file that has now been deleted has been deleted', function() {
+    it('should say committed file that has now been deleted has been deleted', function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -194,7 +194,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
-      it('should say commited file that has now been deleted has been deleted', function() {
+      it('should say committed file that has now been deleted has been deleted', function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");

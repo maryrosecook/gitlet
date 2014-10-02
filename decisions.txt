@@ -30,5 +30,4 @@ todo
 * look for other unfinished tests
 * git status?
 * should be able to checkout head, branch, hash
-* spelling of committed...
 * check all file ops are done on absolute paths
