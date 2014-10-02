@@ -37,4 +37,3 @@ todo
 * check all file ops are done on absolute paths
 * turn unlink() into unlinkSync()
 * remove files.write()
-* make writeFilesFromTree not default prefix - just pass it

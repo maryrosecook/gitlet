@@ -37,10 +37,6 @@ var files = module.exports = {
   },
 
   writeFilesFromTree: function(tree, prefix) {
-    if (prefix === undefined) {
-      return files.writeFilesFromTree(tree, process.cwd());
-    }
-
     Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
       if (util.isString(tree[name])) {

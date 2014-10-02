@@ -22,7 +22,7 @@ var gitletApi = module.exports = {
           },
         }
       }
-    });
+    }, process.cwd());
   },
 
   add: function(path, _) {
