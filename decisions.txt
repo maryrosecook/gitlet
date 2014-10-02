@@ -31,4 +31,3 @@ todo
 * look for other unfinished tests
 * git status?
 * check all file ops are done on absolute paths
-* try checking out from one branch to another where several different commits have happened to each
