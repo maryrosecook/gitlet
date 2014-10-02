@@ -32,10 +32,6 @@ var refs = module.exports = {
     }
   },
 
-  readIsHash: function(possibleHash) {
-    return objects.read(possibleHash) !== undefined;
-  },
-
   readIsHeadDetached: function() {
     return readHead().match("refs") === null;
   },
