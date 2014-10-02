@@ -1,8 +1,8 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var testUtil = require("./test-util");
 
-describe('init', function() {
+describe("init", function() {
   beforeEach(testUtil.createEmptyRepo);
 
   function expectGitletFilesAndDirectories() {
@@ -15,12 +15,12 @@ describe('init', function() {
     testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
   };
 
-  it('should create .gitlet/ and all required dirs', function() {
+  it("should create .gitlet/ and all required dirs", function() {
     ga.init();
     expectGitletFilesAndDirectories();
   });
 
-  it('should not change anything if init run twice', function() {
+  it("should not change anything if init run twice", function() {
     ga.init();
     ga.init();
     expectGitletFilesAndDirectories();

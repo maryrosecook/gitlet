@@ -1,11 +1,11 @@
-var fs = require('fs');
-var files = require('./files');
-var index = require('./index');
-var objects = require('./objects');
-var refs = require('./refs');
-var diff = require('./diff');
-var checkout = require('./checkout');
-var util = require('./util');
+var fs = require("fs");
+var files = require("./files");
+var index = require("./index");
+var objects = require("./objects");
+var refs = require("./refs");
+var diff = require("./diff");
+var checkout = require("./checkout");
+var util = require("./util");
 
 var gitletApi = module.exports = {
   init: function(_) {

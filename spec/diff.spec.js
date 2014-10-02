@@ -1,35 +1,35 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var testUtil = require("./test-util");
 
-describe('diff', function() {
+describe("diff", function() {
   beforeEach(testUtil.createEmptyRepo);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 
-  it('should throw if not in repo', function() {
+  it("should throw if not in repo", function() {
     expect(function() { ga.diff(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should throw if do not pass --name-status option', function() {
+  it("should throw if do not pass --name-status option", function() {
     ga.init();
     expect(function() { ga.diff(undefined, undefined, {}); }).toThrow("unsupported");
   });
 
-  it('should throw unknown revision if ref1 not in objects', function() {
+  it("should throw unknown revision if ref1 not in objects", function() {
     ga.init();
     expect(function() { ga.diff("blah1", undefined, { "name-status": true }) })
       .toThrow("fatal: ambiguous argument blah1: unknown revision");
   });
 
-  it('should throw unknown revision if ref2 not in objects', function() {
+  it("should throw unknown revision if ref2 not in objects", function() {
     ga.init();
     expect(function() { ga.diff("blah2", undefined, { "name-status": true }) })
       .toThrow("fatal: ambiguous argument blah2: unknown revision");
   });
 
-  it('should include several files with changes', function() {
+  it("should include several files with changes", function() {
     testUtil.createStandardFileStructure();
     ga.init();
     ga.add("1a/filea");
@@ -43,13 +43,13 @@ describe('diff', function() {
       .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2b/filec\n");
   });
 
-  describe('no refs passed (index and WC)', function() {
-    it('should show nothing for repo w no commits', function() {
+  describe("no refs passed (index and WC)", function() {
+    it("should show nothing for repo w no commits", function() {
       ga.init();
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should not include unstaged files', function() {
+    it("should not include unstaged files", function() {
       // this is because the file is never mentioned by the index,
       // which is to say: it doesn't compare absence against the WC hash.
 
@@ -58,7 +58,7 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should not include new file that is staged', function() {
+    it("should not include new file that is staged", function() {
       // this is because the file is in the index, but the version
       // in the WC is the same
 
@@ -69,7 +69,7 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should not include committed file w no changes', function() {
+    it("should not include committed file w no changes", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -77,7 +77,7 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should include committed file w unstaged changes', function() {
+    it("should include committed file w unstaged changes", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -87,7 +87,7 @@ describe('diff', function() {
         .toEqual("M 1a/filea\n");
     });
 
-    it('should not include committed file w staged changes', function() {
+    it("should not include committed file w staged changes", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -97,7 +97,7 @@ describe('diff', function() {
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should say file that was created, staged, deleted was deleted', function() {
+    it("should say file that was created, staged, deleted was deleted", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -106,14 +106,14 @@ describe('diff', function() {
         .toEqual("D 1a/filea\n");
     });
 
-    it('should not include file that was created, deleted but never staged', function() {
+    it("should not include file that was created, deleted but never staged", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       fs.unlinkSync("1a/filea");
       expect(ga.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
     });
 
-    it('should say committed file that has now been deleted has been deleted', function() {
+    it("should say committed file that has now been deleted has been deleted", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -123,15 +123,15 @@ describe('diff', function() {
     });
   });
 
-  describe('one ref passed (someref and WC)', function() {
-    describe('HEAD passed (compared with WC)', function() {
-      it('should blow up for HEAD if no commits', function() {
+  describe("one ref passed (someref and WC)", function() {
+    describe("HEAD passed (compared with WC)", function() {
+      it("should blow up for HEAD if no commits", function() {
         ga.init();
         expect(function() { ga.diff("HEAD", undefined, { "name-status": true }) })
           .toThrow("fatal: ambiguous argument HEAD: unknown revision");
       });
 
-      it('should not include unstaged files', function() {
+      it("should not include unstaged files", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -139,7 +139,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
-      it('should include new file that is staged', function() {
+      it("should include new file that is staged", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -148,7 +148,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("A 1b/fileb\n");
       });
 
-      it('should not include committed file w no changes', function() {
+      it("should not include committed file w no changes", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -156,7 +156,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
-      it('should include committed file w unstaged changes', function() {
+      it("should include committed file w unstaged changes", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -165,7 +165,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
       });
 
-      it('should include committed file w staged changes', function() {
+      it("should include committed file w staged changes", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -175,7 +175,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
       });
 
-      it('should not include file that was created, staged, deleted', function() {
+      it("should not include file that was created, staged, deleted", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -185,7 +185,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
-      it('should not include file that was created, deleted but never staged', function() {
+      it("should not include file that was created, deleted but never staged", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -194,7 +194,7 @@ describe('diff', function() {
         expect(ga.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
       });
 
-      it('should say committed file that has now been deleted has been deleted', function() {
+      it("should say committed file that has now been deleted has been deleted", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -204,8 +204,8 @@ describe('diff', function() {
       });
     });
 
-    describe('non-head commits passed (compared with WC)', function() {
-      it('should include committed file modified in WC if HEAD hash passed', function() {
+    describe("non-head commits passed (compared with WC)", function() {
+      it("should include committed file modified in WC if HEAD hash passed", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -215,7 +215,7 @@ describe('diff', function() {
           .toEqual("M 1a/filea\n");
       });
 
-      it('should incl committed file modified in WC if branch from head passed', function() {
+      it("should incl committed file modified in WC if branch from head passed", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -225,7 +225,7 @@ describe('diff', function() {
         expect(ga.diff("other", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
       });
 
-      it('should blow up if non existent ref passed', function() {
+      it("should blow up if non existent ref passed", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -236,21 +236,21 @@ describe('diff', function() {
     });
   });
 
-  describe('two refs passed', function() {
-    describe('basic changes', function() {
-      it('should blow up with two refs if no commits', function() {
+  describe("two refs passed", function() {
+    describe("basic changes", function() {
+      it("should blow up with two refs if no commits", function() {
         ga.init();
         expect(function() { ga.diff("a", "b", { "name-status": true }) })
           .toThrow("fatal: ambiguous argument a: unknown revision");
       });
 
-      it('should blow up for HEAD and other ref if no commits', function() {
+      it("should blow up for HEAD and other ref if no commits", function() {
         ga.init();
         expect(function() { ga.diff("HEAD", "b", { "name-status": true }) })
           .toThrow("fatal: ambiguous argument HEAD: unknown revision");
       });
 
-      it('should blow up if either ref does not exist', function() {
+      it("should blow up if either ref does not exist", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -262,7 +262,7 @@ describe('diff', function() {
           .toThrow("fatal: ambiguous argument blah2: unknown revision");
       });
 
-      it('should not include unstaged files', function() {
+      it("should not include unstaged files", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -272,7 +272,7 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("\n");
       });
 
-      it('should not include committed file w no changes', function() {
+      it("should not include committed file w no changes", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -282,7 +282,7 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("\n");
       });
 
-      it('should include added file', function() {
+      it("should include added file", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -294,7 +294,7 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("A 1b/fileb\n");
       });
 
-      it('should include changed file', function() {
+      it("should include changed file", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -307,7 +307,7 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
       });
 
-      it('should not include staged changes', function() {
+      it("should not include staged changes", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -319,8 +319,8 @@ describe('diff', function() {
       });
     });
 
-    describe('reversing order of ref args', function() {
-      it('should see deletion as addition and vice versa', function() {
+    describe("reversing order of ref args", function() {
+      it("should see deletion as addition and vice versa", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -334,7 +334,7 @@ describe('diff', function() {
         expect(ga.diff("b", "a", { "name-status": true })).toEqual("D 1b/fileb\n");
       });
 
-      it('should see modification in both directions', function() {
+      it("should see modification in both directions", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -350,8 +350,8 @@ describe('diff', function() {
       });
     });
 
-    describe('diffing commits with intervening commits where a lot happened', function() {
-      it('should see additions', function() {
+    describe("diffing commits with intervening commits where a lot happened", function() {
+      it("should see additions", function() {
         testUtil.createStandardFileStructure();
         ga.init();
 
@@ -373,7 +373,7 @@ describe('diff', function() {
           .toEqual("A 1b/fileb\nA 1b/2b/filec\nA 1b/2b/3b/4b/filed\n");
       });
 
-      it('should see deletions', function() {
+      it("should see deletions", function() {
         testUtil.createStandardFileStructure();
         ga.init();
 
@@ -395,7 +395,7 @@ describe('diff', function() {
           .toEqual("D 1b/fileb\nD 1b/2b/filec\nD 1b/2b/3b/4b/filed\n");
       });
 
-      it('should see modifications', function() {
+      it("should see modifications", function() {
         testUtil.createStandardFileStructure();
         ga.init();
 
@@ -423,8 +423,8 @@ describe('diff', function() {
       });
     });
 
-    describe('diffs in which several different types of thing happened', function() {
-      it('should record additions and modifications', function() {
+    describe("diffs in which several different types of thing happened", function() {
+      it("should record additions and modifications", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");
@@ -440,7 +440,7 @@ describe('diff', function() {
         expect(ga.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\nA 1b/fileb\n");
       });
 
-      it('should record deletions and modifications', function() {
+      it("should record deletions and modifications", function() {
         testUtil.createStandardFileStructure();
         ga.init();
         ga.add("1a/filea");

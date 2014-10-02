@@ -1,8 +1,8 @@
-var files = require('./files');
-var index = require('./index');
-var objects = require('./objects');
-var refs = require('./refs');
-var util = require('./util');
+var files = require("./files");
+var index = require("./index");
+var objects = require("./objects");
+var refs = require("./refs");
+var util = require("./util");
 
 var diff = module.exports = {
   FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D" },

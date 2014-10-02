@@ -1,5 +1,5 @@
-var gitletApi = require('./gitlet-api');
-var parseOptions = require('./parse-options');
+var gitletApi = require("./gitlet-api");
+var parseOptions = require("./parse-options");
 
 var gitlet = module.exports = function(argv) {
   var rawArgs = parseOptions(argv);

@@ -1,5 +1,5 @@
-var fs = require('fs');
-var nodePath = require('path');
+var fs = require("fs");
+var nodePath = require("path");
 
 var originalDateToString = Date.prototype.toString;
 

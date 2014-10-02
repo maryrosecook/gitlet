@@ -1,18 +1,18 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var testUtil = require("./test-util");
 
-describe('update-ref', function() {
+describe("update-ref", function() {
   beforeEach(testUtil.createEmptyRepo);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 
-  it('should throw if not in repo', function() {
+  it("should throw if not in repo", function() {
     expect(function() { ga.update_ref(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should throw if try to update ref that is not in refs/heads/', function() {
+  it("should throw if try to update ref that is not in refs/heads/", function() {
     ga.init();
     expect(function() { ga.update_ref("/", ""); }).toThrow("fatal: Cannot lock the ref /.");
     expect(function() { ga.update_ref("refs/", ""); })
@@ -25,13 +25,13 @@ describe('update-ref', function() {
       .toThrow("fatal: Cannot lock the ref ../woo.");
   });
 
-  it('should throw if ref2 is a hash that is not in the db', function() {
+  it("should throw if ref2 is a hash that is not in the db", function() {
     ga.init();
     expect(function() { ga.update_ref("refs/heads/master", "123"); })
       .toThrow("fatal: 123: not a valid SHA1");
   });
 
-  it('should throw if try to update HEAD to hash that is not a commit', function() {
+  it("should throw if try to update HEAD to hash that is not a commit", function() {
     ga.init();
     fs.writeFileSync("a", "a");
     var hash = ga.hash_object("a", { w: true });
@@ -40,7 +40,7 @@ describe('update-ref', function() {
                " to branch refs/heads/master\n");
   });
 
-  it('should throw if try to update master to hash that is not a commit', function() {
+  it("should throw if try to update master to hash that is not a commit", function() {
     ga.init();
     fs.writeFileSync("a", "a");
     var hash = ga.hash_object("a", { w: true });
@@ -49,7 +49,7 @@ describe('update-ref', function() {
                " to branch refs/heads/master\n");
   });
 
-  it('should allow updating HEAD to hash', function() {
+  it("should allow updating HEAD to hash", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1a");
@@ -66,7 +66,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
   });
 
-  it('should update terminal ref at HEAD to passed hash, not HEAD file content', function() {
+  it("should update terminal ref at HEAD to passed hash, not HEAD file content", function() {
     ga.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
@@ -84,7 +84,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gitlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
   });
 
-  it('should allow update of master to a hash', function() {
+  it("should allow update of master to a hash", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1a");
@@ -97,7 +97,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
   });
 
-  it('should allow master to be updated to a qualified branch', function() {
+  it("should allow master to be updated to a qualified branch", function() {
     ga.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
@@ -114,7 +114,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("98d541a");
   });
 
-  it('should allow master to be updated to an unqualified branch', function() {
+  it("should allow master to be updated to an unqualified branch", function() {
     ga.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 
@@ -131,7 +131,7 @@ describe('update-ref', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("98d541a");
   });
 
-  it('should allow ref to be updated to HEAD', function() {
+  it("should allow ref to be updated to HEAD", function() {
     ga.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb" });
 

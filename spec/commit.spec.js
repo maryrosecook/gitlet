@@ -1,19 +1,19 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var nodePath = require('path');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var nodePath = require("path");
+var testUtil = require("./test-util");
 
-describe('commit', function() {
+describe("commit", function() {
   beforeEach(testUtil.createEmptyRepo);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 
-  it('should throw if not in repo', function() {
+  it("should throw if not in repo", function() {
     expect(function() { ga.commit(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should throw if nothing to commit now, but there were previous commits', function() {
+  it("should throw if nothing to commit now, but there were previous commits", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -23,7 +23,7 @@ describe('commit', function() {
       .toThrow("# On master\n" + "nothing to commit, working directory clean");
   });
 
-  it('should create commit file when initially commiting', function() {
+  it("should create commit file when initially commiting", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -37,7 +37,7 @@ describe('commit', function() {
     expect(commitFile.split("\n")[3]).toEqual("    first");
   });
 
-  it('should initial commit file should have no parents', function() {
+  it("should initial commit file should have no parents", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -45,7 +45,7 @@ describe('commit', function() {
     fs.readFileSync(".gitlet/objects/6e7887a2", "utf8").split("\n")[1].match("Date:");
   });
 
-  it('should store parent on all commits after first', function() {
+  it("should store parent on all commits after first", function() {
     ga.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb", filec: "filec" });
 
@@ -65,7 +65,7 @@ describe('commit', function() {
     expect(fs.readFileSync(".gitlet/objects/" + thirdHash, "utf8").split("\n")[1]).toEqual("parent " + secondHash);
   });
 
-  it('should point current branch at commit when committing', function() {
+  it("should point current branch at commit when committing", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -73,7 +73,7 @@ describe('commit', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("6e7887a2");
   });
 
-  it('should record subsequent commit object', function() {
+  it("should record subsequent commit object", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1a");
@@ -90,7 +90,7 @@ describe('commit', function() {
     expect(commitFileLines2[4]).toEqual("    second");
   });
 
-  it('should point current branch at subsequent commits', function() {
+  it("should point current branch at subsequent commits", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1a");
@@ -102,7 +102,7 @@ describe('commit', function() {
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("59bb8412");
   });
 
-  it('should create commit without passing date', function() {
+  it("should create commit without passing date", function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
     ga.add("1");
@@ -122,7 +122,7 @@ describe('commit', function() {
     });
   });
 
-  it('should complain nothing to commit if only changes are unstaged', function() {
+  it("should complain nothing to commit if only changes are unstaged", function() {
     testUtil.createStandardFileStructure();
     ga.init();
     ga.add("1a/filea");
@@ -132,12 +132,12 @@ describe('commit', function() {
       .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
-  // it('should allow checking out commit', function() {
+  // it("should allow checking out commit", function() {
   // });
 
-  // it('should warn when user goes into detached HEAD state', function() {
+  // it("should warn when user goes into detached HEAD state", function() {
   // });
 
-  // it('should indicate detached HEAD after committing to detached HEAD', function() {
+  // it("should indicate detached HEAD after committing to detached HEAD", function() {
   // });
 });

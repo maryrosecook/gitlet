@@ -1,24 +1,24 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var testUtil = require("./test-util");
 
-describe('checkout', function() {
+describe("checkout", function() {
   beforeEach(testUtil.createEmptyRepo);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 
-  it('should throw if not in repo', function() {
+  it("should throw if not in repo", function() {
     expect(function() { ga.checkout(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should throw if pass ref that does not resolve to a hash', function() {
+  it("should throw if pass ref that does not resolve to a hash", function() {
     ga.init();
     expect(function() { ga.checkout("woo"); })
       .toThrow("error: pathspec woo did not match any file(s) known to gitlet.");
   });
 
-  it('should throw if passed ref points to blob', function() {
+  it("should throw if passed ref points to blob", function() {
     testUtil.createStandardFileStructure();
     ga.init();
     ga.add("1a/filea");
@@ -27,7 +27,7 @@ describe('checkout', function() {
       .toThrow("fatal: reference is not a tree: 5ceba65")
   });
 
-  it('should throw if passed ref points to tree', function() {
+  it("should throw if passed ref points to tree", function() {
     testUtil.createStandardFileStructure();
     ga.init();
     ga.add("1a/filea");
@@ -36,7 +36,7 @@ describe('checkout', function() {
       .toThrow("fatal: reference is not a tree: 17653b6d")
   });
 
-  it('should throw if file has unstaged changes w/o common orig content with c/o', function() {
+  it("should throw if file has unstaged changes w/o common orig content with c/o", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -56,7 +56,7 @@ describe('checkout', function() {
 	             "1a/filea\n");
   });
 
-  it('should throw if file has staged changes w/o common orig content with c/o', function() {
+  it("should throw if file has staged changes w/o common orig content with c/o", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -77,7 +77,7 @@ describe('checkout', function() {
 	             "1a/filea\n");
   });
 
-  it('should list all files that would be overwritten when throwing', function() {
+  it("should list all files that would be overwritten when throwing", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -105,7 +105,7 @@ describe('checkout', function() {
 	             "1a/filea\n1b/fileb\n1b/2b/filec\n");
   });
 
-  it('should not throw if file has changes w/ common orig content w/ c/o branch', function() {
+  it("should not throw if file has changes w/ common orig content w/ c/o branch", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -118,7 +118,7 @@ describe('checkout', function() {
     ga.checkout("other"); // does not throw
   });
 
-  it('should keep uncommitted changes compatible w checked out branch', function() {
+  it("should keep uncommitted changes compatible w checked out branch", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -132,8 +132,8 @@ describe('checkout', function() {
     testUtil.expectFile("1a/filea", "fileachange2");
   });
 
-  describe('successful checkout', function() {
-    it('should remove committed files in previous working copy', function() {
+  describe("successful checkout", function() {
+    it("should remove committed files in previous working copy", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -148,7 +148,7 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/fileb")).toEqual(false);
     });
 
-    it('should add committed files in checked out ref', function() {
+    it("should add committed files in checked out ref", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -166,7 +166,7 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/fileb")).toEqual(true); // sanity check
     });
 
-    it('should remove empty folders after checkout', function() {
+    it("should remove empty folders after checkout", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -181,7 +181,7 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/2b/3b")).toEqual(false);
     });
 
-    it('should not remove folders that have unindexed files', function() {
+    it("should not remove folders that have unindexed files", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -196,7 +196,7 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/fileb")).toEqual(true);
     });
 
-    it('should point head at checked out branch', function() {
+    it("should point head at checked out branch", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -211,7 +211,7 @@ describe('checkout', function() {
       testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
     });
 
-    it('should warn in detached head state if checkout commit', function() {
+    it("should warn in detached head state if checkout commit", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");
@@ -221,7 +221,7 @@ describe('checkout', function() {
     });
   });
 
-  it('should allow a commit hash to be passed', function() {
+  it("should allow a commit hash to be passed", function() {
     testUtil.createStandardFileStructure();
     ga.init();
 
@@ -233,7 +233,7 @@ describe('checkout', function() {
     testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
   });
 
-  it('should be able to exit detached head state', function() {
+  it("should be able to exit detached head state", function() {
     testUtil.createStandardFileStructure();
     ga.init();
     ga.add("1a/filea");
@@ -246,8 +246,8 @@ describe('checkout', function() {
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
   });
 
-  describe('repeated checkout of same thing', function() {
-    it('should be idempodent adds, dels, mods for branches', function() {
+  describe("repeated checkout of same thing", function() {
+    it("should be idempodent adds, dels, mods for branches", function() {
       testUtil.createStandardFileStructure();
       ga.init();
 
@@ -273,7 +273,7 @@ describe('checkout', function() {
       expect(fs.existsSync("1b/fileb")).toEqual(true);
     });
 
-    it('should be idempodent adds, dels, mods for detached heads', function() {
+    it("should be idempodent adds, dels, mods for detached heads", function() {
       testUtil.createStandardFileStructure();
       ga.init();
       ga.add("1a/filea");

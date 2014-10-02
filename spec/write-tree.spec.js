@@ -1,16 +1,16 @@
-var fs = require('fs');
-var ga = require('../src/gitlet-api');
-var testUtil = require('./test-util');
+var fs = require("fs");
+var ga = require("../src/gitlet-api");
+var testUtil = require("./test-util");
 
-describe('write-tree', function() {
+describe("write-tree", function() {
   beforeEach(testUtil.createEmptyRepo);
 
-  it('should throw if not in repo', function() {
+  it("should throw if not in repo", function() {
     expect(function() { ga.write_tree(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should be able to write largish tree when no trees written yet', function() {
+  it("should be able to write largish tree when no trees written yet", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -23,7 +23,7 @@ describe('write-tree', function() {
     testUtil.expectFile(".gitlet/objects/752d7973", "tree 4b6b7518 3b\nblob 5ceba67 filec\n");
   });
 
-  it('should keep blobs written by git add', function() {
+  it("should keep blobs written by git add", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b");
@@ -34,7 +34,7 @@ describe('write-tree', function() {
     testUtil.expectFile(".gitlet/objects/5ceba67", "filec");
   });
 
-  it('should omit files in trees above dir that is several layers down', function() {
+  it("should omit files in trees above dir that is several layers down", function() {
     ga.init();
     testUtil.createStandardFileStructure();
     ga.add("1b/2b");
@@ -43,7 +43,7 @@ describe('write-tree', function() {
     testUtil.expectFile(".gitlet/objects/133bcd6", "tree aacf336 1b\n"); // note no 1a
   });
 
-  it('should compose tree from new and existing trees and blobs', function() {
+  it("should compose tree from new and existing trees and blobs", function() {
     ga.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
                                           { "filec": "filec",
@@ -71,7 +71,7 @@ describe('write-tree', function() {
     expect(fs.readdirSync(".gitlet/objects").length).toEqual(12);
   });
 
-  it('should write-tree of empty root tree if no files staged', function() {
+  it("should write-tree of empty root tree if no files staged", function() {
     ga.init();
     expect(ga.write_tree()).toEqual("a");
   });

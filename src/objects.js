@@ -1,7 +1,7 @@
-var fs = require('fs');
-var nodePath = require('path');
-var files = require('./files');
-var util = require('./util');
+var fs = require("fs");
+var nodePath = require("path");
+var files = require("./files");
+var util = require("./util");
 
 var objects = module.exports = {
   writeTree: function(tree) {

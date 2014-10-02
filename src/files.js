@@ -1,6 +1,6 @@
-var fs = require('fs');
-var nodePath = require('path');
-var util = require('./util');
+var fs = require("fs");
+var nodePath = require("path");
+var util = require("./util");
 
 var files = module.exports = {
   gitletDir: function(dir) {
