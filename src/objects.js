@@ -39,7 +39,7 @@ var objects = module.exports = {
 
   write: function(str) {
     var contentHash = util.hash(str);
-    if (objects.read(contentHash) === undefined) {
+    if (!objects.readExists(contentHash)) {
       var filePath = nodePath.join(files.gitletDir(), "objects", contentHash);
       files.write(filePath, str);
     }
