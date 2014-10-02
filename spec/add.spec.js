@@ -13,18 +13,16 @@ describe('add', function() {
   describe('pathspec matching', function() {
     it('should throw rel path if in root and pathspec does not match files', function() {
       ga.init();
-      expect(function() {
-        ga.add("blah");
-      }).toThrow("fatal: pathspec 'blah' did not match any files");
+      expect(function() { ga.add("blah"); })
+        .toThrow("fatal: pathspec 'blah' did not match any files");
     });
 
     it('should throw rel path if not in root and pathspec does not match files', function() {
       ga.init();
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
-      expect(function() {
-        ga.add("blah");
-      }).toThrow("fatal: pathspec '1/2/blah' did not match any files");
+      expect(function() { ga.add("blah"); })
+        .toThrow("fatal: pathspec '1/2/blah' did not match any files");
     });
   });
 

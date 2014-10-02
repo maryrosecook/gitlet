@@ -27,10 +27,8 @@ describe('commit', function() {
     ga.add("1b");
     ga.commit({ m: "first" });
 
-    expect(function() {
-      ga.commit();
-    }).toThrow("# On master\n" +
-               "nothing to commit, working directory clean");
+    expect(function() { ga.commit(); })
+      .toThrow("# On master\n" + "nothing to commit, working directory clean");
   });
 
   it('should create commit file when initially commiting', function() {
