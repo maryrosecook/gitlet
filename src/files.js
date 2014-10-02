@@ -40,7 +40,7 @@ var files = module.exports = {
     Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
       if (util.isString(tree[name])) {
-        files.write(path, tree[name]);
+        fs.writeFileSync(path, tree[name]);
       } else {
         if (!fs.existsSync(path)) {
           fs.mkdirSync(path, "777");
@@ -63,10 +63,6 @@ var files = module.exports = {
 
   read: function(path) {
     return fs.readFileSync(path, "utf8");
-  },
-
-  write: function(path, str) {
-    fs.writeFileSync(path, str);
   },
 
   lsRecursive: function(path) {

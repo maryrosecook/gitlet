@@ -29,7 +29,7 @@ var index = module.exports = {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
         .join("\n") + "\n";
-    files.write(nodePath.join(files.gitletDir(), "index"), indexStr);
+    fs.writeFileSync(nodePath.join(files.gitletDir(), "index"), indexStr);
   },
 
   readWorkingCopyIndex: function() {
