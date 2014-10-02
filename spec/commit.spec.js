@@ -132,12 +132,6 @@ describe("commit", function() {
       .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
-  // it("should allow checking out commit", function() {
-  // });
-
-  // it("should warn when user goes into detached HEAD state", function() {
-  // });
-
   // it("should indicate detached HEAD after committing to detached HEAD", function() {
   // });
 });
