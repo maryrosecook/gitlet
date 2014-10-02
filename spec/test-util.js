@@ -62,7 +62,6 @@ var testUtil = module.exports = {
 
     fs.mkdirSync(tmpDir);
     process.chdir(tmpDir); // switch working dir to test repo root
-
     expect(fs.readdirSync(process.cwd()).length).toEqual(0);
   },
 

@@ -63,30 +63,25 @@ describe('gitlet cli', function() {
       testUtil.pinDate();
 
       ga.init();
-      testUtil.createFilesFromTree({ "1": { filea: "filea", fileb: "fileb", "2":
-                                            { filec: "filec", "3a":
-                                              { filed: "filed", filee: "filee"}, "3b":
-                                              { filef: "filef", fileg: "fileg"}}}});
+      testUtil.createStandardFileStructure();
 
-      ga.add("1/2/3a");
+      ga.add("1a");
       ga.commit({ m: "first" });
-      ga.add("1/2/3b");
+      ga.add("1b");
       ga.commit({ m: "second" });
 
-      g(["node", "gitlet", "update-ref", "HEAD", "343b3d02"]);
+      g(["node", "gitlet", "update-ref", "HEAD", "21cb63f6"]);
 
-      expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("343b3d02");
+      expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
 
       testUtil.unpinDate();
     });
 
     it('should be able to write largish tree when no trees written yet', function() {
       ga.init();
-      testUtil.createFilesFromTree({ "1": { filea: "filea", fileb: "fileb", "2":
-                                            { filec: "filec", "3":
-                                              { filed: "filed", filee: "filee"}}}});
-      ga.add("1");
-      expect(g(["node", "gitlet", "write-tree"])).toEqual("7afc965a");
+      testUtil.createStandardFileStructure();
+      ga.add("1b");
+      expect(g(["node", "gitlet", "write-tree"])).toEqual("391566d4");
     });
   });
 });

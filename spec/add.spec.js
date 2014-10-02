@@ -40,47 +40,36 @@ describe('add', function() {
 
     it('should add all files in a large dir tree', function() {
       ga.init();
-      testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                            { "filec": "filec", "3":
-                                              { "filed": "filed", "filee": "filee"}}}});
-      ga.add("1");
-      expect(testUtil.index()[0].path).toEqual("1/2/3/filed");
-      expect(testUtil.index()[1].path).toEqual("1/2/3/filee");
-      expect(testUtil.index()[2].path).toEqual("1/2/filec");
-      expect(testUtil.index()[3].path).toEqual("1/filea");
-      expect(testUtil.index()[4].path).toEqual("1/fileb");
-      expect(testUtil.index().length).toEqual(5);
+      testUtil.createStandardFileStructure();
+      ga.add("1b");
+      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
+      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
+      expect(testUtil.index()[2].path).toEqual("1b/fileb");
+      expect(testUtil.index().length).toEqual(3);
     });
 
     it('should add only files in specified subdir', function() {
       ga.init();
-      testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                            { "filec": "filec", "3":
-                                              { "filed": "filed", "filee": "filee"}}}});
-      ga.add("1/2");
-      expect(testUtil.index()[0].path).toEqual("1/2/3/filed");
-      expect(testUtil.index()[1].path).toEqual("1/2/3/filee");
-      expect(testUtil.index()[2].path).toEqual("1/2/filec");
+      testUtil.createStandardFileStructure();
+      ga.add("1b");
+      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
+      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
+      expect(testUtil.index()[2].path).toEqual("1b/fileb");
       expect(testUtil.index().length).toEqual(3);
     });
 
     it('should be able to add multiple sets of files', function() {
       ga.init();
-      testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                            { "filec": "filec", "3a":
-                                              { "filed": "filed", "filee": "filee"}, "3b":
-                                              { "filef": "filef", "fileg": "fileg"}}}});
-      ga.add("1/2/3a");
-      expect(testUtil.index()[0].path).toEqual("1/2/3a/filed");
-      expect(testUtil.index()[1].path).toEqual("1/2/3a/filee");
+      testUtil.createStandardFileStructure();
+
+      ga.add("1b/2b");
+      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
+      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
       expect(testUtil.index().length).toEqual(2);
 
-      ga.add("1/2/3b");
-      expect(testUtil.index()[0].path).toEqual("1/2/3a/filed");
-      expect(testUtil.index()[1].path).toEqual("1/2/3a/filee");
-      expect(testUtil.index()[2].path).toEqual("1/2/3b/filef");
-      expect(testUtil.index()[3].path).toEqual("1/2/3b/fileg");
-      expect(testUtil.index().length).toEqual(4);
+      ga.add("1a");
+      expect(testUtil.index()[2].path).toEqual("1a/filea");
+      expect(testUtil.index().length).toEqual(3);
     });
 
     it('should complain that file does not exist even if in index', function() {

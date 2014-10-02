@@ -12,48 +12,35 @@ describe('write-tree', function() {
 
   it('should be able to write largish tree when no trees written yet', function() {
     ga.init();
-    testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                          { "filec": "filec", "3":
-                                            { "filed": "filed", "filee": "filee"}}}});
-    ga.add("1");
-    expect(ga.write_tree()).toEqual("7afc965a");
+    testUtil.createStandardFileStructure();
+    ga.add("1b");
+    expect(ga.write_tree()).toEqual("391566d4");
 
     // check only trees
-    testUtil.expectFile(".gitlet/objects/7afc965a", "tree 380b9be6 1\n");
-    testUtil.expectFile(".gitlet/objects/380b9be6",
-                        "tree 1c778a9 2\nblob 5ceba65 filea\nblob 5ceba66 fileb\n");
-    testUtil.expectFile(".gitlet/objects/1c778a9", "tree 51125fde 3\nblob 5ceba67 filec\n");
-    testUtil.expectFile(".gitlet/objects/51125fde", "blob 5ceba68 filed\nblob 5ceba69 filee\n");
+    testUtil.expectFile(".gitlet/objects/391566d4", "tree 18088c87 1b\n");
+    testUtil.expectFile(".gitlet/objects/18088c87",
+                        "tree 752d7973 2b\nblob 5ceba66 fileb\n");
+    testUtil.expectFile(".gitlet/objects/752d7973", "tree 4b6b7518 3b\nblob 5ceba67 filec\n");
   });
 
   it('should keep blobs written by git add', function() {
     ga.init();
-    testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                          { "filec": "filec", "3":
-                                            { "filed": "filed", "filee": "filee"}}}});
-    ga.add("1");
+    testUtil.createStandardFileStructure();
+    ga.add("1b");
     ga.write_tree();
 
     // check only blobs
-    testUtil.expectFile(".gitlet/objects/5ceba65", "filea");
     testUtil.expectFile(".gitlet/objects/5ceba66", "fileb");
     testUtil.expectFile(".gitlet/objects/5ceba67", "filec");
-    testUtil.expectFile(".gitlet/objects/5ceba68", "filed");
-    testUtil.expectFile(".gitlet/objects/5ceba69", "filee");
   });
 
   it('should omit files in trees above dir that is several layers down', function() {
     ga.init();
-    testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb", "2":
-                                          { "filec": "filec", "3":
-                                            { "filed": "filed", "filee": "filee"}}}});
-    ga.add("1/2");
-    expect(ga.write_tree()).toEqual("45cddb46");
+    testUtil.createStandardFileStructure();
+    ga.add("1b/2b");
+    expect(ga.write_tree()).toEqual("133bcd6");
 
-    testUtil.expectFile(".gitlet/objects/45cddb46", "tree 37ebbafc 1\n");
-    testUtil.expectFile(".gitlet/objects/37ebbafc", "tree 1c778a9 2\n");
-    testUtil.expectFile(".gitlet/objects/1c778a9", "tree 51125fde 3\nblob 5ceba67 filec\n");
-    testUtil.expectFile(".gitlet/objects/51125fde", "blob 5ceba68 filed\nblob 5ceba69 filee\n");
+    testUtil.expectFile(".gitlet/objects/133bcd6", "tree aacf336 1b\n"); // note no 1a
   });
 
   it('should compose tree from new and existing trees and blobs', function() {
