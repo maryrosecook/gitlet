@@ -15,7 +15,7 @@ describe('update-index', function() {
     it('should throw if path does not match existing working copy file', function() {
       ga.init();
       expect(function() { ga.update_index("blah"); })
-        .toThrow("error: blah: does not exist\nfatal: Unable to process path blah");
+        .toThrow("error: blah: does not exist\n");
     });
 
     it('should throw rel path if not in root and pathspec does not match file', function() {
@@ -23,7 +23,7 @@ describe('update-index', function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { ga.update_index("blah"); })
-        .toThrow("error: 1/2/blah: does not exist\nfatal: Unable to process path 1/2/blah");
+        .toThrow("error: 1/2/blah: does not exist\n");
     });
 
     it('should throw rel path if not in root and path is dir', function() {
@@ -31,8 +31,7 @@ describe('update-index', function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1");
       expect(function() { ga.update_index("2"); })
-        .toThrow("error: 1/2: is a directory - add files inside instead\n" +
-                 "fatal: Unable to process path 1/2");
+        .toThrow("error: 1/2: is a directory - add files inside instead\n");
     });
   });
 
@@ -68,8 +67,7 @@ describe('update-index', function() {
       fs.writeFileSync("README.md", "this is a readme");
 
       expect(function() { ga.update_index("README.md"); })
-        .toThrow("error: README.md: cannot add to the index - missing --add option?\n" +
-                 "fatal: Unable to process path README.md");
+        .toThrow("error: README.md: cannot add to the index - missing --add option?\n");
     });
 
     it('should still refer to staged version if file changes after stage', function() {

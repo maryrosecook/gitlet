@@ -37,8 +37,7 @@ describe('update-ref', function() {
     var hash = ga.hash_object("a", { w: true });
     expect(function() { ga.update_ref("HEAD", hash); })
       .toThrow("error: Trying to write non-commit object " + hash +
-               " to branch refs/heads/master\n" +
-               "fatal: Cannot update the ref HEAD");
+               " to branch refs/heads/master\n");
   });
 
   it('should throw if try to update master to hash that is not a commit', function() {
@@ -47,8 +46,7 @@ describe('update-ref', function() {
     var hash = ga.hash_object("a", { w: true });
     expect(function() { ga.update_ref("refs/heads/master", hash); })
       .toThrow("error: Trying to write non-commit object " + hash +
-               " to branch refs/heads/master\n" +
-               "fatal: Cannot update the ref refs/heads/master");
+               " to branch refs/heads/master\n");
   });
 
   it('should allow updating HEAD to hash', function() {

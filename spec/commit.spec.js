@@ -13,14 +13,6 @@ describe('commit', function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
-  it('should throw and explain how to stage if index empty', function() {
-    expect(function() {
-      ga.init();
-      ga.commit();
-    }).toThrow("# On branch master\n#\n# Initial commit\n#\n" +
-               "nothing to commit (create/copy files and use 'git add' to track)");
-  });
-
   it('should throw if nothing to commit now, but there were previous commits', function() {
     ga.init();
     testUtil.createStandardFileStructure();

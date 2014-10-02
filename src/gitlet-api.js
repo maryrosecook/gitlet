@@ -44,15 +44,11 @@ var gitletApi = module.exports = {
 
     var pathFromRoot = files.pathFromRepoRoot(path)
     if (!fs.existsSync(path)) {
-      throw "error: " + pathFromRoot + ": does not exist\n" +
-        "fatal: Unable to process path " + pathFromRoot;
+      throw "error: " + pathFromRoot + ": does not exist\n";
     } else if (fs.statSync(path).isDirectory()) {
-      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n" +
-        "fatal: Unable to process path " + pathFromRoot;
+      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
     } else if (!index.readHasFile(path) && opts.add === undefined) {
-      throw "error: " + pathFromRoot  +
-        ": cannot add to the index - missing --add option?\n" +
-        "fatal: Unable to process path " + pathFromRoot;
+      throw "error: " + pathFromRoot  + ": cannot add to the index - missing --add option?\n";
     } else {
       index.writeFile(path);
     }
@@ -82,24 +78,19 @@ var gitletApi = module.exports = {
   commit: function(opts) {
     files.assertInRepo();
 
-    if (Object.keys(index.read()).length === 0) {
-      throw "# On branch master\n#\n# Initial commit\n#\n" +
-        "nothing to commit (create/copy files and use 'git add' to track)";
-    } else {
-      var headHash = refs.readHash("HEAD");
-      var treeHash = this.write_tree();
+    var headHash = refs.readHash("HEAD");
+    var treeHash = this.write_tree();
 
-      if (headHash !== undefined &&
-          treeHash === objects.treeHash(objects.read(headHash))) {
-        throw "# On " + refs.readCurrentBranchName() + "\n" +
-          "nothing to commit, working directory clean";
-      } else {
-        var isFirstCommit = refs.readHash("HEAD") === undefined;
-        var parentHashes = isFirstCommit ? [] : [refs.readHash("HEAD")];
-        var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
-        this.update_ref("HEAD", commmitHash);
-        return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
-      }
+    if (headHash !== undefined &&
+        treeHash === objects.treeHash(objects.read(headHash))) {
+      throw "# On " + refs.readCurrentBranchName() + "\n" +
+        "nothing to commit, working directory clean";
+    } else {
+      var isFirstCommit = refs.readHash("HEAD") === undefined;
+      var parentHashes = isFirstCommit ? [] : [refs.readHash("HEAD")];
+      var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
+      this.update_ref("HEAD", commmitHash);
+      return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
     }
   },
 
@@ -131,8 +122,7 @@ var gitletApi = module.exports = {
         throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
       } else if (!(objects.type(objects.read(hash)) === "commit")) {
         throw "error: Trying to write non-commit object " + hash + " to branch " +
-          refs.readTerminalRef(refToUpdate) + "\n" +
-          "fatal: Cannot update the ref " + refToUpdate;
+          refs.readTerminalRef(refToUpdate) + "\n";
       } else {
         refs.write(refs.readTerminalRef(refToUpdate), hash);
       }
