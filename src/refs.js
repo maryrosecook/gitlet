@@ -19,14 +19,12 @@ var refs = module.exports = {
   },
 
   readHash: function(refOrHash) {
-    if (refOrHash !== undefined) {
-      if (objects.readExists(refOrHash)) {
-        return refOrHash;
-      } else if (refOrHash === "HEAD" && refs.readIsHeadDetached()) {
-        return readHead();
-      } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
-        return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
-      }
+    if (objects.readExists(refOrHash)) {
+      return refOrHash;
+    } else if (refOrHash === "HEAD" && refs.readIsHeadDetached()) {
+      return readHead();
+    } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
+      return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
     }
   },
 
