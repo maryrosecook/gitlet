@@ -118,7 +118,7 @@ var gitletApi = module.exports = {
       throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
     } else if (!refs.isRef(refToUpdate)) {
       throw "fatal: Cannot lock the ref " + refToUpdate + ".";
-    } else if (!(objects.type(objects.read(hash)) === "commit")) {
+    } else if (objects.type(objects.read(hash)) !== "commit") {
       throw "error: Trying to write non-commit object " + hash + " to branch " +
         refs.readTerminalRef(refToUpdate) + "\n";
     } else {
