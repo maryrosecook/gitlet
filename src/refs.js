@@ -9,8 +9,10 @@ var refs = module.exports = {
   },
 
   readTerminalRef: function(ref) {
-    if (ref === "HEAD" && !this.readIsHeadDetached()) {
-      return readHead();
+    if (ref === "HEAD" && this.readIsHeadDetached()) {
+      return "HEAD";
+    } else if (ref === "HEAD" && !this.readIsHeadDetached()) {
+      return readHeadContent().match("ref: (refs/heads/.+)")[1];
     } else if (isLocalHeadRef(ref)) {
       return ref;
     } else {
@@ -21,15 +23,15 @@ var refs = module.exports = {
   readHash: function(refOrHash) {
     if (objects.readExists(refOrHash)) {
       return refOrHash;
-    } else if (refOrHash === "HEAD" && refs.readIsHeadDetached()) {
-      return readHead();
+    } else if (refs.readTerminalRef(refOrHash) === "HEAD") {
+      return readHeadContent();
     } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
       return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
     }
   },
 
   readIsHeadDetached: function() {
-    return readHead().match("refs") === null;
+    return readHeadContent().match("refs") === null;
   },
 
   nameToBranchRef: function(name) {
@@ -55,16 +57,14 @@ var refs = module.exports = {
   },
 
   readCurrentBranchName: function() {
-    if (readHead().match("refs")) {
-      return readHead().match("refs/heads/(.+)")[1];
+    if (!refs.readIsHeadDetached()) {
+      return readHeadContent().match("refs/heads/(.+)")[1];
     }
   }
 };
 
-function readHead() {
-  var content = files.read(nodePath.join(files.gitletDir(), "HEAD"));
-  var refMatch = content.match("ref: (refs/heads/.+)");
-  return refMatch ? refMatch[1] : content;
+function readHeadContent() {
+  return files.read(nodePath.join(files.gitletDir(), "HEAD"));
 };
 
 function isLocalHeadRef(ref) {
