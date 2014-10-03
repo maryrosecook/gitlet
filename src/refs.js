@@ -26,8 +26,6 @@ var refs = module.exports = {
         return readHead();
       } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
         return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
-      } else if (refs.readExists(refs.nameToBranchRef(refOrHash))) {
-        return files.read(nodePath.join(files.gitletDir(), refs.nameToBranchRef(refOrHash)));
       }
     }
   },
