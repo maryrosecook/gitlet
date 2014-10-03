@@ -25,7 +25,5 @@ todo
 * test committing when other branch checked out
 * make sure merge does two parents
 * model refs/trees/commits/blobs as objs w/ methods?
-* finish tests in commit.spec
-* look for other unfinished tests
 * git status?
 * check all file ops are done on absolute paths
