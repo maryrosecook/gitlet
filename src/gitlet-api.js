@@ -86,8 +86,7 @@ var gitletApi = module.exports = {
       throw "# On " + refs.readCurrentBranchName() + "\n" +
         "nothing to commit, working directory clean";
     } else {
-      var isFirstCommit = refs.readHash("HEAD") === undefined;
-      var parentHashes = isFirstCommit ? [] : [refs.readHash("HEAD")];
+      var parentHashes = headHash === undefined ? [] : [headHash];
       var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
       this.update_ref("HEAD", commmitHash);
       return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
