@@ -132,6 +132,59 @@ describe("commit", function() {
       .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
-  // it("should indicate detached HEAD after committing to detached HEAD", function() {
-  // });
+  describe('detached HEAD commits', function() {
+    it("should report in det head when commit to detached HEAD", function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.checkout("21cb63f6");
+
+      ga.add("1b/fileb")
+      expect(ga.commit({ m: "second" })).toEqual("[detached HEAD 1c4100dd] second");
+    });
+
+    it("should point head at new commit when commit to detached HEAD", function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.checkout("21cb63f6");
+
+      ga.add("1b/fileb")
+      ga.commit({ m: "second" });
+      testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
+    });
+
+    it("should create commit file when committing", function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.checkout("21cb63f6");
+
+      ga.add("1b/fileb")
+      ga.commit({ m: "second" });
+      testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
+
+      var commitFile = fs.readFileSync(".gitlet/objects/1c4100dd", "utf8");
+      expect(commitFile.split("\n")[0]).toEqual("commit 794ea686");
+      expect(commitFile.split("\n")[1]).toEqual("parent 21cb63f6");
+      expect(commitFile.split("\n")[2])
+        .toEqual("Date:  Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)");
+      expect(commitFile.split("\n")[3]).toEqual("");
+      expect(commitFile.split("\n")[4]).toEqual("    second");
+    });
+
+    it("should mention detached head if nothing to commit", function() {
+      testUtil.createStandardFileStructure();
+      ga.init();
+      ga.add("1a/filea");
+      ga.commit({ m: "first" });
+      ga.checkout("21cb63f6");
+
+      expect(function() { ga.commit({ m: "second" }); })
+        .toThrow("# On detached HEAD\nnothing to commit, working directory clean");
+    });
+  });
 });
