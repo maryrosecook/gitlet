@@ -70,5 +70,5 @@ function readHead() {
 };
 
 function isLocalHeadRef(ref) {
-  return ref.match("refs/heads/[A-Za-z-]+");
+  return ref !== undefined && ref.match("refs/heads/[A-Za-z-]+");
 };
