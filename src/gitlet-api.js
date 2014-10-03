@@ -80,6 +80,7 @@ var gitletApi = module.exports = {
 
     var headHash = refs.readHash("HEAD");
     var treeHash = this.write_tree();
+    var headDesc = refs.readIsHeadDetached() ? "detached HEAD" : refs.readCurrentBranchName();
 
     if (headHash !== undefined &&
         treeHash === objects.treeHash(objects.read(headHash))) {
@@ -89,7 +90,7 @@ var gitletApi = module.exports = {
       var parentHashes = headHash === undefined ? [] : [headHash];
       var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
       this.update_ref("HEAD", commmitHash);
-      return "[" + refs.readCurrentBranchName() + " " + commmitHash + "] " + opts.m;
+      return "[" + headDesc + " " + commmitHash + "] " + opts.m;
     }
   },
 
