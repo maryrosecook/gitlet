@@ -84,8 +84,7 @@ var gitletApi = module.exports = {
 
     if (headHash !== undefined &&
         treeHash === objects.treeHash(objects.read(headHash))) {
-      throw "# On " + refs.readCurrentBranchName() + "\n" +
-        "nothing to commit, working directory clean";
+      throw "# On " + headDesc + "\n" + "nothing to commit, working directory clean";
     } else {
       var parentHashes = headHash === undefined ? [] : [headHash];
       var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
