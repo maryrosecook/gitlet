@@ -168,16 +168,20 @@ var gitlet = module.exports = {
           .join("\n") + "\n";
       }
     }
+  },
+
+  remote: function(command, name, path, _) {
+    files.assertInRepo();
+
+    if (command !== "add") {
+      throw "unsupported";
+    } else if (name in config["remote"]) {
+      throw "fatal: remote " + name + " already exists.";
+    }
+    else {
+      var configObj = config.read();
+    }
   }
-  // ,
-
-  // remote: function(command, name, path, _) {
-  //   files.assertInRepo();
-
-  //   if (command !== "add") {
-  //     throw "unsupported";
-  //   }
-  // }
 };
 
 var runCli = module.exports.runCli = function (argv) {
