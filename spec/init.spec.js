@@ -1,5 +1,5 @@
 var fs = require("fs");
-var ga = require("../src/gitlet-api");
+var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("init", function() {
@@ -17,13 +17,13 @@ describe("init", function() {
   };
 
   it("should create .gitlet/ and all required dirs", function() {
-    ga.init();
+    g.init();
     expectGitletFilesAndDirectories();
   });
 
   it("should not change anything if init run twice", function() {
-    ga.init();
-    ga.init();
+    g.init();
+    g.init();
     expectGitletFilesAndDirectories();
   });
 });

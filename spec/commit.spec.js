@@ -1,5 +1,5 @@
 var fs = require("fs");
-var ga = require("../src/gitlet-api");
+var g = require("../src/gitlet");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -9,25 +9,25 @@ describe("commit", function() {
   afterEach(testUtil.unpinDate);
 
   it("should throw if not in repo", function() {
-    expect(function() { ga.commit(); })
+    expect(function() { g.commit(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
   it("should throw if nothing to commit now, but there were previous commits", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1b");
-    ga.commit({ m: "first" });
+    g.add("1b");
+    g.commit({ m: "first" });
 
-    expect(function() { ga.commit(); })
+    expect(function() { g.commit(); })
       .toThrow("# On master\n" + "nothing to commit, working directory clean");
   });
 
   it("should create commit file when initially commiting", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1b");
-    ga.commit({ m: "first" });
+    g.add("1b");
+    g.commit({ m: "first" });
 
     var commitFile = fs.readFileSync(".gitlet/objects/6e7887a2", "utf8");
     expect(commitFile.split("\n")[0]).toEqual("commit 391566d4");
@@ -38,27 +38,27 @@ describe("commit", function() {
   });
 
   it("should initial commit file should have no parents", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1b");
-    ga.commit({ m: "first" });
+    g.add("1b");
+    g.commit({ m: "first" });
     fs.readFileSync(".gitlet/objects/6e7887a2", "utf8").split("\n")[1].match("Date:");
   });
 
   it("should store parent on all commits after first", function() {
-    ga.init();
+    g.init();
     testUtil.createFilesFromTree({ filea: "filea", fileb: "fileb", filec: "filec" });
 
-    ga.add("filea");
-    ga.commit({ m: "first" });
+    g.add("filea");
+    g.commit({ m: "first" });
     var firstHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
-    ga.add("fileb");
-    ga.commit({ m: "second" });
+    g.add("fileb");
+    g.commit({ m: "second" });
     var secondHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
-    ga.add("filec");
-    ga.commit({ m: "third" });
+    g.add("filec");
+    g.commit({ m: "third" });
     var thirdHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
     expect(fs.readFileSync(".gitlet/objects/" + secondHash, "utf8").split("\n")[1]).toEqual("parent " + firstHash);
@@ -66,20 +66,20 @@ describe("commit", function() {
   });
 
   it("should point current branch at commit when committing", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1b");
-    ga.commit({ m: "first" });
+    g.add("1b");
+    g.commit({ m: "first" });
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("6e7887a2");
   });
 
   it("should record subsequent commit object", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1a");
-    ga.commit({ m: "first" });
-    ga.add("1b");
-    ga.commit({ m: "second" });
+    g.add("1a");
+    g.commit({ m: "first" });
+    g.add("1b");
+    g.commit({ m: "second" });
 
     var commitFileLines1 = fs.readFileSync(".gitlet/objects/21cb63f6", "utf8").split("\n");
     expect(commitFileLines1[0]).toEqual("commit 63e0627e");
@@ -91,22 +91,22 @@ describe("commit", function() {
   });
 
   it("should point current branch at subsequent commits", function() {
-    ga.init();
+    g.init();
     testUtil.createStandardFileStructure();
-    ga.add("1a");
-    ga.commit({ m: "first" });
+    g.add("1a");
+    g.commit({ m: "first" });
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
 
-    ga.add("1b");
-    ga.commit({ m: "second" });
+    g.add("1b");
+    g.commit({ m: "second" });
     expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("59bb8412");
   });
 
   it("should create commit without passing date", function() {
-    ga.init();
+    g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea", "fileb": "fileb" }});
-    ga.add("1");
-    ga.commit({ m: "first" });
+    g.add("1");
+    g.commit({ m: "first" });
 
     fs.readdirSync(".gitlet/objects/").forEach(function(filename) {
       var contents = fs.readFileSync(nodePath.join(".gitlet/objects", filename), "utf8");
@@ -124,47 +124,47 @@ describe("commit", function() {
 
   it("should complain nothing to commit if only changes are unstaged", function() {
     testUtil.createStandardFileStructure();
-    ga.init();
-    ga.add("1a/filea");
-    ga.commit({ m: "first" });
+    g.init();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
     fs.writeFileSync("1a/filea", "somethingelse");
-    expect(function() { ga.commit({ m: "second" }); })
+    expect(function() { g.commit({ m: "second" }); })
       .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
   describe('detached HEAD commits', function() {
     it("should report in det head when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
-      ga.init();
-      ga.add("1a/filea");
-      ga.commit({ m: "first" });
-      ga.checkout("21cb63f6");
+      g.init();
+      g.add("1a/filea");
+      g.commit({ m: "first" });
+      g.checkout("21cb63f6");
 
-      ga.add("1b/fileb")
-      expect(ga.commit({ m: "second" })).toEqual("[detached HEAD 1c4100dd] second");
+      g.add("1b/fileb")
+      expect(g.commit({ m: "second" })).toEqual("[detached HEAD 1c4100dd] second");
     });
 
     it("should point head at new commit when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
-      ga.init();
-      ga.add("1a/filea");
-      ga.commit({ m: "first" });
-      ga.checkout("21cb63f6");
+      g.init();
+      g.add("1a/filea");
+      g.commit({ m: "first" });
+      g.checkout("21cb63f6");
 
-      ga.add("1b/fileb")
-      ga.commit({ m: "second" });
+      g.add("1b/fileb")
+      g.commit({ m: "second" });
       testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
     });
 
     it("should create commit file when committing", function() {
       testUtil.createStandardFileStructure();
-      ga.init();
-      ga.add("1a/filea");
-      ga.commit({ m: "first" });
-      ga.checkout("21cb63f6");
+      g.init();
+      g.add("1a/filea");
+      g.commit({ m: "first" });
+      g.checkout("21cb63f6");
 
-      ga.add("1b/fileb")
-      ga.commit({ m: "second" });
+      g.add("1b/fileb")
+      g.commit({ m: "second" });
       testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
 
       var commitFile = fs.readFileSync(".gitlet/objects/1c4100dd", "utf8");
@@ -178,12 +178,12 @@ describe("commit", function() {
 
     it("should mention detached head if nothing to commit", function() {
       testUtil.createStandardFileStructure();
-      ga.init();
-      ga.add("1a/filea");
-      ga.commit({ m: "first" });
-      ga.checkout("21cb63f6");
+      g.init();
+      g.add("1a/filea");
+      g.commit({ m: "first" });
+      g.checkout("21cb63f6");
 
-      expect(function() { ga.commit({ m: "second" }); })
+      expect(function() { g.commit({ m: "second" }); })
         .toThrow("# On detached HEAD\nnothing to commit, working directory clean");
     });
   });

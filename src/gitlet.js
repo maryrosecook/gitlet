@@ -6,8 +6,9 @@ var refs = require("./refs");
 var diff = require("./diff");
 var checkout = require("./checkout");
 var util = require("./util");
+var parseOptions = require("./parse-options");
 
-var gitletApi = module.exports = {
+var gitlet = module.exports = {
   init: function(_) {
     if (files.inRepo()) { return; }
 
@@ -168,4 +169,31 @@ var gitletApi = module.exports = {
       }
     }
   }
+  // ,
+
+  // remote: function(command, name, path, _) {
+  //   files.assertInRepo();
+
+  //   if (command !== "add") {
+  //     throw "unsupported";
+  //   }
+  // }
 };
+
+var runCli = module.exports.runCli = function (argv) {
+  var rawArgs = parseOptions(argv);
+  var commandFnName = rawArgs._[2].replace(/-/g, "_");
+  var fn = gitlet[commandFnName];
+  var commandArgs = rawArgs._.slice(3);
+  var unspecifiedArgs = Array
+      .apply(null, new Array(fn.length - commandArgs.length - 1))
+      .map(function() { return undefined; });
+  return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
+};
+
+if (require.main === module) {
+  var result = runCli(process.argv);
+  if (result !== undefined) {
+    console.log(result);
+  }
+}
