@@ -13,6 +13,7 @@ describe("init", function() {
     expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/remotes/origin/")).toEqual(true);
 
     testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
+    testUtil.expectFile(__dirname + "/tmp/.gitlet/config", "\n");
   };
 
   it("should create .gitlet/ and all required dirs", function() {
