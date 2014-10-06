@@ -20,9 +20,6 @@ var gitlet = module.exports = {
         objects: {},
         refs: {
           heads: {},
-          remotes: {
-            origin: {}
-          },
         }
       }
     }, process.cwd());
