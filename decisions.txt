@@ -28,4 +28,3 @@ todo
 * model refs/trees/commits/blobs as objs w/ methods?
 * git status?
 * check all file ops are done on absolute paths
-* make sure all helper mods get full paths - try and store only state (repo root) in api instance
