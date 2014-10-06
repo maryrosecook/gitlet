@@ -183,6 +183,11 @@ var gitlet = module.exports = {
       config.write(util.assocIn(config.read(), ["remote", name, origin]));
       return "\n";
     }
+  },
+
+  fetch: function(name, _) {
+    files.assertInRepo();
+
   }
 };
 
