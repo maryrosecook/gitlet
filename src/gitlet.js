@@ -7,6 +7,7 @@ var diff = require("./diff");
 var checkout = require("./checkout");
 var util = require("./util");
 var parseOptions = require("./parse-options");
+var config = require("./config");
 
 var gitlet = module.exports = {
   init: function(_) {
@@ -173,13 +174,15 @@ var gitlet = module.exports = {
   remote: function(command, name, path, _) {
     files.assertInRepo();
 
+    var configObj = config.read();
     if (command !== "add") {
       throw "unsupported";
-    } else if (name in config["remote"]) {
+    } else if (name in configObj["remote"]) {
       throw "fatal: remote " + name + " already exists.";
-    }
-    else {
-      var configObj = config.read();
+    } else if (command === "add") {
+      var origin = { url: path, fetch: "+refs/heads/*:refs/remotes/" + name + "/*" };
+      config.write(util.assocIn(configObj, ["remote", name, origin]));
+      return "\n";
     }
   }
 };
