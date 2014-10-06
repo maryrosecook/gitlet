@@ -188,6 +188,9 @@ var gitlet = module.exports = {
   fetch: function(name, _) {
     files.assertInRepo();
 
+    if (name === undefined) {
+      throw "unsupported";
+    }
   }
 };
 
