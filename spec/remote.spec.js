@@ -31,6 +31,13 @@ describe("remote", function() {
     expect(configFileLines[2]).toEqual("  fetch = +refs/heads/*:refs/remotes/origin/*");
   });
 
+  it("should return newline when successfully add remote", function() {
+    g.init();
+    expect(g.remote("add", "origin", "git@origin")).toEqual("\n");
+    var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
+    expect(configFileLines[0]).toEqual("[remote \"origin\"]");
+  });
+
   it("should be able to store more than one remote", function() {
     g.init();
     g.remote("add", "origin", "git@origin");
