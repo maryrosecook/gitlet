@@ -174,14 +174,13 @@ var gitlet = module.exports = {
   remote: function(command, name, path, _) {
     files.assertInRepo();
 
-    var configObj = config.read();
     if (command !== "add") {
       throw "unsupported";
-    } else if (name in configObj["remote"]) {
+    } else if (name in config.read()["remote"]) {
       throw "fatal: remote " + name + " already exists.";
     } else if (command === "add") {
       var origin = { url: path, fetch: "+refs/heads/*:refs/remotes/" + name + "/*" };
-      config.write(util.assocIn(configObj, ["remote", name, origin]));
+      config.write(util.assocIn(config.read(), ["remote", name, origin]));
       return "\n";
     }
   }
