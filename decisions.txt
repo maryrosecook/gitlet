@@ -18,6 +18,7 @@
 * complain if do echo a > a; git add a; rm a; git add a; - git 1.8.2.3 does not complain that file does not exist, presumably because it is in the index.  git 2.0 will complain.
 * not supporting git checkout HEAD
 * not supporting error message if try and checkout to branch already on
+* only checking basic validity of args passed to main git fns when it illustrates something about how git works.  eg don't check for undefined but do check that --add there if file not in index
 
 todo
 * cd back to repo root for all commands
