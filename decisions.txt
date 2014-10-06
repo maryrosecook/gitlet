@@ -1,6 +1,6 @@
 * Running git init is idempotent.  The real behaviour is not idempotent, but it is as far as the features of gitlet are concerned: https://www.kernel.org/pub/software/scm/git/docs/git-init.html
 * no description file
-* only well-formed -w like command-line flags, and each one separate: -w -b, and no data for any args
+* only well-formed -w like command-line flags, and each one separate: -w -b
 * hash function as simple as possible for brevity - real git uses sha1
 * prob no packfiles
 * prob no support for wildcard paths in git add
