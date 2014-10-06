@@ -4,7 +4,7 @@ var nodePath = require("path");
 var testUtil = require("./test-util");
 
 describe("update-index", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
 
   it("should throw if not in repo", function() {
     expect(function() { g.update_index(); })

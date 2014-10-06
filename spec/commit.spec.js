@@ -4,7 +4,7 @@ var nodePath = require("path");
 var testUtil = require("./test-util");
 
 describe("commit", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 

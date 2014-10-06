@@ -3,7 +3,7 @@ var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("hash-object", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
 
   it("should throw if not in repo", function() {
     expect(function() { g.hash_object(); })
@@ -31,7 +31,7 @@ describe("hash-object", function() {
     g.init();
     fs.writeFileSync("a.txt", content);
     expect(g.hash_object("a.txt", { w:true })).toEqual("7f9f2dae");
-    testUtil.expectFile(__dirname + "/tmp/.gitlet/objects/7f9f2dae", content);
+    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/objects/7f9f2dae", content);
   });
 
   it("should not store blob when -w not passed", function() {
@@ -39,7 +39,7 @@ describe("hash-object", function() {
     g.init();
     fs.writeFileSync("a.txt", content);
 
-    var objectPath = __dirname + "/tmp/.gitlet/objects/" + g.hash_object("a.txt");
+    var objectPath = __dirname + "/testData/repo1/.gitlet/objects/" + g.hash_object("a.txt");
     expect(fs.existsSync(objectPath, "utf8")).toEqual(false);
 
     // check that file is stored with -w

@@ -3,7 +3,7 @@ var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("add", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
 
   it("should throw if not in repo", function() {
     expect(function() { g.add(); })

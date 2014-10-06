@@ -3,17 +3,19 @@ var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("init", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
 
   function expectGitletFilesAndDirectories() {
-    expect(fs.existsSync(__dirname + "/tmp/.gitlet/objects/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/heads/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/remotes/")).toEqual(true);
-    expect(fs.existsSync(__dirname + "/tmp/.gitlet/refs/remotes/origin/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/objects/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/heads/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/remotes/")).toEqual(true);
+    expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/remotes/origin/"))
+      .toEqual(true);
 
-    testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
-    testUtil.expectFile(__dirname + "/tmp/.gitlet/config", "\n");
+    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/HEAD",
+                        "ref: refs/heads/master\n");
+    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config", "\n");
   };
 
   it("should create .gitlet/ and all required dirs", function() {

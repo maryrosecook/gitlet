@@ -53,15 +53,17 @@ var testUtil = module.exports = {
       });
   },
 
-  createEmptyRepo: function() {
-    var tmpDir = __dirname + "/tmp";
+  initTestDataDir: function() {
+    var testDataDir = __dirname + "/testData";
 
-    if (fs.existsSync(tmpDir)) {
-      testUtil.rmdirSyncRecursive(tmpDir);
+    if (fs.existsSync(testDataDir)) {
+      testUtil.rmdirSyncRecursive(testDataDir);
     }
 
-    fs.mkdirSync(tmpDir);
-    process.chdir(tmpDir); // switch working dir to test repo root
+    fs.mkdirSync(testDataDir);
+    process.chdir(testDataDir);
+    fs.mkdirSync("repo1");
+    process.chdir("repo1");
     expect(fs.readdirSync(process.cwd()).length).toEqual(0);
   },
 

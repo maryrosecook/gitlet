@@ -3,7 +3,7 @@ var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("diff", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
 

@@ -3,7 +3,7 @@ var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 describe("gitlet cli", function() {
-  beforeEach(testUtil.createEmptyRepo);
+  beforeEach(testUtil.initTestDataDir);
 
   describe("missing args", function() {
     it("should allow two missing args (ref1 and ref2)", function() {
@@ -15,7 +15,8 @@ describe("gitlet cli", function() {
   describe("running each gitlet command under normal circs", function() {
     it("gitlet init a repo", function() {
       g.runCli(["node", "gitlet", "init"]);
-      testUtil.expectFile(__dirname + "/tmp/.gitlet/HEAD", "ref: refs/heads/master\n");
+      testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/HEAD",
+                          "ref: refs/heads/master\n");
     });
 
     it("gitlet add a file", function() {
