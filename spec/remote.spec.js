@@ -15,11 +15,37 @@ describe("remote", function() {
     expect(function() { g.remote("remove"); }).toThrow("unsupported");
   });
 
-  // it("should add origin", function() {
+  it("should store url when add origin", function() {
+    g.init();
+    g.remote("add", "origin", "git@origin");
+    var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
+    expect(configFileLines[0]).toEqual("[remote \"origin\"]");
+    expect(configFileLines[1]).toEqual("  url = git@origin");
+  });
 
-  // });
+  it("should store remote branch ref location when add origin", function() {
+    g.init();
+    g.remote("add", "origin", "git@origin");
+    var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
+    expect(configFileLines[0]).toEqual("[remote \"origin\"]");
+    expect(configFileLines[2]).toEqual("  fetch = +refs/heads/*:refs/remotes/origin/*");
+  });
 
-  // it("should throw if origin already exists", function() {
+  it("should be able to store more than one remote", function() {
+    g.init();
+    g.remote("add", "origin", "git@origin");
+    g.remote("add", "heroku", "git@heroku");
+    g.remote("add", "server", "git@server");
+    var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
+    expect(configFileLines[0]).toEqual("[remote \"origin\"]");
+    expect(configFileLines[3]).toEqual("[remote \"heroku\"]");
+    expect(configFileLines[6]).toEqual("[remote \"server\"]");
+  });
 
-  // });
+  it("should throw if origin already exists", function() {
+    g.init();
+    g.remote("add", "origin", "git@origin");
+    expect(function() { g.remote("add", "origin", "git@heroku"); })
+      .toThrow("fatal: remote origin already exists.");
+  });
 });
