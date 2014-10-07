@@ -59,4 +59,29 @@ describe("fetch", function() {
         testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
       });
   });
+
+  it("should avoid unreferenced objects when fetching", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" });
+    gr.update_ref("refs/heads/master", "21cb63f6"); // doctor master to point to first commit
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+
+    expect(fs.existsSync(nodePath.join(".gitlet/objects", "63e0627e"))).toEqual(true); //sanity
+    ["1c4100dd", "794ea686", "507bf191", "5ceba66"].forEach(function(h) {
+      expect(fs.existsSync(nodePath.join(".gitlet/objects", h))).toEqual(false);
+    });
+  });
+
 });
