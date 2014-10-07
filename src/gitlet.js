@@ -176,8 +176,7 @@ var gitlet = module.exports = {
     } else if (name in config.read()["remote"]) {
       throw "fatal: remote " + name + " already exists.";
     } else if (command === "add") {
-      var origin = { url: path, fetch: "+refs/heads/*:refs/remotes/" + name + "/*" };
-      config.write(util.assocIn(config.read(), ["remote", name, origin]));
+      config.write(util.assocIn(config.read(), ["remote", name, "url", path]));
       return "\n";
     }
   },

@@ -28,7 +28,6 @@ describe("remote", function() {
     g.remote("add", "origin", "git@origin");
     var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
     expect(configFileLines[0]).toEqual("[remote \"origin\"]");
-    expect(configFileLines[2]).toEqual("  fetch = +refs/heads/*:refs/remotes/origin/*");
   });
 
   it("should return newline when successfully add remote", function() {
@@ -45,8 +44,8 @@ describe("remote", function() {
     g.remote("add", "server", "git@server");
     var configFileLines = fs.readFileSync(".gitlet/config", "utf8").split("\n");
     expect(configFileLines[0]).toEqual("[remote \"origin\"]");
-    expect(configFileLines[3]).toEqual("[remote \"heroku\"]");
-    expect(configFileLines[6]).toEqual("[remote \"server\"]");
+    expect(configFileLines[2]).toEqual("[remote \"heroku\"]");
+    expect(configFileLines[4]).toEqual("[remote \"server\"]");
   });
 
   it("should throw if origin already exists", function() {
