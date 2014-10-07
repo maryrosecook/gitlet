@@ -38,7 +38,7 @@ var refs = module.exports = {
     return "refs/heads/" + name;
   },
 
-  write: function(ref, content) {
+  writeLocal: function(ref, content) {
     if (ref === "HEAD") {
       fs.writeFileSync(nodePath.join(files.gitletDir(), "HEAD"), content);
     } else if (isLocalHeadRef(ref)) {

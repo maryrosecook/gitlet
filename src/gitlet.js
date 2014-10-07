@@ -106,7 +106,7 @@ var gitlet = module.exports = {
     } else if (refs.readLocalHeads().filter(function(h) { return h === name; }).length > 0) {
       throw "fatal: A branch named '" + name + "' already exists.";
     } else {
-      refs.write(refs.nameToBranchRef(name), refs.readHash("HEAD"));
+      refs.writeLocal(refs.nameToBranchRef(name), refs.readHash("HEAD"));
     }
   },
 
@@ -122,7 +122,7 @@ var gitlet = module.exports = {
       throw "error: Trying to write non-commit object " + hash + " to branch " +
         refs.readTerminalRef(refToUpdate) + "\n";
     } else {
-      refs.write(refs.readTerminalRef(refToUpdate), hash);
+      refs.writeLocal(refs.readTerminalRef(refToUpdate), hash);
     }
   },
 
