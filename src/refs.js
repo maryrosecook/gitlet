@@ -2,6 +2,7 @@ var fs = require("fs");
 var nodePath = require("path");
 var files = require("./files");
 var objects = require("./objects");
+var util = require("./util");
 
 var refs = module.exports = {
   isRef: function(ref) {
@@ -44,6 +45,11 @@ var refs = module.exports = {
     } else if (isLocalHeadRef(ref)) {
       fs.writeFileSync(nodePath.join(files.gitletDir(), ref), content);
     }
+  },
+
+  writeRemote: function(remote, name, content) {
+    var tree = util.assocIn({}, ["refs", "remotes", remote, name, content]);
+    files.writeFilesFromTree(tree, files.gitletDir());
   },
 
   readLocalHeads: function() {
