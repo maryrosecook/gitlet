@@ -101,7 +101,7 @@ describe("fetch", function() {
     });
   });
 
-  it("should be able to set other branches to hash values they have on remote", function() {
+  it("should be able to pull objects over only referenced by non-master branches", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
     var remoteRepo = makeRemoteRepo();
@@ -111,21 +111,22 @@ describe("fetch", function() {
 
     gr.add("1a/filea");
     gr.commit({ m: "first" });
-    gr.branch("other1");
+    gr.branch("other");
 
+    gr.checkout("other");
     gr.add("1b/fileb");
     gr.commit({ m: "second" });
-    gr.branch("other2");
-
-    var remoteOther1Hash = fs.readFileSync(".gitlet/refs/heads/other1", "utf8");
-    var remoteOther2Hash = fs.readFileSync(".gitlet/refs/heads/other2", "utf8");
 
     process.chdir(localRepo);
     gl.init();
     gl.remote("add", "origin", remoteRepo);
     gl.fetch("origin");
 
-    testUtil.expectFile(".gitlet/refs/remotes/origin/other1", remoteOther1Hash);
-    testUtil.expectFile(".gitlet/refs/remotes/origin/other2", remoteOther2Hash);
+    ["21cb63f6", "63e0627e", "17653b6d", "5ceba65", // first commit
+     "1c4100dd", "794ea686", "507bf191", "5ceba66"] // second commit
+      .forEach(function(h) {
+        var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
+        testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
+      });
   });
 });
