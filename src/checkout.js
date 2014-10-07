@@ -20,7 +20,7 @@ var checkout = module.exports = {
     fs.readdirSync(files.repoDir())
       .filter(function(dirChild) { return dirChild !== ".gitlet"; })
       .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
-      .forEach(function(dirChild) { files.deleteEmptyDirs(dirChild); });
+      .forEach(files.deleteEmptyDirs);
 
     refs.write("HEAD", objects.readExists(ref) ? ref : "ref: " + refs.nameToBranchRef(ref));
   }
