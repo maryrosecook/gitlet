@@ -72,6 +72,32 @@ var objects = module.exports = {
     }
   },
 
+  readCommitObjects: function(commitHash) {
+    var treeHashes = function(hash) {
+      return util.lines(objects.read(hash)).reduce(function(keys, line) {
+        var lineTokens = line.split(/ /);
+        return keys.concat(lineTokens[1])
+          .concat(lineTokens[0] === "tree" ? treeHashes(lineTokens[1]) : []);
+      }, [hash]);
+    };
+
+    var commit = objects.read(commitHash);
+    return treeHashes(objects.treeHash(commit)).map(objects.read).concat(commit);
+  },
+
+  readHistory: function(commitHash) {
+    return objects.parentHashes(objects.read(commitHash))
+      .map(objects.readHistory).concat(commitHash);
+  },
+
+  parentHashes: function(str) {
+    if (objects.type(str) === "commit") {
+      return str.split("\n")
+        .filter(function(line) { return line.match(/^parent/); })
+        .map(function(line) { return line.split(" ")[1]; });
+    }
+  },
+
   treeHash: function(str) {
     if (objects.type(str) === "commit") {
       return str.split(/\s/)[1];

@@ -181,13 +181,25 @@ var gitlet = module.exports = {
     }
   },
 
-  fetch: function(name, _) {
+  fetch: function(remoteName, _) {
     files.assertInRepo();
 
-    if (name === undefined) {
+    if (remoteName === undefined) {
       throw "unsupported";
-    } else if (!(name in config.read().remote)) {
-      throw "fatal: '" + name + "' does not appear to be a git repository";
+    } else if (!(remoteName in config.read().remote)) {
+      throw "fatal: '" + remoteName + "' does not appear to be a git repository";
+    } else {
+      var localUrl = files.repoDir();
+
+      process.chdir(config.read().remote[remoteName].url);
+      var heads = refs.readLocalHeads();
+      var commitHashes = util.flatten(heads.map(refs.readHash).map(objects.readHistory));
+      var reqObjects = util.flatten(commitHashes.map(objects.readCommitObjects));
+      var remoteRefs = heads.map(function(n) { return { name: n, hash: refs.readHash(n) }; });
+
+      process.chdir(localUrl);
+      reqObjects.forEach(objects.write);
+      remoteRefs.forEach(function(r) { refs.writeRemote(remoteName, r.name, r.hash); });
     }
   }
 };
