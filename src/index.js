@@ -42,7 +42,7 @@ var index = module.exports = {
   },
 
   readCommitIndex: function(commitHash) {
-    return files.flattenNestedTree(objects.readTree(objects.treeHash(
+    return files.flattenNestedTree(objects.readFileTree(objects.treeHash(
       objects.read(commitHash))));
   }
 };

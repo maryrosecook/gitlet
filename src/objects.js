@@ -16,14 +16,14 @@ var objects = module.exports = {
     return objects.write(treeObject);
   },
 
-  readTree: function(treeHash, tree) {
-    if (tree === undefined) { return objects.readTree(treeHash, {}); }
+  readFileTree: function(treeHash, tree) {
+    if (tree === undefined) { return objects.readFileTree(treeHash, {}); }
 
     util.lines(objects.read(treeHash)).forEach(function(line) {
       var lineTokens = line.split(/ /);
       tree[lineTokens[2]] = lineTokens[0] === "tree" ?
-        objects.readTree(lineTokens[1], {}) :
-        tree[lineTokens[2]] = lineTokens[1];
+        objects.readFileTree(lineTokens[1], {}) :
+        lineTokens[1];
     });
 
     return tree;
