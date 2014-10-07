@@ -33,7 +33,7 @@ describe("fetch", function() {
     expect(function() { g.fetch(); }).toThrow("unsupported");
   });
 
-  it("should be able to fetch main branch on remote", function() {
+  it("should be able to fetch objects for main branch on remote", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
     var remoteRepo = makeRemoteRepo();
@@ -44,14 +44,12 @@ describe("fetch", function() {
     gr.commit({ m: "first" });
     gr.add("1b/fileb");
     gr.commit({ m: "second" });
-    var remoteMasterHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
     process.chdir(localRepo);
     gl.init();
     gl.remote("add", "origin", remoteRepo);
     gl.fetch("origin");
 
-    testUtil.expectFile(".gitlet/refs/remotes/origin/master", remoteMasterHash);
     ["21cb63f6", "63e0627e", "17653b6d", "5ceba65", // first commit
      "1c4100dd", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
