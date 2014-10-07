@@ -101,4 +101,31 @@ describe("fetch", function() {
     });
   });
 
+  it("should be able to set other branches to hash values they have on remote", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other1");
+
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" });
+    gr.branch("other2");
+
+    var remoteOther1Hash = fs.readFileSync(".gitlet/refs/heads/other1", "utf8");
+    var remoteOther2Hash = fs.readFileSync(".gitlet/refs/heads/other2", "utf8");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+
+    testUtil.expectFile(".gitlet/refs/remotes/origin/other1", remoteOther1Hash);
+    testUtil.expectFile(".gitlet/refs/remotes/origin/other2", remoteOther2Hash);
+  });
 });
