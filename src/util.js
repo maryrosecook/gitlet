@@ -26,5 +26,11 @@ var util = module.exports = {
 
   lines: function(str) {
     return str.split("\n").slice(0, -1); // last is empty
+  },
+
+  flatten: function(arr) {
+    return arr.reduce(function(a, e) {
+      return a.concat(e instanceof Array ? util.flatten(e) : e);
+    }, []);
   }
 };
