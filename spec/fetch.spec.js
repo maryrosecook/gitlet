@@ -55,9 +55,8 @@ describe("fetch", function() {
     ["21cb63f6", "63e0627e", "17653b6d", "5ceba65", // first commit
      "1c4100dd", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
-        var expected = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h),
-                                       "utf8");
-        testUtil.expectFile(nodePath.join(".gitlet/objects", h), expected);
+        var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
+        testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
       });
   });
 });
