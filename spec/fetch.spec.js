@@ -58,6 +58,25 @@ describe("fetch", function() {
       });
   });
 
+  it("should set master to hash value it has on remote", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    var remoteMasterHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+
+    testUtil.expectFile(".gitlet/refs/remotes/origin/master", remoteMasterHash);
+  });
+
   it("should avoid unreferenced objects when fetching", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
