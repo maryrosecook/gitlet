@@ -77,30 +77,6 @@ describe("fetch", function() {
     testUtil.expectFile(".gitlet/refs/remotes/origin/master", remoteMasterHash);
   });
 
-  it("should avoid unreferenced objects when fetching", function() {
-    var gl = g, gr = g;
-    var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
-
-    gr.init();
-    testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
-    gr.commit({ m: "first" });
-    gr.add("1b/fileb");
-    gr.commit({ m: "second" });
-    gr.update_ref("refs/heads/master", "21cb63f6"); // doctor master to point to first commit
-
-    process.chdir(localRepo);
-    gl.init();
-    gl.remote("add", "origin", remoteRepo);
-    gl.fetch("origin");
-
-    expect(fs.existsSync(nodePath.join(".gitlet/objects", "63e0627e"))).toEqual(true); //sanity
-    ["1c4100dd", "794ea686", "507bf191", "5ceba66"].forEach(function(h) {
-      expect(fs.existsSync(nodePath.join(".gitlet/objects", h))).toEqual(false);
-    });
-  });
-
   it("should be able to pull objects over only referenced by non-master branches", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
@@ -128,5 +104,126 @@ describe("fetch", function() {
         var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
         testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
       });
+  });
+
+  it("should set other branch to hash value it has on remote", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other");
+    var remoteOtherHash = fs.readFileSync(".gitlet/refs/heads/other", "utf8");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+
+    testUtil.expectFile(".gitlet/refs/remotes/origin/other", remoteOtherHash);
+  });
+
+  it("should announce which origin it fetched from", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    expect(gl.fetch("origin")).toMatch("From " + remoteRepo);
+  });
+
+  it("should announce total objects transferred from remote (all of them)", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    expect(gl.fetch("origin")).toMatch("Count 4");
+  });
+
+  it("should announce count of all objs transf when some already transf", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+
+    process.chdir(remoteRepo);
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" });
+
+    process.chdir(localRepo);
+    expect(gl.fetch("origin")).toMatch("Count 8");
+  });
+
+  it("should set other branch to hash value it has on remote", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other1");
+    gr.branch("other2");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+
+    var fetchReport = gl.fetch("origin");
+    expect(fetchReport).toMatch(/\* \[new branch\] other1 -> origin\/other1/);
+    expect(fetchReport).toMatch(/\* \[new branch\] other2 -> origin\/other2/);
+  });
+
+  it("should format return value nicely", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other1");
+    gr.branch("other2");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+
+    expect(gl.fetch("origin")).toEqual("From " + remoteRepo + "\n" +
+                                       "Count 4\n" +
+                                       "* [new branch] master -> origin/master\n" +
+                                       "* [new branch] other1 -> origin/other1\n" +
+                                       "* [new branch] other2 -> origin/other2\n");
   });
 });
