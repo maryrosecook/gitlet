@@ -67,6 +67,15 @@ var testUtil = module.exports = {
     expect(fs.readdirSync(process.cwd()).length).toEqual(0);
   },
 
+  makeRemoteRepo: function() {
+    process.chdir("../");
+    fs.mkdirSync("sub");
+    process.chdir("sub");
+    fs.mkdirSync("repo2");
+    process.chdir("repo2");
+    return process.cwd();
+  },
+
   pinDate: function() {
     global.Date.prototype.toString = function() {
       return "Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)";

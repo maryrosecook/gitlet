@@ -3,15 +3,6 @@ var nodePath = require("path");
 var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
-var makeRemoteRepo = function() {
-  process.chdir("../");
-  fs.mkdirSync("sub");
-  process.chdir("sub");
-  fs.mkdirSync("repo2");
-  process.chdir("repo2");
-  return process.cwd();
-};
-
 describe("fetch", function() {
   beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
@@ -36,7 +27,7 @@ describe("fetch", function() {
   it("should be able to fetch objects for main branch on remote", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -61,7 +52,7 @@ describe("fetch", function() {
   it("should set master to hash value it has on remote", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -80,7 +71,7 @@ describe("fetch", function() {
   it("should be able to pull objects over only referenced by non-master branches", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -109,7 +100,7 @@ describe("fetch", function() {
   it("should set other branch to hash value it has on remote", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -130,7 +121,7 @@ describe("fetch", function() {
   it("should announce which origin it fetched from", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -146,7 +137,7 @@ describe("fetch", function() {
   it("should announce total objects transferred from remote (all of them)", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -162,7 +153,7 @@ describe("fetch", function() {
   it("should announce count of all objs transf when some already transf", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -184,7 +175,7 @@ describe("fetch", function() {
   it("should set other branch to hash value it has on remote", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
@@ -206,7 +197,7 @@ describe("fetch", function() {
   it("should format return value nicely", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
-    var remoteRepo = makeRemoteRepo();
+    var remoteRepo = testUtil.makeRemoteRepo();
 
     gr.init();
     testUtil.createStandardFileStructure();
