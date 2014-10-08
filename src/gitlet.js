@@ -97,13 +97,14 @@ var gitlet = module.exports = {
     files.assertInRepo();
 
     if (name === undefined) {
-      return refs.readLocalHeads().map(function(branchName) {
+      return Object.keys(refs.readLocalHeads()).map(function(branchName) {
         var marker = branchName === refs.readCurrentBranchName() ? "* " : "  ";
         return marker + branchName;
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: 'master'.";
-    } else if (refs.readLocalHeads().filter(function(h) { return h === name; }).length > 0) {
+    } else if (Object.keys(refs.readLocalHeads())
+               .filter(function(h) { return h === name; }).length > 0) {
       throw "fatal: A branch named '" + name + "' already exists.";
     } else {
       refs.writeLocal(refs.nameToBranchRef(name), refs.readHash("HEAD"));

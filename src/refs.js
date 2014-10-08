@@ -53,7 +53,8 @@ var refs = module.exports = {
   },
 
   readLocalHeads: function() {
-    return fs.readdirSync(nodePath.join(files.gitletDir(), "refs/heads/"));
+    return fs.readdirSync(nodePath.join(files.gitletDir(), "refs/heads/"))
+      .reduce(function(o, n) { return util.assocIn(o, [n, refs.readHash(n)]); }, {});
   },
 
   readExists: function(ref) {
