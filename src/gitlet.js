@@ -8,6 +8,7 @@ var checkout = require("./checkout");
 var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
+var fetch = require("./fetch");
 
 var gitlet = module.exports = {
   init: function(_) {
@@ -182,25 +183,31 @@ var gitlet = module.exports = {
     }
   },
 
-  fetch: function(remoteName, _) {
+  fetch: function(remote, _) {
     files.assertInRepo();
 
-    if (remoteName === undefined) {
+    if (remote === undefined) {
       throw "unsupported";
-    } else if (!(remoteName in config.read().remote)) {
-      throw "fatal: '" + remoteName + "' does not appear to be a git repository";
+    } else if (!(remote in config.read().remote)) {
+      throw "fatal: '" + remote + "' does not appear to be a git repository";
     } else {
       var localUrl = files.repoDir();
+      var remoteUrl = config.read().remote[remote].url;
+      var localHashes = fetch.readAllRefHashes();
 
-      process.chdir(config.read().remote[remoteName].url);
-      var heads = refs.readLocalHeads();
-      var commitHashes = util.flatten(heads.map(refs.readHash).map(objects.readHistory));
-      var reqObjects = util.flatten(commitHashes.map(objects.readCommitObjects));
-      var remoteRefs = heads.map(function(n) { return { name: n, hash: refs.readHash(n) }; });
+      process.chdir(remoteUrl);
+      var remoteRefs = refs.readLocalHeads();
+      var reqObjs = util.difference(fetch.readAllRefHashes(), localHashes).map(objects.read);
 
       process.chdir(localUrl);
-      reqObjects.forEach(objects.write);
-      remoteRefs.forEach(function(r) { refs.writeRemote(remoteName, r.name, r.hash); });
+      reqObjs.forEach(objects.write);
+      Object.keys(remoteRefs).forEach(function(r){refs.writeRemote(remote, r, remoteRefs[r])});
+
+      var refStr = util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
+          .map(function(b) { return " * [new branch] " + b + " -> " + remote + "/" + b; })
+          .join("\n");
+
+      return "From " + remoteUrl + "\n" + refStr + "\n" + "Total " + reqObjs.length + "\n";
     }
   }
 };

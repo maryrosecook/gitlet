@@ -61,6 +61,10 @@ var objects = module.exports = {
     }
   },
 
+  readAllHashes: function() {
+    return fs.readdirSync(nodePath.join(files.gitletDir(), "objects"));
+  },
+
   type: function(str) {
     var firstToken = str.split(" ")[0];
     if (firstToken === "commit") {
@@ -72,22 +76,13 @@ var objects = module.exports = {
     }
   },
 
-  readCommitObjects: function(commitHash) {
-    var treeHashes = function(hash) {
-      return util.lines(objects.read(hash)).reduce(function(keys, line) {
-        var lineTokens = line.split(/ /);
-        return keys.concat(lineTokens[1])
-          .concat(lineTokens[0] === "tree" ? treeHashes(lineTokens[1]) : []);
-      }, [hash]);
-    };
-
-    var commit = objects.read(commitHash);
-    return treeHashes(objects.treeHash(commit)).map(objects.read).concat(commit);
+  readGraphHashes: function(commitHash) {
+    return objects.parentHashes(objects.read(commitHash))
+      .map(objects.readGraphHashes).concat(commitHash);
   },
 
-  readHistory: function(commitHash) {
-    return objects.parentHashes(objects.read(commitHash))
-      .map(objects.readHistory).concat(commitHash);
+  readHashesRequiredForCommit: function(commitHash) {
+    return treeHashes(objects.treeHash(objects.read(commitHash))).concat(commitHash);
   },
 
   parentHashes: function(str) {
@@ -103,4 +98,12 @@ var objects = module.exports = {
       return str.split(/\s/)[1];
     }
   }
+};
+
+function treeHashes(hash) {
+  return util.lines(objects.read(hash)).reduce(function(keys, line) {
+    var lineTokens = line.split(/ /);
+    return keys.concat(lineTokens[1])
+      .concat(lineTokens[0] === "tree" ? treeHashes(lineTokens[1]) : []);
+  }, [hash]);
 };
