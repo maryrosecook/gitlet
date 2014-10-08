@@ -204,8 +204,9 @@ var gitlet = module.exports = {
       throw "fatal: '" + remote + "' does not appear to be a git repository";
     } else {
       var localUrl = files.repoDir();
+      var remoteUrl = config.read().remote[remote].url;
 
-      process.chdir(config.read().remote[remote].url);
+      process.chdir(remoteUrl);
       var remoteRefs = refs.readLocalHeads();
       var remoteObjects = objects.readAllHashes().map(objects.read);
 
@@ -213,7 +214,7 @@ var gitlet = module.exports = {
       remoteObjects.forEach(objects.write);
       Object.keys(remoteRefs).forEach(function(r){refs.writeRemote(remote, r, remoteRefs[r])});
 
-      return "From " + config.read().remote[remote].url + "\n" +
+      return "From " + remoteUrl + "\n" +
         "Count " + remoteObjects.length + "\n" +
         util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
           .map(function(b) { return "* [new branch] " + b + " -> " + remote + "/" + b; })
