@@ -20,6 +20,7 @@
 * not supporting error message if try and checkout to branch already on
 * only checking basic validity of args passed to main git fns when it illustrates something about how git works.  eg don't check for undefined but do check that --add there if file not in index
 * only allow repo interop via cp - no network support
+* only support setting up remote tracking (branch -u) for current branch
 
 todo
 * cd back to repo root for all commands
