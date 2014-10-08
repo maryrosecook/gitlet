@@ -32,5 +32,9 @@ var util = module.exports = {
     return arr.reduce(function(a, e) {
       return a.concat(e instanceof Array ? util.flatten(e) : e);
     }, []);
+  },
+
+  difference: function(a, b) {
+    return a.filter(function(e) { return b.indexOf(e) === -1; });
   }
 };
