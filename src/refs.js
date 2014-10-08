@@ -10,7 +10,9 @@ var refs = module.exports = {
   },
 
   readTerminalRef: function(ref) {
-    if (ref === "HEAD" && this.readIsHeadDetached()) {
+    if (isRemoteHeadRef(ref)) {
+      return ref;
+    } else if (ref === "HEAD" && this.readIsHeadDetached()) {
       return "HEAD";
     } else if (ref === "HEAD" && !this.readIsHeadDetached()) {
       return readHeadContent().match("ref: (refs/heads/.+)")[1];
@@ -76,4 +78,8 @@ function readHeadContent() {
 
 function isLocalHeadRef(ref) {
   return ref !== undefined && ref.match("refs/heads/[A-Za-z-]+");
+};
+
+function isRemoteHeadRef(ref) {
+  return ref !== undefined && ref.match("refs/remotes/[A-Za-z-]+/[A-Za-z-]+");
 };
