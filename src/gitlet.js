@@ -192,22 +192,20 @@ var gitlet = module.exports = {
       throw "fatal: '" + remote + "' does not appear to be a git repository";
     } else {
       var localUrl = files.repoDir();
-      var remoteUrl = config.read().remote[remote].url;
-      var localHashes = fetch.readAllRefHashes();
 
-      process.chdir(remoteUrl);
+      process.chdir(config.read().remote[remote].url);
       var remoteRefs = refs.readLocalHeads();
-      var reqObjs = util.difference(fetch.readAllRefHashes(), localHashes).map(objects.read);
+      var remoteObjects = objects.readAllHashes().map(objects.read);
 
       process.chdir(localUrl);
-      reqObjs.forEach(objects.write);
+      remoteObjects.forEach(objects.write);
       Object.keys(remoteRefs).forEach(function(r){refs.writeRemote(remote, r, remoteRefs[r])});
 
-      var refStr = util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
-          .map(function(b) { return " * [new branch] " + b + " -> " + remote + "/" + b; })
-          .join("\n");
-
-      return "From " + remoteUrl + "\n" + refStr + "\n" + "Total " + reqObjs.length + "\n";
+      return "From " + config.read().remote[remote].url + "\n" +
+        "Count " + remoteObjects.length + "\n" +
+        util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
+          .map(function(b) { return "* [new branch] " + b + " -> " + remote + "/" + b; })
+          .join("\n") + "\n";
     }
   }
 };
