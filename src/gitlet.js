@@ -94,18 +94,30 @@ var gitlet = module.exports = {
     }
   },
 
-  branch: function(name, _) {
+  branch: function(name, opts) {
     files.assertInRepo();
+    opts = opts || {};
 
-    if (name === undefined) {
-      return Object.keys(refs.readLocalHeads()).map(function(branchName) {
-        var marker = branchName === refs.readCurrentBranchName() ? "* " : "  ";
-        return marker + branchName;
+    if (name === undefined && opts.u === undefined) {
+      return Object.keys(refs.readLocalHeads()).map(function(branch) {
+        return (branch === refs.readCurrentBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: 'master'.";
-    } else if (Object.keys(refs.readLocalHeads())
-               .filter(function(h) { return h === name; }).length > 0) {
+    } else if (name === undefined && opts.u !== undefined) {
+      var rem = opts.u.split("/");
+
+      if (refs.readIsHeadDetached()) {
+        throw "fatal: could not set upstream of HEAD to " + opts.u +
+          " when it does not point to any branch.";
+      } else if (!refs.readExists("refs/remotes/" + rem[0] + "/" + rem[1])) {
+        throw "error: the requested upstream branch '" + opts.u + "' does not exist";
+      } else {
+        config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
+        return "Branch " + refs.readCurrentBranchName() +
+          " set up to track remote branch " + rem[1] + " from " + rem[0] + ".";
+      }
+    } else if (refs.readExists(refs.nameToBranchRef(name))) {
       throw "fatal: A branch named '" + name + "' already exists.";
     } else {
       refs.writeLocal(refs.nameToBranchRef(name), refs.readHash("HEAD"));
