@@ -61,7 +61,7 @@ var refs = module.exports = {
 
   readExists: function(ref) {
     return ref !== undefined &&
-      isLocalHeadRef(ref) &&
+      (isLocalHeadRef(ref) || isRemoteHeadRef(ref)) &&
       fs.existsSync(nodePath.join(files.gitletDir(), ref));
   },
 
