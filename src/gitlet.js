@@ -213,6 +213,7 @@ var gitlet = module.exports = {
       process.chdir(localUrl);
       remoteObjects.forEach(objects.write);
       Object.keys(remoteRefs).forEach(function(r){refs.writeRemote(remote, r, remoteRefs[r])});
+      refs.writeFetchHead(remoteRefs, remoteUrl);
 
       return "From " + remoteUrl + "\n" +
         "Count " + remoteObjects.length + "\n" +

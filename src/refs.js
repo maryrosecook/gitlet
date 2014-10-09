@@ -2,6 +2,7 @@ var fs = require("fs");
 var nodePath = require("path");
 var files = require("./files");
 var objects = require("./objects");
+var config = require("./config");
 var util = require("./util");
 
 var refs = module.exports = {
@@ -47,6 +48,21 @@ var refs = module.exports = {
     } else if (isLocalHeadRef(ref)) {
       fs.writeFileSync(nodePath.join(files.gitletDir(), ref), content);
     }
+  },
+
+  writeFetchHead: function(remoteRefs, remoteUrl) {
+    var content = Object.keys(remoteRefs).map(function(name) {
+      var notForMerge;
+      if (name !== refs.readCurrentBranchName() || config.read().branch[name] === undefined) {
+        notForMerge = " not-for-merge";
+      } else {
+        notForMerge = "";
+      }
+
+      return remoteRefs[name] + notForMerge + " branch '" + name + "' of " + remoteUrl;
+    }).join("\n") + "\n";
+
+    fs.writeFileSync(nodePath.join(files.gitletDir(), "FETCH_HEAD"), content);
   },
 
   writeRemote: function(remote, name, content) {
