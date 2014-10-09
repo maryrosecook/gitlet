@@ -132,6 +132,21 @@ describe("commit", function() {
       .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
+  it("should allow commiting to other checked out branch", function() {
+    testUtil.createStandardFileStructure();
+    g.init();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+
+    g.branch("other");
+    g.checkout("other");
+    g.add("1b/fileb");
+    g.commit({ m: "second" });
+
+    testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
+    testUtil.expectFile(".gitlet/refs/heads/other", "1c4100dd");
+  });
+
   describe('detached HEAD commits', function() {
     it("should report in det head when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
