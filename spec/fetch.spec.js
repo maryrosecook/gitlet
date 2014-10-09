@@ -217,4 +217,139 @@ describe("fetch", function() {
                                        "* [new branch] other1 -> origin/other1\n" +
                                        "* [new branch] other2 -> origin/other2\n");
   });
+
+  ddescribe("fetch head", function() {
+    it("should say that all branches not for merge if no tracking branches", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+      gr.branch("other1");
+
+      process.chdir(localRepo);
+      gl.init();
+      gl.remote("add", "origin", remoteRepo);
+      gl.fetch("origin");
+
+      var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
+      expect(fetchHeadLines[0])
+        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+      expect(fetchHeadLines[1])
+        .toEqual("21cb63f6 not-for-merge branch 'other1' of " + remoteRepo);
+    });
+
+    it("should say master not for merge if not a tracking branch", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+
+      process.chdir(localRepo);
+      gl.init();
+      gl.remote("add", "origin", remoteRepo);
+      gl.fetch("origin");
+
+      var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
+      expect(fetchHeadLines[0])
+        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+    });
+
+    it("should say master for merge if tracking branch", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+
+      process.chdir(localRepo);
+      gl.init();
+      testUtil.createStandardFileStructure();
+      gr.add("1a/filea");
+      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+
+      gl.remote("add", "origin", remoteRepo);
+      gl.fetch("origin");
+      gl.branch(undefined, { u: "origin/master" });
+      gl.fetch("origin"); // have to fetch again - prev fetch not-for-merge - not tracking
+
+      var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
+      expect(fetchHeadLines[0])
+        .toEqual("21cb63f6 branch 'master' of " + remoteRepo);
+    });
+
+    it("should say master not for merge if tracking branch but checked out other", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+
+      process.chdir(localRepo);
+      gl.init();
+      testUtil.createStandardFileStructure();
+      gr.add("1a/filea");
+      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+
+      gl.remote("add", "origin", remoteRepo);
+      gl.fetch("origin");
+      gl.branch(undefined, { u: "origin/master" });
+      gl.branch("other");
+      gl.checkout("other");
+      gl.fetch("origin");
+
+      var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
+      expect(fetchHeadLines[0])
+        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+    });
+
+    it("should say other branch for merge if checked out and tracking", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+      gr.branch("other");
+
+      process.chdir(localRepo);
+      gl.init();
+      testUtil.createStandardFileStructure();
+      gr.add("1a/filea");
+      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+      gl.remote("add", "origin", remoteRepo);
+
+      gl.branch("other");
+      gl.checkout("other");
+      gl.fetch("origin");
+      gl.branch(undefined, { u: "origin/other" });
+      gl.fetch("origin");
+
+      var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
+      expect(fetchHeadLines[0])
+        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo); // sanity
+      expect(fetchHeadLines[1])
+        .toEqual("21cb63f6 branch 'other' of " + remoteRepo);
+    });
+  });
 });
