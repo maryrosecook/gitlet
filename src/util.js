@@ -40,5 +40,20 @@ var util = module.exports = {
 
   unique: function(arr) {
     return arr.reduce(function(a, e) { return a.indexOf(e) === -1 ? a.concat(e) : a; }, []);
+  },
+
+  // assumes args to fn have unique toString
+  memoize: function(fn) {
+    var cache = {};
+    return function() {
+      var key = Array.prototype.slice.apply(arguments)
+          .map(function(a) { return a.toString(); }).join(",");
+      if (cache[key] !== undefined) {
+        return cache[key];
+      } else {
+        cache[key] = fn.apply(null, arguments);
+        return cache[key];
+      }
+    }
   }
 };
