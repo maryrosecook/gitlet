@@ -109,7 +109,7 @@ var gitlet = module.exports = {
       if (refs.readIsHeadDetached()) {
         throw "fatal: could not set upstream of HEAD to " + opts.u +
           " when it does not point to any branch.";
-      } else if (!refs.readExists("refs/remotes/" + rem[0] + "/" + rem[1])) {
+      } else if (!refs.readExists(refs.toRemoteRef(rem[0], rem[1]))) {
         throw "error: the requested upstream branch '" + opts.u + "' does not exist";
       } else {
         config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
