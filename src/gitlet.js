@@ -220,6 +220,10 @@ var gitlet = module.exports = {
           .map(function(b) { return "* [new branch] " + b + " -> " + remote + "/" + b; })
           .join("\n") + "\n";
     }
+  },
+
+  merge: function(ref, _) {
+    files.assertInRepo();
   }
 };
 
