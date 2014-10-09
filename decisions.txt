@@ -27,7 +27,6 @@ todo
 * sort out which unexpected results to throw for and which to just print for: error, fatal, or just message (eg commit when nothing to commit)
 * test committing when other branch checked out
 * make sure merge does two parents
-* model refs/trees/commits/blobs as objs w/ methods?
 * git status?
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
