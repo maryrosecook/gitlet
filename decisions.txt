@@ -30,3 +30,4 @@ todo
 * git status?
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
+* use update_ref to update remote refs
