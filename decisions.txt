@@ -24,7 +24,6 @@
 
 todo
 * cd back to repo root for all commands
-* sort out which unexpected results to throw for and which to just print for: error, fatal, or just message (eg commit when nothing to commit)
 * make sure merge does two parents
 * git status?
 * check all file ops are done on absolute paths
