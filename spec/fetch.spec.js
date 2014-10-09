@@ -218,7 +218,7 @@ describe("fetch", function() {
                                        "* [new branch] other2 -> origin/other2\n");
   });
 
-  ddescribe("fetch head", function() {
+  describe("fetch head", function() {
     it("should say that all branches not for merge if no tracking branches", function() {
       var gl = g, gr = g;
       var localRepo = process.cwd();
