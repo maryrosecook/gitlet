@@ -22,7 +22,7 @@ var checkout = module.exports = {
       .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
       .forEach(files.deleteEmptyDirs);
 
-    refs.writeLocal("HEAD", objects.readExists(ref) ? ref : "ref: " + refs.nameToBranchRef(ref));
+    refs.writeLocal("HEAD", objects.readExists(ref) ? ref : "ref: " + refs.toLocalRef(ref));
   }
 };
 

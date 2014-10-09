@@ -20,7 +20,7 @@ var refs = module.exports = {
     } else if (isLocalHeadRef(ref)) {
       return ref;
     } else {
-      return refs.nameToBranchRef(ref);
+      return refs.toLocalRef(ref);
     }
   },
 
@@ -38,7 +38,7 @@ var refs = module.exports = {
     return readHeadContent().match("refs") === null;
   },
 
-  nameToBranchRef: function(name) {
+  toLocalRef: function(name) {
     return "refs/heads/" + name;
   },
 

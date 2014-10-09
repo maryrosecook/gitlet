@@ -116,10 +116,10 @@ var gitlet = module.exports = {
         return "Branch " + refs.readCurrentBranchName() +
           " set up to track remote branch " + rem[1] + " from " + rem[0] + ".";
       }
-    } else if (refs.readExists(refs.nameToBranchRef(name))) {
+    } else if (refs.readExists(refs.toLocalRef(name))) {
       throw "fatal: A branch named '" + name + "' already exists.";
     } else {
-      refs.writeLocal(refs.nameToBranchRef(name), refs.readHash("HEAD"));
+      refs.writeLocal(refs.toLocalRef(name), refs.readHash("HEAD"));
     }
   },
 
