@@ -8,7 +8,6 @@ var checkout = require("./checkout");
 var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
-var fetch = require("./fetch");
 
 var gitlet = module.exports = {
   init: function(_) {
