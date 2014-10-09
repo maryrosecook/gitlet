@@ -8,7 +8,7 @@ function spToUnd(charr) {
   return charr === "_" ? undefined : charr;
 };
 
-ddescribe("merge", function() {
+describe("merge", function() {
   beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
