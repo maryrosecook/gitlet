@@ -31,4 +31,3 @@ todo
 * git status?
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
-* get rid of readLocalHeads()?
