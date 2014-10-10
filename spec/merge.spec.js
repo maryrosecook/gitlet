@@ -246,7 +246,7 @@ describe("merge", function() {
     });
   });
 
-  ddescribe('merging', function() {
+  describe('merging', function() {
     it("should throw if can't resolve ref/hash passed", function() {
       g.init();
       expect(function() { g.merge("blah"); })
