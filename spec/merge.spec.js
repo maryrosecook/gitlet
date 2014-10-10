@@ -110,23 +110,22 @@ describe("merge", function() {
   });
 
   describe('common ancestors', function() {
-    it("should return undefined if same hash passed", function() {
+    it("should return hash if same hash passed", function() {
       g.init();
       createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
-      expect(merge.readCommonAncestor("98d541a", "98d541a")).toBeUndefined();
+      expect(merge.readCommonAncestor("98d541a", "98d541a")).toEqual("98d541a");
     });
 
-    it("should return undefined if one is descendent of other", function() {
+    it("should return ancestor if one is descendent of other", function() {
       g.init();
       createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       g.add("fileb");
       g.commit({ m: "second" });
-      expect(merge.readCommonAncestor("98d541a", "5b89af33")).toBeUndefined();
-      expect(merge.readCommonAncestor("5b89af33", "98d541a")).toBeUndefined();
+      expect(merge.readCommonAncestor("98d541a", "5b89af33")).toEqual("98d541a");
     });
 
     it("should return branch point for master and branch both w one extra commit", function() {
@@ -165,8 +164,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("1d42b9a3", "116a5202")).toEqual("98d541a");
-      expect(merge.readCommonAncestor("116a5202", "1d42b9a3")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("47bd0fa3", "116a5202")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("116a5202", "47bd0fa3")).toEqual("98d541a");
     });
 
     it("should return most recent ancestor if there is a shared hist of several commits", function() {

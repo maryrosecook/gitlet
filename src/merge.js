@@ -47,8 +47,8 @@ var merge = module.exports = {
   },
 
   readCommonAncestor: function(aHash, bHash) {
-    var aAncestors = objects.readAncestors(aHash);
-    var bAncestors = objects.readAncestors(bHash);
+    var aAncestors = [aHash].concat(objects.readAncestors(aHash));
+    var bAncestors = [bHash].concat(objects.readAncestors(bHash));
     return aAncestors
       .filter(function(a) { return bAncestors.indexOf(a) !== -1; })
       .sort()[0]; // sort to make sure answer is commutative
