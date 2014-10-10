@@ -316,6 +316,3 @@ describe("merge", function() {
     });
   });
 });
-
-// test that merge says already up to date if one commit is ancestor of other - it's
-//   if branch to merge appears in parents list of current commit - not commutative
