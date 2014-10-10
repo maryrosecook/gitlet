@@ -1,3 +1,4 @@
+var objects = require("./objects");
 var util = require("./util");
 
 var merge = module.exports = {
@@ -43,5 +44,13 @@ var merge = module.exports = {
       out.b.push(undefined);
       return merge.align(a.slice(1), b, lcs, out);
     }
+  },
+
+  readCommonAncestor: function(aHash, bHash) {
+    var aAncestors = objects.readAncestors(aHash);
+    var bAncestors = objects.readAncestors(bHash);
+    return aAncestors
+      .filter(function(a) { return bAncestors.indexOf(a) !== -1; })
+      .sort()[0]; // sort to make sure answer is commutative
   }
 };
