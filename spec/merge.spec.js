@@ -118,7 +118,7 @@ describe("merge", function() {
       expect(merge.readCommonAncestor("98d541a", "98d541a")).toBeUndefined();
     });
 
-    it("should return undefined if one is direct descendent of other", function() {
+    it("should return undefined if one is descendent of other", function() {
       g.init();
       createFileStructure();
       g.add("filea");
