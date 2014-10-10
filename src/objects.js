@@ -76,10 +76,6 @@ var objects = module.exports = {
     }
   },
 
-  readGraphHashes: function(commitHash) {
-    return objects.parentHashes(objects.read(commitHash))
-      .map(objects.readGraphHashes).concat(commitHash);
-  },
 
   readHashesRequiredForCommit: function(commitHash) {
     return treeHashes(objects.treeHash(objects.read(commitHash))).concat(commitHash);
