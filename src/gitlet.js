@@ -225,9 +225,11 @@ var gitlet = module.exports = {
   merge: function(ref, _) {
     files.assertInRepo();
 
-    var hash = refs.readHash(ref);
-    if (hash === undefined) {
+    var fromHash = refs.readHash(ref);
+    if (fromHash === undefined) {
       throw "merge: " + ref + " - not something we can merge";
+    } else if (refs.readIsHeadDetached()) {
+      throw "unsupported";
     }
   }
 };

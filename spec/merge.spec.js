@@ -253,6 +253,19 @@ describe("merge", function() {
       expect(function() { g.merge("blah"); })
         .toThrow("merge: blah - not something we can merge");
     });
+
+    it("should throw if try to merge when head detached", function() {
+      testUtil.createStandardFileStructure();
+      g.init();
+      g.add("1a/filea");
+      g.commit({ m: "first" });
+      g.add("1b/fileb");
+      g.commit({ m: "second" });
+      g.checkout("21cb63f6");
+
+      expect(function() { g.merge("1c4100dd"); })
+        .toThrow("unsupported");
+    });
   });
 });
 
