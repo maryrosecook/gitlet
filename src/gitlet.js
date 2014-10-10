@@ -230,6 +230,9 @@ var gitlet = module.exports = {
       throw "merge: " + ref + " - not something we can merge";
     } else if (refs.readIsHeadDetached()) {
       throw "unsupported";
+    } else if (objects.type(objects.read(fromHash)) !== "commit") {
+      throw "error: " + ref + ": expected commit type, but the object " +
+        "dereferences to " + objects.type(objects.read(fromHash)) + " type";
     }
   }
 };
