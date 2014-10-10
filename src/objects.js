@@ -76,6 +76,10 @@ var objects = module.exports = {
     }
   },
 
+  readIsAncestor: function(intoHash, fromHash) {
+    return objects.readAncestors(intoHash).indexOf(fromHash) !== -1;
+  },
+
   readAncestors: function(commitHash) {
     var parents = objects.parentHashes(objects.read(commitHash));
     return util.flatten(parents.concat(parents.map(objects.readAncestors)));

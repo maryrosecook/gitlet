@@ -8,6 +8,7 @@ var checkout = require("./checkout");
 var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
+var merge = require("./merge");
 
 var gitlet = module.exports = {
   init: function(_) {
@@ -233,6 +234,11 @@ var gitlet = module.exports = {
     } else if (objects.type(objects.read(fromHash)) !== "commit") {
       throw "error: " + ref + ": expected commit type, but the object " +
         "dereferences to " + objects.type(objects.read(fromHash)) + " type";
+    } else {
+      var intoHash = refs.readHash("HEAD");
+      if (intoHash === fromHash || objects.readIsAncestor(intoHash, fromHash)) {
+        return "Already up-to-date.";
+      }
     }
   }
 };
