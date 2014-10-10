@@ -38,10 +38,6 @@ var util = module.exports = {
     return a.filter(function(e) { return b.indexOf(e) === -1; });
   },
 
-  unique: function(arr) {
-    return arr.reduce(function(a, e) { return a.indexOf(e) === -1 ? a.concat(e) : a; }, []);
-  },
-
   // assumes args to fn have unique toString
   memoize: function(fn) {
     var cache = {};
