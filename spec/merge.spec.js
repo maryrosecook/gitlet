@@ -97,4 +97,156 @@ describe("merge", function() {
       expect(merge.align(a, b)).toEqual(exp);
     });
   });
+
+  describe('common ancestors', function() {
+    function createFileStructure() {
+      testUtil.createFilesFromTree({ filea: "filea",
+                                     fileb: "filea",
+                                     filec: "filea",
+                                     filed: "filea",
+                                     filee: "filea",
+                                     filef: "filea",
+                                     fileg: "filea",
+                                     fileh: "filea" });
+    };
+
+    it("should return undefined if same hash passed", function() {
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "first" });
+      expect(merge.readCommonAncestor("98d541a", "98d541a")).toBeUndefined();
+    });
+
+    it("should return undefined if one is direct descendent of other", function() {
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "first" });
+      g.add("fileb");
+      g.commit({ m: "second" });
+      expect(merge.readCommonAncestor("98d541a", "5b89af33")).toBeUndefined();
+      expect(merge.readCommonAncestor("5b89af33", "98d541a")).toBeUndefined();
+    });
+
+    it("should return branch point for master and branch both w one extra commit", function() {
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "first" });
+      g.branch("other");
+
+      g.add("fileb");
+      g.commit({ m: "second" });
+
+      g.checkout("other");
+      g.add("filec");
+      g.commit({ m: "third" });
+
+      expect(merge.readCommonAncestor("5b89af33", "22a17392")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("22a17392", "5b89af33")).toEqual("98d541a");
+    });
+
+    it("should return branch point for master and branch both w two extra commits", function() {
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "first" });
+      g.branch("other");
+
+      g.add("fileb");
+      g.commit({ m: "second" });
+      g.add("filec");
+      g.commit({ m: "third" });
+
+      g.checkout("other");
+      g.add("filed");
+      g.commit({ m: "fourth" });
+      g.add("filee");
+      g.commit({ m: "fifth" });
+
+      expect(merge.readCommonAncestor("1d42b9a3", "116a5202")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("116a5202", "1d42b9a3")).toEqual("98d541a");
+    });
+
+    it("should return most recent ancestor if there is a shared hist of several commits", function() {
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "first" });
+      g.add("fileb");
+      g.commit({ m: "second" });
+      g.add("filec");
+      g.commit({ m: "third" });
+      g.branch("other");
+
+      g.add("filed");
+      g.commit({ m: "fourth" });
+
+      g.checkout("other");
+      g.add("filee");
+      g.commit({ m: "fifth" });
+
+      expect(merge.readCommonAncestor("4dc3d2e0", "6391e16f")).toEqual("47bd0fa3");
+      expect(merge.readCommonAncestor("6391e16f", "4dc3d2e0")).toEqual("47bd0fa3");
+    });
+
+    it("should return a single ancestor if merge commits have multiple common ancestors", function() {
+      // (it's basically arbitrary which of the possible ancestors is returned)
+
+      // example here: http://codicesoftware.blogspot.com/2011/09/merge-recursive-strategy.html
+      // real git uses recursive strategy to merge multiple ancestors into a final common ancestor.
+      // I am not going to implement this for now
+
+      g.init();
+      createFileStructure();
+      g.add("filea");
+      g.commit({ m: "10" });
+      g.branch("task001");
+
+      g.add("fileb");
+      g.commit({ m: "11" });
+
+      g.checkout("task001");
+      g.add("filec");
+      g.commit({ m: "12" });
+
+      g.checkout("master");
+      g.add("filed");
+      g.commit({ m: "13" });
+
+      g.checkout("task001");
+      g.add("filee");
+      g.commit({ m: "14" });
+
+      g.checkout("master");
+      g.add("filef");
+      g.commit({ m: "15" });
+
+      g.checkout("task001");
+      g.add("fileg");
+      g.commit({ m: "16" });
+
+      // TODO: once merge implemented change these fake merges into calls to merge()
+
+      function addParent(commitHash, parentHash) {
+        var path = ".gitlet/objects/" + commitHash;
+        var lines = fs.readFileSync(path, "utf8").split("\n");
+        var out = lines.slice(0, 2)
+            .concat("parent " + parentHash)
+            .concat(lines.slice(2))
+            .join("\n") + "\n";
+        fs.writeFileSync(path, out);
+      };
+
+      addParent("234b5b00", "3e8447ee"); // 16 has another parent: 11
+      addParent("71fd6f26", "5ca1d0c7"); // 15 has another parent: 12
+
+      expect(merge.readCommonAncestor("234b5b00", "71fd6f26")).toEqual("3e8447ee");
+      expect(merge.readCommonAncestor("71fd6f26", "234b5b00")).toEqual("3e8447ee");
+    });
+  });
 });
+
+// test that merge says already up to date if one commit is ancestor of other - it's
+//   if branch to merge appears in parents list of current commit - not commutative
