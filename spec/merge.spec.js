@@ -8,6 +8,17 @@ function spToUnd(charr) {
   return charr === "_" ? undefined : charr;
 };
 
+function createFlatFileStructure() {
+  testUtil.createFilesFromTree({ filea: "filea",
+                                 fileb: "filea",
+                                 filec: "filea",
+                                 filed: "filea",
+                                 filee: "filea",
+                                 filef: "filea",
+                                 fileg: "filea",
+                                 fileh: "filea" });
+};
+
 describe("merge", function() {
   beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
@@ -99,20 +110,9 @@ describe("merge", function() {
   });
 
   describe('common ancestors', function() {
-    function createFileStructure() {
-      testUtil.createFilesFromTree({ filea: "filea",
-                                     fileb: "filea",
-                                     filec: "filea",
-                                     filed: "filea",
-                                     filee: "filea",
-                                     filef: "filea",
-                                     fileg: "filea",
-                                     fileh: "filea" });
-    };
-
     it("should return undefined if same hash passed", function() {
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       expect(merge.readCommonAncestor("98d541a", "98d541a")).toBeUndefined();
@@ -120,7 +120,7 @@ describe("merge", function() {
 
     it("should return undefined if one is descendent of other", function() {
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       g.add("fileb");
@@ -131,7 +131,7 @@ describe("merge", function() {
 
     it("should return branch point for master and branch both w one extra commit", function() {
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       g.branch("other");
@@ -149,7 +149,7 @@ describe("merge", function() {
 
     it("should return branch point for master and branch both w two extra commits", function() {
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       g.branch("other");
@@ -171,7 +171,7 @@ describe("merge", function() {
 
     it("should return most recent ancestor if there is a shared hist of several commits", function() {
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
       g.add("fileb");
@@ -199,7 +199,7 @@ describe("merge", function() {
       // I am not going to implement this for now
 
       g.init();
-      createFileStructure();
+      createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "10" });
       g.branch("task001");
