@@ -246,6 +246,14 @@ describe("merge", function() {
       expect(merge.readCommonAncestor("71fd6f26", "234b5b00")).toEqual("3e8447ee");
     });
   });
+
+  ddescribe('merging', function() {
+    it("should throw if can't resolve ref/hash passed", function() {
+      g.init();
+      expect(function() { g.merge("blah"); })
+        .toThrow("merge: blah - not something we can merge");
+    });
+  });
 });
 
 // test that merge says already up to date if one commit is ancestor of other - it's
