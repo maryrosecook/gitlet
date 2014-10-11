@@ -158,7 +158,7 @@ var gitlet = module.exports = {
         checkout.writeCheckout(ref);
         return objects.readExists(ref) ?
           "Note: checking out " + ref + "\nYou are in 'detached HEAD' state." :
-          "Switched to branch '" + ref + "'\n";
+          "Switched to branch '" + ref + "'";
       }
     }
   },
