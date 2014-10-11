@@ -219,6 +219,40 @@ describe("checkout", function() {
       expect(g.checkout("21cb63f6"))
         .toEqual("Note: checking out 21cb63f6\nYou are in 'detached HEAD' state.");
     });
+
+    describe('index writing', function() {
+      it("should remove files from index that are not in checked out branch", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+
+        g.add("1b/fileb");
+        g.commit({ m: "second" });
+
+        g.checkout("other");
+        testUtil.expectFile(".gitlet/index", "1a/filea 5ceba65\n");
+      });
+
+      it("should add files to index that are now in checked out branch", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+
+        g.add("1b/fileb");
+        g.commit({ m: "second" });
+
+        g.checkout("other");
+        testUtil.expectFile(".gitlet/index", "1a/filea 5ceba65\n");
+        g.checkout("master");
+        testUtil.expectFile(".gitlet/index", "1a/filea 5ceba65\n1b/fileb 5ceba66\n");
+      });
+    });
   });
 
   it("should allow a commit hash to be passed", function() {
