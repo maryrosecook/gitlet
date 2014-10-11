@@ -216,8 +216,8 @@ describe("checkout", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      expect(g.checkout("21cb63f6"))
-        .toEqual("Note: checking out 21cb63f6\nYou are in 'detached HEAD' state.");
+      expect(g.checkout("17a11ad4"))
+        .toEqual("Note: checking out 17a11ad4\nYou are in 'detached HEAD' state.");
     });
 
     describe('index writing', function() {
@@ -263,8 +263,8 @@ describe("checkout", function() {
     g.commit({ m: "first" });
     g.add("1b/fileb");
     g.commit({ m: "second" });
-    g.checkout("21cb63f6");
-    testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
+    g.checkout("17a11ad4");
+    testUtil.expectFile(".gitlet/HEAD", "17a11ad4");
   });
 
   it("should be able to exit detached head state", function() {
@@ -275,7 +275,7 @@ describe("checkout", function() {
     g.branch("other");
     g.add("1b/fileb");
     g.commit({ m: "second" });
-    g.checkout("21cb63f6");
+    g.checkout("17a11ad4");
     g.checkout("other");
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
   });
@@ -317,15 +317,15 @@ describe("checkout", function() {
       g.add("1b/fileb");
       g.commit({ m: "second" });
 
-      g.checkout("21cb63f6");
-      g.checkout("21cb63f6");
-      testUtil.expectFile(".gitlet/HEAD", "21cb63f6");
+      g.checkout("17a11ad4");
+      g.checkout("17a11ad4");
+      testUtil.expectFile(".gitlet/HEAD", "17a11ad4");
       testUtil.expectFile("1a/filea", "filea");
       expect(fs.existsSync("1b/fileb")).toEqual(false);
 
-      g.checkout("5c4868ac");
-      g.checkout("5c4868ac");
-      testUtil.expectFile(".gitlet/HEAD", "5c4868ac");
+      g.checkout("55cdc501");
+      g.checkout("55cdc501");
+      testUtil.expectFile(".gitlet/HEAD", "55cdc501");
       testUtil.expectFile("1a/filea", "somethingelse");
       expect(fs.existsSync("1b/fileb")).toEqual(true);
     });

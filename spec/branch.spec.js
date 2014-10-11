@@ -24,7 +24,7 @@ describe("branch", function() {
     g.add("1/filea");
     g.commit({ m: "first" });
     g.branch("woo");
-    testUtil.expectFile(".gitlet/refs/heads/woo", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/woo", "3606c2bf");
   });
 
   it("should should leave master pointed at orig hash after branching", function() {
@@ -32,9 +32,9 @@ describe("branch", function() {
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
     g.add("1/filea");
     g.commit({ m: "first" });
-    testUtil.expectFile(".gitlet/refs/heads/master", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/master", "3606c2bf");
     g.branch("woo");
-    testUtil.expectFile(".gitlet/refs/heads/master", "48946d55");
+    testUtil.expectFile(".gitlet/refs/heads/master", "3606c2bf");
   });
 
   it("should return list of branches when called with no args", function() {
@@ -78,7 +78,7 @@ describe("branch", function() {
     testUtil.createStandardFileStructure();
     g.add("1a/filea");
     g.commit({ m: "first" });
-    g.checkout("21cb63f6");
+    g.checkout("17a11ad4");
 
     expect(function() { g.branch(undefined, { u: "origin/master" }) })
       .toThrow("fatal: could not set upstream of HEAD to origin/master" +

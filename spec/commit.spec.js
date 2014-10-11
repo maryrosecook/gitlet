@@ -29,7 +29,7 @@ describe("commit", function() {
     g.add("1b");
     g.commit({ m: "first" });
 
-    var commitFile = fs.readFileSync(".gitlet/objects/6e7887a2", "utf8");
+    var commitFile = fs.readFileSync(".gitlet/objects/60986c94", "utf8");
     expect(commitFile.split("\n")[0]).toEqual("commit 391566d4");
     expect(commitFile.split("\n")[1])
       .toEqual("Date:  Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)");
@@ -42,7 +42,7 @@ describe("commit", function() {
     testUtil.createStandardFileStructure();
     g.add("1b");
     g.commit({ m: "first" });
-    fs.readFileSync(".gitlet/objects/6e7887a2", "utf8").split("\n")[1].match("Date:");
+    fs.readFileSync(".gitlet/objects/60986c94", "utf8").split("\n")[1].match("Date:");
   });
 
   it("should store parent on all commits after first", function() {
@@ -70,7 +70,7 @@ describe("commit", function() {
     testUtil.createStandardFileStructure();
     g.add("1b");
     g.commit({ m: "first" });
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("6e7887a2");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("60986c94");
   });
 
   it("should record subsequent commit object", function() {
@@ -81,11 +81,11 @@ describe("commit", function() {
     g.add("1b");
     g.commit({ m: "second" });
 
-    var commitFileLines1 = fs.readFileSync(".gitlet/objects/21cb63f6", "utf8").split("\n");
+    var commitFileLines1 = fs.readFileSync(".gitlet/objects/17a11ad4", "utf8").split("\n");
     expect(commitFileLines1[0]).toEqual("commit 63e0627e");
     expect(commitFileLines1[3]).toEqual("    first");
 
-    var commitFileLines2 = fs.readFileSync(".gitlet/objects/59bb8412", "utf8").split("\n");
+    var commitFileLines2 = fs.readFileSync(".gitlet/objects/5b228c59", "utf8").split("\n");
     expect(commitFileLines2[0]).toEqual("commit 566d6fea");
     expect(commitFileLines2[4]).toEqual("    second");
   });
@@ -95,11 +95,11 @@ describe("commit", function() {
     testUtil.createStandardFileStructure();
     g.add("1a");
     g.commit({ m: "first" });
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("17a11ad4");
 
     g.add("1b");
     g.commit({ m: "second" });
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("59bb8412");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("5b228c59");
   });
 
   it("should create commit without passing date", function() {
@@ -144,7 +144,7 @@ describe("commit", function() {
     g.commit({ m: "second" });
 
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
-    testUtil.expectFile(".gitlet/refs/heads/other", "1c4100dd");
+    testUtil.expectFile(".gitlet/refs/heads/other", "16b35712");
   });
 
   describe('detached HEAD commits', function() {
@@ -153,10 +153,10 @@ describe("commit", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      g.checkout("21cb63f6");
+      g.checkout("17a11ad4");
 
       g.add("1b/fileb")
-      expect(g.commit({ m: "second" })).toEqual("[detached HEAD 1c4100dd] second");
+      expect(g.commit({ m: "second" })).toEqual("[detached HEAD 16b35712] second");
     });
 
     it("should point head at new commit when commit to detached HEAD", function() {
@@ -164,11 +164,11 @@ describe("commit", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      g.checkout("21cb63f6");
+      g.checkout("17a11ad4");
 
       g.add("1b/fileb")
       g.commit({ m: "second" });
-      testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
+      testUtil.expectFile(".gitlet/HEAD", "16b35712");
     });
 
     it("should create commit file when committing", function() {
@@ -176,15 +176,15 @@ describe("commit", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      g.checkout("21cb63f6");
+      g.checkout("17a11ad4");
 
       g.add("1b/fileb")
       g.commit({ m: "second" });
-      testUtil.expectFile(".gitlet/HEAD", "1c4100dd");
+      testUtil.expectFile(".gitlet/HEAD", "16b35712");
 
-      var commitFile = fs.readFileSync(".gitlet/objects/1c4100dd", "utf8");
+      var commitFile = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
       expect(commitFile.split("\n")[0]).toEqual("commit 794ea686");
-      expect(commitFile.split("\n")[1]).toEqual("parent 21cb63f6");
+      expect(commitFile.split("\n")[1]).toEqual("parent 17a11ad4");
       expect(commitFile.split("\n")[2])
         .toEqual("Date:  Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)");
       expect(commitFile.split("\n")[3]).toEqual("");
@@ -196,7 +196,7 @@ describe("commit", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      g.checkout("21cb63f6");
+      g.checkout("17a11ad4");
 
       expect(function() { g.commit({ m: "second" }); })
         .toThrow("# On detached HEAD\nnothing to commit, working directory clean");

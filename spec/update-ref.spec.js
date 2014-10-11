@@ -58,12 +58,12 @@ describe("update-ref", function() {
     g.commit({ m: "second" });
 
     expect(fs.readFileSync(".gitlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("59bb8412");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("5b228c59");
 
-    g.update_ref("HEAD", "21cb63f6");
+    g.update_ref("HEAD", "17a11ad4");
 
     expect(fs.readFileSync(".gitlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("17a11ad4");
   });
 
   it("should update terminal ref at HEAD to passed hash, not HEAD file content", function() {
@@ -78,9 +78,9 @@ describe("update-ref", function() {
     g.add("fileb");
     g.commit({ m: "second" });
 
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("d08448d");
     g.update_ref("HEAD", "refs/heads/other-branch");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("98d541a");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("281d2f1c");
     expect(fs.readFileSync(".gitlet/HEAD", "utf8")).toEqual("ref: refs/heads/master\n");
   });
 
@@ -92,9 +92,9 @@ describe("update-ref", function() {
     g.add("1b");
     g.commit({ m: "second" });
 
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("59bb8412");
-    g.update_ref("refs/heads/master", "21cb63f6");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("5b228c59");
+    g.update_ref("refs/heads/master", "17a11ad4");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("17a11ad4");
   });
 
   it("should allow master to be updated to a qualified branch", function() {
@@ -109,9 +109,9 @@ describe("update-ref", function() {
     g.add("fileb");
     g.commit({ m: "second" });
 
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("d08448d");
     g.update_ref("refs/heads/master", "refs/heads/other-branch");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("98d541a");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("281d2f1c");
   });
 
   it("should allow master to be updated to an unqualified branch", function() {
@@ -126,9 +126,9 @@ describe("update-ref", function() {
     g.add("fileb");
     g.commit({ m: "second" });
 
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("d08448d");
     g.update_ref("refs/heads/master", "other-branch");
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("98d541a");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("281d2f1c");
   });
 
   it("should allow ref to be updated to HEAD", function() {
@@ -143,9 +143,9 @@ describe("update-ref", function() {
     g.add("fileb");
     g.commit({ m: "second" });
 
-    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("67fd42fe");
-    expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("98d541a");
+    expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("d08448d");
+    expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("281d2f1c");
     g.update_ref("refs/heads/other-branch", "HEAD");
-    expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("67fd42fe");
+    expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("d08448d");
   });
 });

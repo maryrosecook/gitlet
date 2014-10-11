@@ -211,7 +211,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         fs.writeFileSync("1a/filea", "somethingelse");
-        expect(g.diff("21cb63f6", undefined, { "name-status": true }))
+        expect(g.diff("17a11ad4", undefined, { "name-status": true }))
           .toEqual("M 1a/filea\n");
       });
 

@@ -35,7 +35,7 @@ describe("gitlet cli", function() {
       g.add("1/filea");
       g.commit({ m: "blah" });
       g.runCli(["node", "gitlet", "branch", "woo"]);
-      testUtil.expectFile(".gitlet/refs/heads/woo", "6db3fd6a");
+      testUtil.expectFile(".gitlet/refs/heads/woo", "48cbafcc");
 
       testUtil.unpinDate();
     });
@@ -47,7 +47,7 @@ describe("gitlet cli", function() {
       g.init();
       g.add("1/filea");
       g.runCli(["node", "gitlet", "commit", "-m", "blah"]);
-      testUtil.expectFile(".gitlet/refs/heads/master", "6db3fd6a");
+      testUtil.expectFile(".gitlet/refs/heads/master", "48cbafcc");
 
       testUtil.unpinDate();
     });
@@ -70,9 +70,9 @@ describe("gitlet cli", function() {
       g.add("1b");
       g.commit({ m: "second" });
 
-      g.runCli(["node", "gitlet", "update-ref", "HEAD", "21cb63f6"]);
+      g.runCli(["node", "gitlet", "update-ref", "HEAD", "17a11ad4"]);
 
-      expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("21cb63f6");
+      expect(fs.readFileSync(".gitlet/refs/heads/master", "utf8")).toEqual("17a11ad4");
 
       testUtil.unpinDate();
     });

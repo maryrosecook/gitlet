@@ -41,8 +41,8 @@ describe("fetch", function() {
     gl.remote("add", "origin", remoteRepo);
     gl.fetch("origin");
 
-    ["21cb63f6", "63e0627e", "17653b6d", "5ceba65", // first commit
-     "1c4100dd", "794ea686", "507bf191", "5ceba66"] // second commit
+    ["17a11ad4", "63e0627e", "17653b6d", "5ceba65", // first commit
+     "16b35712", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
         var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
         testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
@@ -89,8 +89,8 @@ describe("fetch", function() {
     gl.remote("add", "origin", remoteRepo);
     gl.fetch("origin");
 
-    ["21cb63f6", "63e0627e", "17653b6d", "5ceba65", // first commit
-     "1c4100dd", "794ea686", "507bf191", "5ceba66"] // second commit
+    ["17a11ad4", "63e0627e", "17653b6d", "5ceba65", // first commit
+     "16b35712", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
         var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
         testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
@@ -238,9 +238,9 @@ describe("fetch", function() {
 
       var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
       expect(fetchHeadLines[0])
-        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+        .toEqual("17a11ad4 not-for-merge branch 'master' of " + remoteRepo);
       expect(fetchHeadLines[1])
-        .toEqual("21cb63f6 not-for-merge branch 'other1' of " + remoteRepo);
+        .toEqual("17a11ad4 not-for-merge branch 'other1' of " + remoteRepo);
     });
 
     it("should say master not for merge if not a tracking branch", function() {
@@ -261,7 +261,7 @@ describe("fetch", function() {
 
       var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
       expect(fetchHeadLines[0])
-        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+        .toEqual("17a11ad4 not-for-merge branch 'master' of " + remoteRepo);
     });
 
     it("should say master for merge if tracking branch", function() {
@@ -288,7 +288,7 @@ describe("fetch", function() {
 
       var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
       expect(fetchHeadLines[0])
-        .toEqual("21cb63f6 branch 'master' of " + remoteRepo);
+        .toEqual("17a11ad4 branch 'master' of " + remoteRepo);
     });
 
     it("should say master not for merge if tracking branch but checked out other", function() {
@@ -317,7 +317,7 @@ describe("fetch", function() {
 
       var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
       expect(fetchHeadLines[0])
-        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo);
+        .toEqual("17a11ad4 not-for-merge branch 'master' of " + remoteRepo);
     });
 
     it("should say other branch for merge if checked out and tracking", function() {
@@ -347,9 +347,9 @@ describe("fetch", function() {
 
       var fetchHeadLines = fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n");
       expect(fetchHeadLines[0])
-        .toEqual("21cb63f6 not-for-merge branch 'master' of " + remoteRepo); // sanity
+        .toEqual("17a11ad4 not-for-merge branch 'master' of " + remoteRepo); // sanity
       expect(fetchHeadLines[1])
-        .toEqual("21cb63f6 branch 'other' of " + remoteRepo);
+        .toEqual("17a11ad4 branch 'other' of " + remoteRepo);
     });
   });
 });

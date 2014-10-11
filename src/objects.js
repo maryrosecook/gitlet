@@ -34,7 +34,7 @@ var objects = module.exports = {
       parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
       "Date:  " + new Date().toString() + "\n" +
       "\n" +
-      "    " + message;
+      "    " + message + "\n";
   },
 
   write: function(str) {

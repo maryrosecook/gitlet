@@ -116,7 +116,7 @@ describe("merge", function() {
       createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
-      expect(merge.readCommonAncestor("98d541a", "98d541a")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("281d2f1c", "281d2f1c")).toEqual("281d2f1c");
     });
 
     it("should return ancestor if one is descendent of other", function() {
@@ -126,7 +126,7 @@ describe("merge", function() {
       g.commit({ m: "first" });
       g.add("fileb");
       g.commit({ m: "second" });
-      expect(merge.readCommonAncestor("98d541a", "5b89af33")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
     });
 
     it("should return branch point for master and branch both w one extra commit", function() {
@@ -143,8 +143,8 @@ describe("merge", function() {
       g.add("filec");
       g.commit({ m: "third" });
 
-      expect(merge.readCommonAncestor("5b89af33", "62ae159b")).toEqual("98d541a");
-      expect(merge.readCommonAncestor("62ae159b", "5b89af33")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("a9b6e7e", "281d2f1c")).toEqual("281d2f1c");
+      expect(merge.readCommonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
     });
 
     it("should return branch point for master and branch both w two extra commits", function() {
@@ -165,8 +165,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("47bd0fa3", "6f1303d6")).toEqual("98d541a");
-      expect(merge.readCommonAncestor("6f1303d6", "47bd0fa3")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("7ece7757", "47cf8efe")).toEqual("281d2f1c");
+      expect(merge.readCommonAncestor("47cf8efe", "7ece7757")).toEqual("281d2f1c");
     });
 
     it("should return most recent ancestor if there is a shared hist of several commits", function() {
@@ -187,8 +187,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("4dc3d2e0", "732c39f4")).toEqual("47bd0fa3");
-      expect(merge.readCommonAncestor("732c39f4", "4dc3d2e0")).toEqual("47bd0fa3");
+      expect(merge.readCommonAncestor("34503151", "1c67dfcf")).toEqual("7ece7757");
+      expect(merge.readCommonAncestor("1c67dfcf", "34503151")).toEqual("7ece7757");
     });
 
     it("should return a single ancestor if merge commits have multiple common ancestors", function() {
@@ -239,11 +239,11 @@ describe("merge", function() {
         fs.writeFileSync(path, out);
       };
 
-      addParent("6b13f419", "3e8447ee"); // 16 has another parent: 11
-      addParent("37d19e84", "4a516110"); // 15 has another parent: 12
+      addParent("2f31bde1", "571effba"); // 16 has another parent: 11
+      addParent("7f7be135", "16b70b64"); // 15 has another parent: 12
 
-      expect(merge.readCommonAncestor("6b13f419", "37d19e84")).toEqual("3e8447ee");
-      expect(merge.readCommonAncestor("37d19e84", "6b13f419")).toEqual("3e8447ee");
+      expect(merge.readCommonAncestor("2f31bde1", "7f7be135")).toEqual("571effba");
+      expect(merge.readCommonAncestor("7f7be135", "2f31bde1")).toEqual("571effba");
     });
   });
 
@@ -261,9 +261,9 @@ describe("merge", function() {
       g.commit({ m: "first" });
       g.add("1b/fileb");
       g.commit({ m: "second" });
-      g.checkout("21cb63f6");
+      g.checkout("17a11ad4");
 
-      expect(function() { g.merge("1c4100dd"); })
+      expect(function() { g.merge("16b35712"); })
         .toThrow("unsupported");
     });
 
@@ -275,7 +275,7 @@ describe("merge", function() {
       g.add("fileb");
       g.commit({ m: "second" });
 
-      expect(g.merge("98d541a")).toEqual("Already up-to-date.");
+      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
     });
 
     it("should not throw if passed hash not descendent of HEAD, but HEAD descendent of passed hash", function() {
@@ -287,12 +287,12 @@ describe("merge", function() {
       g.add("fileb");
       g.commit({ m: "second" });
 
-      expect(refs.readHash("HEAD")).toEqual("5b89af33");
-      expect(g.merge("98d541a")).toEqual("Already up-to-date.");
+      expect(refs.readHash("HEAD")).toEqual("a9b6e7e");
+      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
 
       g.checkout("other");
-      expect(refs.readHash("HEAD")).toEqual("98d541a");
-      expect(g.merge("5b89af33")).toNotEqual("Already up-to-date.");
+      expect(refs.readHash("HEAD")).toEqual("281d2f1c");
+      expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date.");
     });
 
     it("should return up to date if pass current HEAD hash", function() {
@@ -301,7 +301,7 @@ describe("merge", function() {
       g.add("filea");
       g.commit({ m: "first" });
 
-      expect(g.merge("98d541a")).toEqual("Already up-to-date.");
+      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
     });
 
     it("should throw if item to merge resolves, but is not commit", function() {
