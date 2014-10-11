@@ -143,8 +143,8 @@ describe("merge", function() {
       g.add("filec");
       g.commit({ m: "third" });
 
-      expect(merge.readCommonAncestor("5b89af33", "22a17392")).toEqual("98d541a");
-      expect(merge.readCommonAncestor("22a17392", "5b89af33")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("5b89af33", "62ae159b")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("62ae159b", "5b89af33")).toEqual("98d541a");
     });
 
     it("should return branch point for master and branch both w two extra commits", function() {
@@ -165,8 +165,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("47bd0fa3", "116a5202")).toEqual("98d541a");
-      expect(merge.readCommonAncestor("116a5202", "47bd0fa3")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("47bd0fa3", "6f1303d6")).toEqual("98d541a");
+      expect(merge.readCommonAncestor("6f1303d6", "47bd0fa3")).toEqual("98d541a");
     });
 
     it("should return most recent ancestor if there is a shared hist of several commits", function() {
@@ -187,8 +187,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("4dc3d2e0", "6391e16f")).toEqual("47bd0fa3");
-      expect(merge.readCommonAncestor("6391e16f", "4dc3d2e0")).toEqual("47bd0fa3");
+      expect(merge.readCommonAncestor("4dc3d2e0", "732c39f4")).toEqual("47bd0fa3");
+      expect(merge.readCommonAncestor("732c39f4", "4dc3d2e0")).toEqual("47bd0fa3");
     });
 
     it("should return a single ancestor if merge commits have multiple common ancestors", function() {
@@ -239,11 +239,11 @@ describe("merge", function() {
         fs.writeFileSync(path, out);
       };
 
-      addParent("234b5b00", "3e8447ee"); // 16 has another parent: 11
-      addParent("71fd6f26", "5ca1d0c7"); // 15 has another parent: 12
+      addParent("6b13f419", "3e8447ee"); // 16 has another parent: 11
+      addParent("37d19e84", "4a516110"); // 15 has another parent: 12
 
-      expect(merge.readCommonAncestor("234b5b00", "71fd6f26")).toEqual("3e8447ee");
-      expect(merge.readCommonAncestor("71fd6f26", "234b5b00")).toEqual("3e8447ee");
+      expect(merge.readCommonAncestor("6b13f419", "37d19e84")).toEqual("3e8447ee");
+      expect(merge.readCommonAncestor("37d19e84", "6b13f419")).toEqual("3e8447ee");
     });
   });
 
