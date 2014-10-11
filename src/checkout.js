@@ -16,13 +16,15 @@ var checkout = module.exports = {
   },
 
   writeCheckout: function(ref) {
-    addModifyDelete("HEAD", refs.readHash(ref));
+    var hash = refs.readHash(ref);
+    addModifyDelete("HEAD", hash);
     fs.readdirSync(files.repoDir())
       .filter(function(dirChild) { return dirChild !== ".gitlet"; })
       .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
       .forEach(files.deleteEmptyDirs);
 
     refs.writeLocal("HEAD", objects.readExists(ref) ? ref : "ref: " + refs.toLocalRef(ref));
+    index.write(index.readCommitIndex(hash));
   }
 };
 
