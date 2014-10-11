@@ -251,7 +251,12 @@ var runCli = module.exports.runCli = function (argv) {
   var unspecifiedArgs = Array
       .apply(null, new Array(fn.length - commandArgs.length - 1))
       .map(function() { return undefined; });
-  return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
+
+  try {
+    return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
+  } catch (e) {
+    console.log(e)
+  }
 };
 
 if (require.main === module) {
