@@ -47,10 +47,11 @@ var merge = module.exports = {
   },
 
   readCommonAncestor: function(aHash, bHash) {
+    var sorted = [aHash, bHash].sort();
+    aHash = sorted[0];
+    bHash = sorted[1];
     var aAncestors = [aHash].concat(objects.readAncestors(aHash));
     var bAncestors = [bHash].concat(objects.readAncestors(bHash));
-    return aAncestors
-      .filter(function(a) { return bAncestors.indexOf(a) !== -1; })
-      .sort()[0]; // sort to make sure answer is commutative
+    return aAncestors.filter(function(a) { return bAncestors.indexOf(a) !== -1; })[0];
   }
 };
