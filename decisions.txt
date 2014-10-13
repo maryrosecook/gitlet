@@ -25,7 +25,6 @@
 
 todo
 * cd back to repo root for all commands
-* make sure merge does two parents
 * git status?
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
