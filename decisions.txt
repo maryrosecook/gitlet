@@ -31,3 +31,14 @@ todo
 * use update_ref to update remote refs
 * fix heads being written w/o a newline
 * cannot add config to an empty-with-a-newline config file
+* merge for non-conflicted files
+* init --bare
+* git pull origin master
+* git push origin master
+* merge for conflicted files
+
+
+
+
+notes
+* can't update refs w push to non bare repo
