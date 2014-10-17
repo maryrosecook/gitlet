@@ -148,6 +148,8 @@ var gitlet = module.exports = {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
     } else if (objects.type(objects.read(hash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
+    } else if (ref === refs.readCurrentBranchName() || ref === refs.readHeadContent()) {
+      return "Already on '" + ref + "'";
     } else {
       var paths = checkout.readChangedFilesCheckoutWouldOverwrite(hash);
       if (paths.length > 0) {
