@@ -281,53 +281,107 @@ describe("checkout", function() {
   });
 
   describe("repeated checkout of same thing", function() {
-    it("should be idempodent adds, dels, mods for branches", function() {
-      testUtil.createStandardFileStructure();
-      g.init();
+    describe("branch", function() {
+      it("should say already on branch if try to check out current branch", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
 
-      g.add("1a/filea");
-      g.commit({ m: "first" });
-      g.branch("other");
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        expect(g.checkout("master")).toEqual("Already on 'master'");
+      });
 
-      fs.writeFileSync("1a/filea", "somethingelse");
-      g.add("1a/filea");
-      g.add("1b/fileb");
-      g.commit({ m: "second" });
+      it("should not meddle with wc on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        fs.writeFileSync("1a/filea", "somethingelse");
+        g.add("1a/filea");
 
-      g.checkout("other");
-      g.checkout("other");
-      testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
-      testUtil.expectFile("1a/filea", "filea");
-      expect(fs.existsSync("1b/fileb")).toEqual(false);
+        g.checkout("master");
+        testUtil.expectFile("1a/filea", "somethingelse");
+      });
 
-      g.checkout("master");
-      g.checkout("master");
-      testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/master");
-      testUtil.expectFile("1a/filea", "somethingelse");
-      expect(fs.existsSync("1b/fileb")).toEqual(true);
+      it("should not meddle with index on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        fs.writeFileSync("1a/filea", "somethingelse");
+
+        testUtil.expectFile(".gitlet/index", "1a/filea 5ceba65\n");
+        g.add("1a/filea");
+
+        g.checkout("master");
+        testUtil.expectFile(".gitlet/index", "1a/filea 17b748b3\n");
+      });
+
+      it("should not meddle with HEAD commit on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+
+        testUtil.expectFile(".gitlet/refs/heads/master", "17a11ad4");
+        g.checkout("master");
+        testUtil.expectFile(".gitlet/refs/heads/master", "17a11ad4");
+      });
     });
 
-    it("should be idempodent adds, dels, mods for detached heads", function() {
-      testUtil.createStandardFileStructure();
-      g.init();
-      g.add("1a/filea");
-      g.commit({ m: "first" });
-      fs.writeFileSync("1a/filea", "somethingelse");
-      g.add("1a/filea");
-      g.add("1b/fileb");
-      g.commit({ m: "second" });
+    describe("branch", function() {
+      it("should say already on commit if try to check out current commit", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
 
-      g.checkout("17a11ad4");
-      g.checkout("17a11ad4");
-      testUtil.expectFile(".gitlet/HEAD", "17a11ad4");
-      testUtil.expectFile("1a/filea", "filea");
-      expect(fs.existsSync("1b/fileb")).toEqual(false);
+        g.add("1a/filea");
+        g.commit({ m: "first" });
 
-      g.checkout("55cdc501");
-      g.checkout("55cdc501");
-      testUtil.expectFile(".gitlet/HEAD", "55cdc501");
-      testUtil.expectFile("1a/filea", "somethingelse");
-      expect(fs.existsSync("1b/fileb")).toEqual(true);
+        g.checkout("17a11ad4");
+        expect(g.checkout("17a11ad4")).toEqual("Already on '17a11ad4'");
+      });
+
+      it("should not meddle with wc on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+
+        g.checkout("17a11ad4");
+        fs.writeFileSync("1a/filea", "somethingelse");
+        g.add("1a/filea");
+
+        g.checkout("17a11ad4");
+        testUtil.expectFile("1a/filea", "somethingelse");
+      });
+
+      it("should not meddle with index on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        g.checkout("17a11ad4");
+
+        fs.writeFileSync("1a/filea", "somethingelse");
+
+        testUtil.expectFile(".gitlet/index", "1a/filea 5ceba65\n");
+        g.add("1a/filea");
+
+        g.checkout("17a11ad4");
+        testUtil.expectFile(".gitlet/index", "1a/filea 17b748b3\n");
+      });
+
+      it("should not meddle with HEAD commit on second checkout", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        g.checkout("17a11ad4");
+
+        testUtil.expectFile(".gitlet/refs/heads/master", "17a11ad4");
+        g.checkout("17a11ad4");
+        testUtil.expectFile(".gitlet/refs/heads/master", "17a11ad4");
+      });
     });
   });
 });
