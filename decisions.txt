@@ -22,6 +22,8 @@
 * only allow repo interop via cp - no network support
 * only support setting up remote tracking (branch -u) for current branch
 * support three-way merge, but not recursive merge
+* pushing to non-bare repo completely disallowed (no transfer of objects, no flag to enable it)
+* repeatedly checking out same commit or same branch seem to do nothing (no change to index which DOES happen if you checkout normally).  They have a different message, but I've made it the same for both.
 
 todo
 * cd back to repo root for all commands
@@ -36,9 +38,4 @@ todo
 * git pull origin master
 * git push origin master
 * merge for conflicted files
-
-
-
-
-notes
-* can't update refs w push to non bare repo
+* block pushing to non bare repo
