@@ -143,15 +143,15 @@ var gitlet = module.exports = {
   checkout: function(ref, _) {
     files.assertInRepo();
 
-    var hash = refs.readHash(ref);
-    if (!objects.readExists(hash)) {
+    var toHash = refs.readHash(ref);
+    if (!objects.readExists(toHash)) {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
-    } else if (objects.type(objects.read(hash)) !== "commit") {
+    } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
     } else if (ref === refs.readCurrentBranchName() || ref === refs.readHeadContent()) {
       return "Already on '" + ref + "'";
     } else {
-      var paths = checkout.readChangedFilesCheckoutWouldOverwrite(hash);
+      var paths = checkout.readChangedFilesCheckoutWouldOverwrite(toHash);
       if (paths.length > 0) {
         throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	        paths.join("\n") + "\n";
@@ -160,11 +160,11 @@ var gitlet = module.exports = {
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
-        checkout.writeWorkingCopy(fromHash, hash);
-        refs.writeLocal("HEAD", isDetachingHead ? hash : "ref: " + refs.toLocalRef(ref));
-        checkout.writeIndex(hash);
+        checkout.writeWorkingCopy(fromHash, toHash);
+        refs.writeLocal("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
+        checkout.writeIndex(toHash);
         return isDetachingHead ?
-          "Note: checking out " + hash + "\nYou are in 'detached HEAD' state." :
+          "Note: checking out " + toHash + "\nYou are in 'detached HEAD' state." :
           "Switched to branch '" + ref + "'";
       }
     }
