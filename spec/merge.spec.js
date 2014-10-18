@@ -1,8 +1,10 @@
 var fs = require("fs");
 var nodePath = require("path");
-var g = require("../src/gitlet");
 var merge = require("../src/merge");
 var refs = require("../src/refs");
+var objects = require("../src/objects");
+var index = require("../src/index");
+var g = require("../src/gitlet");
 var testUtil = require("./test-util");
 
 function spToUnd(charr) {
@@ -247,72 +249,76 @@ describe("merge", function() {
     });
   });
 
-  describe('merging', function() {
-    it("should throw if can't resolve ref/hash passed", function() {
-      g.init();
-      expect(function() { g.merge("blah"); })
-        .toThrow("merge: blah - not something we can merge");
+  describe('merge', function() {
+    describe('aborts', function() {
+      it("should throw if can't resolve ref/hash passed", function() {
+        g.init();
+        expect(function() { g.merge("blah"); })
+          .toThrow("merge: blah - not something we can merge");
+      });
+
+      it("should throw if try to merge when head detached", function() {
+        testUtil.createStandardFileStructure();
+        g.init();
+        g.add("1a/filea");
+        g.commit({ m: "first" });
+        g.add("1b/fileb");
+        g.commit({ m: "second" });
+        g.checkout("17a11ad4");
+
+        expect(function() { g.merge("16b35712"); })
+          .toThrow("unsupported");
+      });
+
+      it("should return up to date if one is descendent of other", function() {
+        g.init();
+        createFlatFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.add("fileb");
+        g.commit({ m: "second" });
+
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+      });
+
+      it("should not throw if passed hash not descendent of HEAD, but HEAD descendent of passed hash", function() {
+        g.init();
+        createFlatFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        g.add("fileb");
+        g.commit({ m: "second" });
+
+        expect(refs.readHash("HEAD")).toEqual("a9b6e7e");
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+
+        g.checkout("other");
+        expect(refs.readHash("HEAD")).toEqual("281d2f1c");
+        expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date.");
+      });
+
+      it("should return up to date if pass current HEAD hash", function() {
+        g.init();
+        createFlatFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+      });
+
+      it("should throw if item to merge resolves, but is not commit", function() {
+        g.init();
+        createFlatFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+
+        expect(function() { g.merge("5ceba65"); })
+          .toThrow("error: 5ceba65: expected commit type, but the object " +
+                   "dereferences to blob type");
+      });
     });
 
-    it("should throw if try to merge when head detached", function() {
-      testUtil.createStandardFileStructure();
-      g.init();
-      g.add("1a/filea");
-      g.commit({ m: "first" });
-      g.add("1b/fileb");
-      g.commit({ m: "second" });
-      g.checkout("17a11ad4");
-
-      expect(function() { g.merge("16b35712"); })
-        .toThrow("unsupported");
-    });
-
-    it("should return up to date if one is descendent of other", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.add("fileb");
-      g.commit({ m: "second" });
-
-      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
-    });
-
-    it("should not throw if passed hash not descendent of HEAD, but HEAD descendent of passed hash", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.branch("other");
-      g.add("fileb");
-      g.commit({ m: "second" });
-
-      expect(refs.readHash("HEAD")).toEqual("a9b6e7e");
-      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
-
-      g.checkout("other");
-      expect(refs.readHash("HEAD")).toEqual("281d2f1c");
-      expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date.");
-    });
-
-    it("should return up to date if pass current HEAD hash", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-
-      expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
-    });
-
-    it("should throw if item to merge resolves, but is not commit", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-
-      expect(function() { g.merge("5ceba65"); })
-        .toThrow("error: 5ceba65: expected commit type, but the object " +
-                 "dereferences to blob type");
     });
   });
 });
