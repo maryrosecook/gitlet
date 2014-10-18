@@ -22,6 +22,17 @@ function createFlatFileStructure() {
                                  fileh: "filea" });
 };
 
+function createNestedFileStructure() {
+  testUtil.createFilesFromTree({ filea: "filea",
+                                 fileb: "fileb",
+                                 c1: { filec: "filec" },
+                                 d1: { filed: "filed" },
+                                 e1: { e2: { filee: "filee" }},
+                                 f1: { f2: { filef: "filef" }},
+                                 g1: { g2: { g3: { fileg: "fileg" }}},
+                                 h1: { h2: { h3: { fileh: "fileh" }}}});
+};
+
 describe("merge", function() {
   beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
@@ -319,6 +330,122 @@ describe("merge", function() {
       });
     });
 
+    describe('fast forward', function() {
+      it("should report that ancestor has been fast forwarded", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+
+        g.checkout("other");
+        expect(g.merge("master")).toEqual("Fast-forward");
+      });
+
+      it("should set destination branch to merged commit", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        expect(refs.readHash("other")).toEqual("281d2f1c");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+        var masterHash = refs.readHash("master");
+        expect(masterHash).toEqual("d08448d");
+
+        g.checkout("other");
+        g.merge("master");
+        var otherHash = refs.readHash("other");
+
+        expect(masterHash).toEqual(otherHash);
+      });
+
+      it("should stay on branch after merge", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        expect(refs.readHash("other")).toEqual("281d2f1c");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+        g.checkout("other");
+
+        expect(g.merge("master")).toEqual("Fast-forward");
+        expect(refs.readCurrentBranchName()).toEqual("other");
+      });
+
+      it("should update working copy after merge", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        expect(refs.readHash("other")).toEqual("281d2f1c");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+        var masterHash = refs.readHash("master");
+        expect(masterHash).toEqual("d08448d");
+
+        g.checkout("other");
+        g.merge("master");
+
+        testUtil.expectFile("filea", "filea");
+        testUtil.expectFile("fileb", "fileb");
+      });
+
+      it("should update index after merge", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        expect(refs.readHash("other")).toEqual("281d2f1c");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+        var masterHash = refs.readHash("master");
+        expect(masterHash).toEqual("d08448d");
+
+        g.checkout("other");
+        g.merge("master");
+
+        testUtil.expectFile(".gitlet/index", "filea 5ceba65\nfileb 5ceba66\n");
+      });
+
+      it("should be able to fast foward a few commits", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+        expect(refs.readHash("other")).toEqual("281d2f1c");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+        g.add("c1/filec");
+        g.commit({ m: "third" });
+        g.add("d1/filed");
+        g.commit({ m: "fourth" });
+        g.add("e1/e2/filee");
+        g.commit({ m: "fifth" });
+
+        var masterHash = refs.readHash("master");
+        expect(masterHash).toEqual("4b3c6333");
+
+        g.checkout("other");
+        g.merge("master");
+        var otherHash = refs.readHash("other");
+
+        expect(masterHash).toEqual(otherHash);
+      });
     });
   });
 });
