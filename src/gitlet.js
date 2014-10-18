@@ -234,18 +234,28 @@ var gitlet = module.exports = {
   merge: function(ref, _) {
     files.assertInRepo();
 
-    var fromHash = refs.readHash(ref);
-    if (fromHash === undefined) {
+    var giverHash = refs.readHash(ref);
+    if (giverHash === undefined) {
       throw "merge: " + ref + " - not something we can merge";
     } else if (refs.readIsHeadDetached()) {
       throw "unsupported";
-    } else if (objects.type(objects.read(fromHash)) !== "commit") {
+    } else if (objects.type(objects.read(giverHash)) !== "commit") {
       throw "error: " + ref + ": expected commit type, but the object " +
-        "dereferences to " + objects.type(objects.read(fromHash)) + " type";
+        "dereferences to " + objects.type(objects.read(giverHash)) + " type";
     } else {
-      var intoHash = refs.readHash("HEAD");
-      if (intoHash === fromHash || objects.readIsAncestor(intoHash, fromHash)) {
+      var receiverHash = refs.readHash("HEAD");
+      if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
+      } else if (merge.readCanFastForward(receiverHash, giverHash)) {
+        if (refs.readIsHeadDetached()) {
+          refs.writeLocal("HEAD", giverHash);
+        } else {
+          refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+        }
+
+        checkout.writeWorkingCopy(receiverHash, giverHash);
+        checkout.writeIndex(giverHash);
+        return "Fast-forward";
       }
     }
   }
