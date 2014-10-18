@@ -9,8 +9,9 @@ var util = require("./util");
 
 var checkout = module.exports = {
   readChangedFilesCheckoutWouldOverwrite: function(checkoutHash) {
-    var localChanges = diff.readDiff("HEAD");
-    var headToBranchChanges = diff.readDiff("HEAD", checkoutHash);
+    var headHash = refs.readHash("HEAD");
+    var localChanges = diff.readDiff(headHash);
+    var headToBranchChanges = diff.readDiff(headHash, checkoutHash);
     return Object.keys(localChanges)
       .filter(function(path) { return path in headToBranchChanges; });
   },
@@ -29,7 +30,8 @@ var checkout = module.exports = {
 };
 
 function addModifyDelete(diffFromRef, diffToRef) {
-  var changes = diff.readDiff(diffFromRef, diffToRef);
+  var changes = diff.readDiff(refs.readHash(diffFromRef),
+                              refs.readHash(diffToRef));
   var checkoutIndex = index.readCommitIndex(diffToRef);
   Object.keys(changes).forEach(function(path) {
     if (changes[path] === diff.FILE_STATUS.ADD ||

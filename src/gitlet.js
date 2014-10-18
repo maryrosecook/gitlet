@@ -176,7 +176,8 @@ var gitlet = module.exports = {
       if (opts["name-status"] !== true) {
         throw "unsupported"; // for now
       } else {
-        var nameToStatus = diff.readDiff(ref1, ref2);
+        var nameToStatus = diff.readDiff(refs.readHash(ref1),
+                                         refs.readHash(ref2));
         return Object.keys(nameToStatus)
           .map(function(path) { return nameToStatus[path] + " " + path; })
           .join("\n") + "\n";

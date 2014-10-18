@@ -7,13 +7,10 @@ var util = require("./util");
 var diff = module.exports = {
   FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D" },
 
-  readDiff: function(ref1, ref2) {
-    var hash1 = refs.readHash(ref1);
-    var hash2 = refs.readHash(ref2);
-
-    if (ref1 === undefined && ref2 === undefined) {
+  readDiff: function(hash1, hash2) {
+    if (hash1 === undefined && hash2 === undefined) {
       return diff.nameStatus(index.read(), index.readWorkingCopyIndex());
-    } else if (ref2 === undefined) {
+    } else if (hash2 === undefined) {
       return diff.nameStatus(index.readCommitIndex(hash1), index.readWorkingCopyIndex());
     } else {
       return diff.nameStatus(index.readCommitIndex(hash1), index.readCommitIndex(hash2));
