@@ -157,9 +157,14 @@ var gitlet = module.exports = {
 	        paths.join("\n") + "\n";
       } else {
         process.chdir(files.repoDir());
-        checkout.writeCheckout(ref);
-        return objects.readExists(ref) ?
-          "Note: checking out " + ref + "\nYou are in 'detached HEAD' state." :
+
+        var fromHash = refs.readHash("HEAD");
+        var isDetachingHead = objects.readExists(ref);
+        checkout.writeWorkingCopy(fromHash, hash);
+        refs.writeLocal("HEAD", isDetachingHead ? hash : "ref: " + refs.toLocalRef(ref));
+        checkout.writeIndex(hash);
+        return isDetachingHead ?
+          "Note: checking out " + hash + "\nYou are in 'detached HEAD' state." :
           "Switched to branch '" + ref + "'";
       }
     }

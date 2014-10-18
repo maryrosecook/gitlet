@@ -16,31 +16,27 @@ var checkout = module.exports = {
       .filter(function(path) { return path in headToBranchChanges; });
   },
 
-  writeCheckout: function(ref) {
-    var hash = refs.readHash(ref);
-    addModifyDelete("HEAD", hash);
+  writeWorkingCopy: function(fromHash, toHash) {
+    var changes = diff.readDiff(fromHash, toHash);
+    var checkoutIndex = index.readCommitIndex(toHash);
+    Object.keys(changes).forEach(function(path) {
+      if (changes[path] === diff.FILE_STATUS.ADD ||
+          changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
+          var content = objects.read(checkoutIndex[path]);
+        files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)),
+                                 files.repoDir());
+      } else if (changes[path] === diff.FILE_STATUS.DELETE) {
+        fs.unlinkSync(path);
+      }
+    });
+
     fs.readdirSync(files.repoDir())
       .filter(function(dirChild) { return dirChild !== ".gitlet"; })
       .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
       .forEach(files.deleteEmptyDirs);
+  },
 
-    refs.writeLocal("HEAD", objects.readExists(ref) ? ref : "ref: " + refs.toLocalRef(ref));
+  writeIndex: function(hash) {
     index.write(index.readCommitIndex(hash));
   }
-};
-
-function addModifyDelete(diffFromRef, diffToRef) {
-  var changes = diff.readDiff(refs.readHash(diffFromRef),
-                              refs.readHash(diffToRef));
-  var checkoutIndex = index.readCommitIndex(diffToRef);
-  Object.keys(changes).forEach(function(path) {
-    if (changes[path] === diff.FILE_STATUS.ADD ||
-        changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
-        var content = objects.read(checkoutIndex[path]);
-      files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)),
-                               files.repoDir());
-    } else if (changes[path] === diff.FILE_STATUS.DELETE) {
-      fs.unlinkSync(path);
-    }
-  });
 };
