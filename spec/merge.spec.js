@@ -446,6 +446,21 @@ describe("merge", function() {
 
         expect(masterHash).toEqual(otherHash);
       });
+
+      it("should not have created merge commit, so HEAD should have one parent", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+
+        g.checkout("other");
+        g.merge("master");
+        expect(objects.parentHashes(objects.read(refs.readHash("HEAD"))).length).toEqual(1);
+      });
     });
   });
 });
