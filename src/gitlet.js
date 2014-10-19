@@ -247,12 +247,7 @@ var gitlet = module.exports = {
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
       } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-        if (refs.readIsHeadDetached()) {
-          refs.writeLocal("HEAD", giverHash);
-        } else {
-          refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-        }
-
+        refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
         checkout.writeWorkingCopy(receiverHash, giverHash);
         checkout.writeIndex(giverHash);
         return "Fast-forward";
