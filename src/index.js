@@ -11,7 +11,7 @@ var index = module.exports = {
 
   read: function() {
     var indexFilePath = nodePath.join(files.gitletDir(), "index");
-    return util.lines(fs.existsSync(indexFilePath) ? files.read(indexFilePath) : "")
+    return util.lines(fs.existsSync(indexFilePath) ? files.read(indexFilePath) : "\n")
       .reduce(function(idx, blobStr) {
         var blobData = blobStr.split(/ /);
         idx[blobData[0]] = blobData[1];
