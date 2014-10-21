@@ -46,7 +46,7 @@ var testUtil = module.exports = {
   index: function() {
     return fs.readFileSync(".gitlet/index", "utf8")
       .split("\n")
-      .slice(0, -1)
+      .filter(function(l) { return l !== ""; })
       .map(function(blobStr) {
         var blobData = blobStr.split(/ /);
         return { path: blobData[0], hash: blobData[1] };
