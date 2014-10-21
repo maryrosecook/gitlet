@@ -40,3 +40,4 @@ todo
 * git push origin master
 * merge for conflicted files
 * block pushing to non bare repo
+* remove test index reader and use real one
