@@ -25,6 +25,12 @@ var index = module.exports = {
     index.write(idx);
   },
 
+  removeFile: function(path) {
+    var idx = index.read();
+    delete idx[path];
+    index.write(idx);
+  },
+
   write: function(index) {
     var indexStr = Object.keys(index)
         .map(function(path) { return path + " " + index[path]; })
