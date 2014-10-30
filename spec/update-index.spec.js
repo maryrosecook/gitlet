@@ -98,4 +98,46 @@ describe("update-index", function() {
       expect(newVersionHash).toEqual(g.hash_object("README.md"));
     });
   });
+
+  describe("removing files from index", function() {
+    it("should do nothing if --remove passed and file not disk, not in index", function() {
+      g.init();
+      expect(g.update_index("filea", { remove: true })).toEqual("\n");
+    });
+
+    it("should see --remove as attempt to add if file on disk but not in index", function() {
+      g.init();
+      testUtil.createFilesFromTree({ filea: "filea" });
+      expect(fs.existsSync("filea")).toEqual(true); // sanity
+      expect(testUtil.index().length).toEqual(0); // sanity
+
+      expect(function() { g.update_index("filea", { remove: true }); })
+        .toThrow("error: filea: cannot add to the index - missing --add option?\n");
+    });
+
+    it("shouldn't rm file from index/disk if --remove, file on disk, file in idx", function() {
+      g.init();
+      testUtil.createFilesFromTree({ filea: "filea" });
+      g.add("filea", { add: true });
+      expect(fs.existsSync("filea")).toEqual(true); // sanity
+      expect(testUtil.index()[0].path).toEqual("filea"); // sanity
+
+      g.update_index("filea", { remove: true });
+      expect(testUtil.index().length).toEqual(1); // not gone
+      expect(fs.existsSync("filea")).toEqual(true); // not gone
+    });
+
+    it("should rm file from index if --remove, file not on disk, file in index", function() {
+      g.init();
+      testUtil.createFilesFromTree({ filea: "filea" });
+      g.add("filea", { add: true });
+      expect(fs.existsSync("filea")).toEqual(true); // sanity
+
+      fs.unlinkSync("filea");
+      expect(fs.existsSync("filea")).toEqual(false); // sanity
+      expect(testUtil.index()[0].path).toEqual("filea"); // sanity
+      g.update_index("filea", { remove: true });
+      expect(testUtil.index().length).toEqual(0); // gone
+    });
+  });
 });
