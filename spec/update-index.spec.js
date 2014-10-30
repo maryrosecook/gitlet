@@ -15,7 +15,7 @@ describe("update-index", function() {
     it("should throw if path does not match existing working copy file", function() {
       g.init();
       expect(function() { g.update_index("blah"); })
-        .toThrow("error: blah: does not exist\n");
+        .toThrow("error: blah: does not exist and --remove not passed\n");
     });
 
     it("should throw rel path if not in root and pathspec does not match file", function() {
@@ -23,7 +23,7 @@ describe("update-index", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.update_index("blah"); })
-        .toThrow("error: 1/2/blah: does not exist\n");
+        .toThrow("error: 1/2/blah: does not exist and --remove not passed\n");
     });
 
     it("should throw rel path if not in root and path is dir", function() {
