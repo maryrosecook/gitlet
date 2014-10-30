@@ -44,11 +44,16 @@ var gitlet = module.exports = {
     opts = opts || {};
 
     var pathFromRoot = files.pathFromRepoRoot(path)
-    if (!fs.existsSync(path)) {
-      throw "error: " + pathFromRoot + ": does not exist\n";
-    } else if (fs.statSync(path).isDirectory()) {
+    if (!fs.existsSync(path) && !opts.remove) {
+      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
+    } else if (fs.existsSync(path) && fs.statSync(path).isDirectory()) {
       throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
-    } else if (!index.readHasFile(path) && opts.add === undefined) {
+    } else if (!fs.existsSync(path) && !index.readHasFile(path) && opts.remove) {
+      return "\n";
+    } else if (!fs.existsSync(path) && index.readHasFile(path) && opts.remove) {
+      index.removeFile(path);
+      return "\n";
+    } else if (!index.readHasFile(path) && !opts.add) {
       throw "error: " + pathFromRoot  + ": cannot add to the index - missing --add option?\n";
     } else {
       index.writeFile(path);
