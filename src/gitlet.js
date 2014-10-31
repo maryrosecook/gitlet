@@ -240,6 +240,10 @@ var gitlet = module.exports = {
     }
   },
 
+  rm: function(path, _) {
+    files.assertInRepo();
+  },
+
   merge: function(ref, _) {
     files.assertInRepo();
 
