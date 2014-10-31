@@ -242,6 +242,11 @@ var gitlet = module.exports = {
 
   rm: function(path, _) {
     files.assertInRepo();
+
+    var removedFiles = files.lsRecursive(path);
+    if (removedFiles.length === 0) {
+      throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
+    }
   },
 
   merge: function(ref, _) {
