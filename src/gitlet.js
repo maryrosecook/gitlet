@@ -43,20 +43,24 @@ var gitlet = module.exports = {
     files.assertInRepo();
     opts = opts || {};
 
-    var pathFromRoot = files.pathFromRepoRoot(path)
-    if (!fs.existsSync(path) && !opts.remove) {
-      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
-    } else if (fs.existsSync(path) && fs.statSync(path).isDirectory()) {
+    var pathFromRoot = files.pathFromRepoRoot(path);
+    var isOnDisk = fs.existsSync(path);
+    var isInIndex = index.readHasFile(path);
+
+    if (isOnDisk && fs.statSync(path).isDirectory()) {
       throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
-    } else if (!fs.existsSync(path) && !index.readHasFile(path) && opts.remove) {
-      return "\n";
-    } else if (!fs.existsSync(path) && index.readHasFile(path) && opts.remove) {
+    } else if (opts.remove && !isOnDisk && isInIndex) {
       index.removeFile(path);
       return "\n";
-    } else if (!index.readHasFile(path) && !opts.add) {
-      throw "error: " + pathFromRoot  + ": cannot add to the index - missing --add option?\n";
-    } else {
+    } else if (opts.remove && !isOnDisk && !isInIndex) {
+      return "\n";
+    } else if (!opts.add && isOnDisk && !isInIndex) {
+      throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
+    } else if (isOnDisk && (opts.add || isInIndex)) {
       index.writeFile(path);
+      return "\n";
+    } else if (!opts.remove && !isOnDisk) {
+      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
     }
   },
 
