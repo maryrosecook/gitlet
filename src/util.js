@@ -38,6 +38,10 @@ var util = module.exports = {
     return a.filter(function(e) { return b.indexOf(e) === -1; });
   },
 
+  intersection: function(a, b) {
+    return a.filter(function(e) { return b.indexOf(e) !== -1; });
+  },
+
   // assumes args to fn have unique toString
   memoize: function(fn) {
     var cache = {};
