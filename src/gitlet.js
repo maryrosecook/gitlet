@@ -240,12 +240,37 @@ var gitlet = module.exports = {
     }
   },
 
-  rm: function(path, _) {
+  rm: function(path, opts) {
     files.assertInRepo();
+    opts = opts || {};
 
-    var removedFiles = files.lsRecursive(path);
-    if (removedFiles.length === 0) {
+    var diskFiles = files.lsRecursive(path);
+    var fileList = Object.keys(index.read()).
+        filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
+    if (opts.f) {
+      throw "unsupported";
+    } else if (fileList.length === 0) {
       throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
+    } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
+      throw "fatal: not removing '" + path + "' recursively without -r";
+    } else {
+      var headIndex = refs.readHash("HEAD") ? index.readCommitIndex(refs.readHash("HEAD")) : {}
+      var wcDiff = diff.nameStatus(headIndex, index.readWorkingCopyIndex());
+      var addedModified = Object.keys(wcDiff)
+          .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
+      var changesToRm = util.intersection(addedModified, fileList);
+
+      if (changesToRm.length > 0) {
+        throw "error: the following files have changes:\n" + changesToRm.join("\n") + "\n";
+      } else {
+        for (var i = 0; i < fileList.length; i++) {
+          if (fs.existsSync(fileList[i])) {
+            fs.unlinkSync(fileList[i]);
+          }
+
+          this.update_index(fileList[i], { remove: true });
+        }
+      }
     }
   },
 
