@@ -290,11 +290,6 @@ var runCli = module.exports.runCli = function (argv) {
   }
 };
 
-// pin date for ConnectJS
-global.Date.prototype.toString = function() {
-  return "Sat Aug 30 2014 09:16:45 GMT-0400 (EDT)";
-};
-
 if (require.main === module) {
   var result = runCli(process.argv);
   if (result !== undefined) {
