@@ -24,6 +24,7 @@
 * support three-way merge, but not recursive merge
 * pushing to non-bare repo completely disallowed (no transfer of objects, no flag to enable it)
 * repeatedly checking out same commit or same branch seem to do nothing (no change to index which DOES happen if you checkout normally).  They have a different message, but I've made it the same for both.
+* when rming a set of files that include both staged and unstaged changes, print them all in a single list
 
 todo
 * stop api commands returning newlines - make cli runner add them
@@ -42,3 +43,4 @@ todo
 * merge for conflicted files
 * block pushing to non bare repo
 * remove test index reader and use real one
+* see if "." works as a path?
