@@ -1,4 +1,6 @@
 var objects = require("./objects");
+var index = require("./index");
+var files = require("./files");
 var util = require("./util");
 
 var merge = module.exports = {
@@ -58,4 +60,36 @@ var merge = module.exports = {
   readCanFastForward: function(intoHash, fromHash) {
     return objects.readIsAncestor(fromHash, intoHash);
   },
+
+  writeMergeTree: function(intoHash, fromHash) {
+    var baseHash = merge.readCommonAncestor(intoHash, fromHash);
+    var mergedIndex = merge.mergeIndices(index.readCommitIndex(intoHash),
+                                         index.readCommitIndex(baseHash),
+                                         index.readCommitIndex(fromHash));
+    return objects.writeTree(files.nestFlatTree(mergedIndex));
+  },
+
+  mergeIndices: function(into, base, from) {
+    return Object.keys(into).concat(Object.keys(base)).concat(Object.keys(from))
+      .reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, [])
+      .reduce(function(idx, p) {
+        var intoPresent = into[p] !== undefined;
+        var basePresent = base[p] !== undefined;
+        var fromPresent = from[p] !== undefined;
+        if (intoPresent && fromPresent && into[p] !== from[p]) {
+          idx[p] = composeConflict(objects.read(into[p]),
+                                   objects.read(from[p]),
+                                   "HEAD",
+                                   fromHash);
+        } else if (into[p] === base[p] && base[p] === from[p]) {
+          idx[p] = into[p];
+        } else if (intoPresent && !basePresent && !fromPresent) {
+          idx[p] = into[p];
+        } else if (!intoPresent && !basePresent && fromPresent) {
+          idx[p] = from[p];
+        }
+
+        return idx;
+      }, {});
+  }
 };
