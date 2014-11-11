@@ -462,5 +462,75 @@ describe("merge", function() {
         expect(objects.parentHashes(objects.read(refs.readHash("HEAD"))).length).toEqual(1);
       });
     });
+
+    describe('three way merge', function() {
+      it("should give merge commit parents: head of cur branch, merged branch", function() {
+        //      a
+        //     / \
+        //  M b  c
+        //     \/
+        //     m O
+
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("master");
+
+        var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
+        expect(parentHashes[0]).toEqual("4c37d74c");
+        expect(parentHashes[1]).toEqual("505952f0");
+      });
+
+      it("should stay on branch after merge", function() {
+        //      a
+        //     / \
+        //  M b  c
+        //     \/
+        //     m O
+
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("master");
+        expect(refs.readCurrentBranchName()).toEqual("other");
+      });
+
+      it("should return string describing merge strategy", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        expect(g.merge("master")).toEqual("Merge made by the three-way strategy.");
+      });
+    });
   });
 });
