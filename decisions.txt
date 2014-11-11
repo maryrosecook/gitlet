@@ -44,3 +44,4 @@ todo
 * block pushing to non bare repo
 * remove test index reader and use real one
 * see if "." works as a path?
+* remove all silly apostrophes from messages
