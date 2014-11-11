@@ -52,7 +52,7 @@ var merge = module.exports = {
     bHash = sorted[1];
     var aAncestors = [aHash].concat(objects.readAncestors(aHash));
     var bAncestors = [bHash].concat(objects.readAncestors(bHash));
-    return aAncestors.filter(function(a) { return bAncestors.indexOf(a) !== -1; })[0];
+    return util.intersection(aAncestors, bAncestors)[0];
   },
 
   readCanFastForward: function(intoHash, fromHash) {
