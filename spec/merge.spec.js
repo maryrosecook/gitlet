@@ -501,10 +501,7 @@ describe("merge", function() {
 
         g.merge("master");
 
-        var mergeHash = refs.readHash("HEAD");
-        expect(mergeHash).toEqual("3cc84b4c");
-
-        var parentHashes = objects.parentHashes(objects.read(mergeHash));
+        var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
         expect(parentHashes[0]).toEqual("4c37d74c");
         expect(parentHashes[1]).toEqual("505952f0");
       });
