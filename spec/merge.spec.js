@@ -479,7 +479,7 @@ describe("merge", function() {
     });
 
     describe('simple three way merge', function() {
-      it("should give merge commit parents: head of cur branch, merged branch", function() {
+      beforeEach(function() {
         //      a
         //     / \
         //  M b  c
@@ -498,7 +498,9 @@ describe("merge", function() {
         g.checkout("other");
         g.add("c1/filec");
         g.commit({ m: "c" });
+      });
 
+      it("should give merge commit parents: head of cur branch, merged branch", function() {
         g.merge("master");
 
         var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
@@ -507,116 +509,30 @@ describe("merge", function() {
       });
 
       it("should point HEAD at merge commit", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("master");
-
         expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
       });
 
       it("should point branch at merge commit", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("master");
-
         expect(refs.readHash("other")).toEqual("3cc84b4c");
       });
 
       it("should stay on branch after merge", function() {
-        //      a
-        //     / \
-        //  M b  c
-        //     \/
-        //     m O
-
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("master");
         expect(refs.readCurrentBranchName()).toEqual("other");
       });
 
       it("should return string describing merge strategy", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         expect(g.merge("master")).toEqual("Merge made by the three-way strategy.");
       });
 
       it("should allow merging of hash", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("505952f0");
         expect(refs.readHash("HEAD")).toEqual("7b1641d0");
       });
 
       it("should say hash was merged in commit message", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("505952f0");
 
         var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
@@ -625,19 +541,6 @@ describe("merge", function() {
       });
 
       it("should say branch was merged in commit message", function() {
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
-
-        g.add("fileb");
-        g.commit({ m: "b" });
-
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-
         g.merge("master");
 
         var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
