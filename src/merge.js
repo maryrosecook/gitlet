@@ -57,36 +57,36 @@ var merge = module.exports = {
     return util.intersection(aAncestors, bAncestors)[0];
   },
 
-  readCanFastForward: function(intoHash, fromHash) {
-    return objects.readIsAncestor(fromHash, intoHash);
+  readCanFastForward: function(receiverHash, giverHash) {
+    return objects.readIsAncestor(giverHash, receiverHash);
   },
 
-  writeMergeTree: function(intoHash, fromHash) {
-    var baseHash = merge.readCommonAncestor(intoHash, fromHash);
-    var mergedIndex = merge.mergeIndices(index.readCommitIndex(intoHash),
+  writeMergeTree: function(receiverHash, giverHash) {
+    var baseHash = merge.readCommonAncestor(receiverHash, giverHash);
+    var mergedIndex = merge.mergeIndices(index.readCommitIndex(receiverHash),
                                          index.readCommitIndex(baseHash),
-                                         index.readCommitIndex(fromHash));
+                                         index.readCommitIndex(giverHash));
     return objects.writeTree(files.nestFlatTree(mergedIndex));
   },
 
-  mergeIndices: function(into, base, from) {
-    return Object.keys(into).concat(Object.keys(base)).concat(Object.keys(from))
+  mergeIndices: function(receiver, base, giver) {
+    return Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver))
       .reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, [])
       .reduce(function(idx, p) {
-        var intoPresent = into[p] !== undefined;
+        var receiverPresent = receiver[p] !== undefined;
         var basePresent = base[p] !== undefined;
-        var fromPresent = from[p] !== undefined;
-        if (intoPresent && fromPresent && into[p] !== from[p]) {
-          idx[p] = composeConflict(objects.read(into[p]),
-                                   objects.read(from[p]),
+        var giverPresent = giver[p] !== undefined;
+        if (receiverPresent && giverPresent && receiver[p] !== giver[p]) {
+          idx[p] = composeConflict(objects.read(receiver[p]),
+                                   objects.read(giver[p]),
                                    "HEAD",
-                                   fromHash);
-        } else if (into[p] === base[p] && base[p] === from[p]) {
-          idx[p] = into[p];
-        } else if (intoPresent && !basePresent && !fromPresent) {
-          idx[p] = into[p];
-        } else if (!intoPresent && !basePresent && fromPresent) {
-          idx[p] = from[p];
+                                   giverHash);
+        } else if (receiver[p] === base[p] && base[p] === giver[p]) {
+          idx[p] = receiver[p];
+        } else if (receiverPresent && !basePresent && !giverPresent) {
+          idx[p] = receiver[p];
+        } else if (!receiverPresent && !basePresent && giverPresent) {
+          idx[p] = giver[p];
         }
 
         return idx;
