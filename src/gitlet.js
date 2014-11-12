@@ -296,9 +296,8 @@ var gitlet = module.exports = {
         return "Fast-forward";
       } else {
         var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
-        var commitStr = objects.composeCommit(merge.writeMergeTree(receiverHash, giverHash),
-                                              message,
-                                              [receiverHash, giverHash]);
+        var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
+        var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
 
         var mergeCommitHash = objects.write(commitStr);
         refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);

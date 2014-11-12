@@ -61,12 +61,12 @@ var merge = module.exports = {
     return objects.readIsAncestor(giverHash, receiverHash);
   },
 
-  writeMergeTree: function(receiverHash, giverHash) {
+  composeMergeTree: function(receiverHash, giverHash) {
     var baseHash = merge.readCommonAncestor(receiverHash, giverHash);
     var mergedIndex = merge.mergeIndices(index.readCommitIndex(receiverHash),
                                          index.readCommitIndex(baseHash),
                                          index.readCommitIndex(giverHash));
-    return objects.writeTree(files.nestFlatTree(mergedIndex));
+    return files.nestFlatTree(mergedIndex);
   },
 
   mergeIndices: function(receiver, base, giver) {
