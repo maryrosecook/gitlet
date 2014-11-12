@@ -478,7 +478,7 @@ describe("merge", function() {
       });
     });
 
-    describe('three way merge', function() {
+    describe('simple three way merge', function() {
       it("should give merge commit parents: head of cur branch, merged branch", function() {
         //      a
         //     / \
