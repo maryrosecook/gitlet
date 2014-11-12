@@ -461,6 +461,21 @@ describe("merge", function() {
         g.merge("master");
         expect(objects.parentHashes(objects.read(refs.readHash("HEAD"))).length).toEqual(1);
       });
+
+      it("should be able to pass hash when fast-forwarding", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "first" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "second" });
+
+        g.checkout("other");
+        g.merge("d08448d");
+        expect(refs.readHash("HEAD")).toEqual("d08448d");
+      });
     });
 
     describe('three way merge', function() {
