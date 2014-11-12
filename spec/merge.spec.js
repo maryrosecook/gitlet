@@ -478,74 +478,76 @@ describe("merge", function() {
       });
     });
 
-    describe('simple three way merge', function() {
-      beforeEach(function() {
-        //      a
-        //     / \
-        //  M b  c
-        //     \/
-        //     m O
+    describe('three way merge', function() {
+      describe('basic results', function() {
+        beforeEach(function() {
+          //      a
+          //     / \
+          //  M b  c
+          //     \/
+          //     m O
 
-        g.init();
-        createNestedFileStructure();
-        g.add("filea");
-        g.commit({ m: "a" });
-        g.branch("other");
+          g.init();
+          createNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+          g.branch("other");
 
-        g.add("fileb");
-        g.commit({ m: "b" });
+          g.add("fileb");
+          g.commit({ m: "b" });
 
-        g.checkout("other");
-        g.add("c1/filec");
-        g.commit({ m: "c" });
-      });
+          g.checkout("other");
+          g.add("c1/filec");
+          g.commit({ m: "c" });
+        });
 
-      it("should give merge commit parents: head of cur branch, merged branch", function() {
-        g.merge("master");
+        it("should give merge commit parents: head of cur branch, merged branch", function() {
+          g.merge("master");
 
-        var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
-        expect(parentHashes[0]).toEqual("4c37d74c");
-        expect(parentHashes[1]).toEqual("505952f0");
-      });
+          var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
+          expect(parentHashes[0]).toEqual("4c37d74c");
+          expect(parentHashes[1]).toEqual("505952f0");
+        });
 
-      it("should point HEAD at merge commit", function() {
-        g.merge("master");
-        expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
-      });
+        it("should point HEAD at merge commit", function() {
+          g.merge("master");
+          expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
+        });
 
-      it("should point branch at merge commit", function() {
-        g.merge("master");
-        expect(refs.readHash("other")).toEqual("3cc84b4c");
-      });
+        it("should point branch at merge commit", function() {
+          g.merge("master");
+          expect(refs.readHash("other")).toEqual("3cc84b4c");
+        });
 
-      it("should stay on branch after merge", function() {
-        g.merge("master");
-        expect(refs.readCurrentBranchName()).toEqual("other");
-      });
+        it("should stay on branch after merge", function() {
+          g.merge("master");
+          expect(refs.readCurrentBranchName()).toEqual("other");
+        });
 
-      it("should return string describing merge strategy", function() {
-        expect(g.merge("master")).toEqual("Merge made by the three-way strategy.");
-      });
+        it("should return string describing merge strategy", function() {
+          expect(g.merge("master")).toEqual("Merge made by the three-way strategy.");
+        });
 
-      it("should allow merging of hash", function() {
-        g.merge("505952f0");
-        expect(refs.readHash("HEAD")).toEqual("7b1641d0");
-      });
+        it("should allow merging of hash", function() {
+          g.merge("505952f0");
+          expect(refs.readHash("HEAD")).toEqual("7b1641d0");
+        });
 
-      it("should say hash was merged in commit message", function() {
-        g.merge("505952f0");
+        it("should say hash was merged in commit message", function() {
+          g.merge("505952f0");
 
-        var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
-        expect(commitStrLines[commitStrLines.length - 2])
-          .toEqual("    Merge 505952f0 into other");
-      });
+          var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+          expect(commitStrLines[commitStrLines.length - 2])
+            .toEqual("    Merge 505952f0 into other");
+        });
 
-      it("should say branch was merged in commit message", function() {
-        g.merge("master");
+        it("should say branch was merged in commit message", function() {
+          g.merge("master");
 
-        var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
-        expect(commitStrLines[commitStrLines.length - 2])
-          .toEqual("    Merge master into other");
+          var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+          expect(commitStrLines[commitStrLines.length - 2])
+            .toEqual("    Merge master into other");
+        });
       });
     });
   });
