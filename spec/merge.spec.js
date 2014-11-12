@@ -525,6 +525,25 @@ describe("merge", function() {
         expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
       });
 
+      it("should point branch at merge commit", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("master");
+
+        expect(refs.readHash("other")).toEqual("3cc84b4c");
+      });
+
       it("should stay on branch after merge", function() {
         //      a
         //     / \
