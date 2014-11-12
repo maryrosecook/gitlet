@@ -47,11 +47,7 @@ var refs = module.exports = {
   },
 
   writeLocal: function(ref, content) {
-    if (ref === "HEAD") {
-      fs.writeFileSync(nodePath.join(files.gitletDir(), "HEAD"), content);
-    } else if (ref === "FETCH_HEAD") {
-      fs.writeFileSync(nodePath.join(files.gitletDir(), "FETCH_HEAD"), content);
-    } else if (isLocalHeadRef(ref)) {
+    if (["HEAD", "FETCH_HEAD"].indexOf(ref) !== -1 || isLocalHeadRef(ref)) {
       fs.writeFileSync(nodePath.join(files.gitletDir(), ref), content);
     }
   },
