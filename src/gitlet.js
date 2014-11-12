@@ -295,12 +295,12 @@ var gitlet = module.exports = {
         checkout.writeIndex(giverHash);
         return "Fast-forward";
       } else {
-        var treeHash = merge.writeMergeTree(refs.readHash("HEAD"), giverHash);
-        var fromDesc = ref === giverHash ? "branch " + ref : "commit " + giverHash;
-        var message = "Merge " + fromDesc + " into " + refs.readCurrentBranchName();
-        var mergeCommitHash = objects.write(objects.composeCommit(treeHash,
-                                                                  message,
-                                                                  [receiverHash, giverHash]));
+        var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
+        var commitStr = objects.composeCommit(merge.writeMergeTree(receiverHash, giverHash),
+                                              message,
+                                              [receiverHash, giverHash]);
+
+        var mergeCommitHash = objects.write(commitStr);
         refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
         checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
         checkout.writeIndex(mergeCommitHash);
