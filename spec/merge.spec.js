@@ -567,6 +567,48 @@ describe("merge", function() {
         g.merge("505952f0");
         expect(refs.readHash("HEAD")).toEqual("7b1641d0");
       });
+
+      it("should say hash was merged in commit message", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("505952f0");
+
+        var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+        expect(commitStrLines[commitStrLines.length - 2])
+          .toEqual("    Merge 505952f0 into other");
+      });
+
+      it("should say branch was merged in commit message", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("master");
+
+        var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+        expect(commitStrLines[commitStrLines.length - 2])
+          .toEqual("    Merge master into other");
+      });
     });
   });
 });
