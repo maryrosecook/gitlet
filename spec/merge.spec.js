@@ -506,6 +506,25 @@ describe("merge", function() {
         expect(parentHashes[1]).toEqual("505952f0");
       });
 
+      it("should point HEAD at merge commit", function() {
+        g.init();
+        createNestedFileStructure();
+        g.add("filea");
+        g.commit({ m: "a" });
+        g.branch("other");
+
+        g.add("fileb");
+        g.commit({ m: "b" });
+
+        g.checkout("other");
+        g.add("c1/filec");
+        g.commit({ m: "c" });
+
+        g.merge("master");
+
+        expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
+      });
+
       it("should stay on branch after merge", function() {
         //      a
         //     / \
