@@ -3,6 +3,7 @@ var nodePath = require("path");
 var merge = require("../src/merge");
 var refs = require("../src/refs");
 var objects = require("../src/objects");
+var files = require("../src/files");
 var index = require("../src/index");
 var g = require("../src/gitlet");
 var testUtil = require("./test-util");
@@ -547,6 +548,44 @@ describe("merge", function() {
           var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge master into other");
+        });
+      });
+
+      describe('rm', function() {
+
+        it("should merge in rm of file", function() {
+          //      a
+          //     / \
+          // M rma  b
+          //     \/
+          //     m O    files: b
+
+          g.init();
+          createNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+          g.branch("other");
+
+          g.rm("filea");
+          g.commit({ m: "rma" });
+
+          g.checkout("other");
+          g.add("fileb");
+          g.commit({ m: "b" });
+
+          g.merge("master");
+
+          expect(testUtil.index().length).toEqual(1);
+          expect(testUtil.index()[0].path).toEqual("fileb");
+
+          expect(fs.existsSync("filea")).toEqual(false);
+          expect(fs.existsSync("c1/filec")).toEqual(true); // sanity
+          testUtil.expectFile("fileb", "fileb");
+
+          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
+            objects.treeHash(objects.read(refs.readHash("HEAD")))));
+          expect(Object.keys(treeAsIndex).length).toEqual(1);
+          expect(treeAsIndex["fileb"]).toBeDefined();
         });
       });
     });
