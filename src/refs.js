@@ -61,7 +61,7 @@ var refs = module.exports = {
         notForMerge = "";
       }
 
-      return remoteRefs[name] + notForMerge + " branch '" + name + "' of " + remoteUrl;
+      return remoteRefs[name] + notForMerge + " branch " + name + " of " + remoteUrl;
     }).join("\n") + "\n";
   },
 

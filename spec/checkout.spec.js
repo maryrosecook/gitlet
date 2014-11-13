@@ -217,7 +217,7 @@ describe("checkout", function() {
       g.add("1a/filea");
       g.commit({ m: "first" });
       expect(g.checkout("17a11ad4"))
-        .toEqual("Note: checking out 17a11ad4\nYou are in 'detached HEAD' state.");
+        .toEqual("Note: checking out 17a11ad4\nYou are in detached HEAD state.");
     });
 
     describe('index writing', function() {
@@ -288,7 +288,7 @@ describe("checkout", function() {
 
         g.add("1a/filea");
         g.commit({ m: "first" });
-        expect(g.checkout("master")).toEqual("Already on 'master'");
+        expect(g.checkout("master")).toEqual("Already on master");
       });
 
       it("should not meddle with wc on second checkout", function() {
@@ -338,7 +338,7 @@ describe("checkout", function() {
         g.commit({ m: "first" });
 
         g.checkout("17a11ad4");
-        expect(g.checkout("17a11ad4")).toEqual("Already on '17a11ad4'");
+        expect(g.checkout("17a11ad4")).toEqual("Already on 17a11ad4");
       });
 
       it("should not meddle with wc on second checkout", function() {

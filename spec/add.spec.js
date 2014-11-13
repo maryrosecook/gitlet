@@ -14,7 +14,7 @@ describe("add", function() {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
-        .toThrow("fatal: pathspec 'blah' did not match any files");
+        .toThrow("fatal: pathspec blah did not match any files");
     });
 
     it("should throw rel path if not in root and pathspec does not match files", function() {
@@ -22,7 +22,7 @@ describe("add", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.add("blah"); })
-        .toThrow("fatal: pathspec '1/2/blah' did not match any files");
+        .toThrow("fatal: pathspec 1/2/blah did not match any files");
     });
   });
 
@@ -79,7 +79,7 @@ describe("add", function() {
       g.add("1a/filea");
       fs.unlinkSync("1a/filea");
       expect(function() { g.add("1a/filea"); })
-        .toThrow("fatal: pathspec '1a/filea' did not match any files");
+        .toThrow("fatal: pathspec 1a/filea did not match any files");
     });
   });
 });

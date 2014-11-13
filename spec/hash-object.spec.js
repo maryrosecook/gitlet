@@ -13,7 +13,7 @@ describe("hash-object", function() {
   it("should throw if file specified does not exist", function() {
     g.init();
     expect(function() { g.hash_object("not-there") })
-      .toThrow("fatal: Cannot open 'not-there': No such file or directory");
+      .toThrow("fatal: Cannot open not-there: No such file or directory");
   });
 
   it("should return unique (!) hash of contents when file passed with no -w", function() {

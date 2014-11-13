@@ -15,7 +15,7 @@ describe("branch", function() {
   it("should throw if master has not been created", function() {
     g.init();
     expect(function() { g.branch("woo"); })
-      .toThrow("fatal: Not a valid object name: 'master'.");
+      .toThrow("fatal: Not a valid object name: master.");
   });
 
   it("should create new branch pointed at HEAD when call branch w branch name", function() {
@@ -54,13 +54,13 @@ describe("branch", function() {
     g.commit({ m: "first" });
     g.branch("woo");
     expect(function() { g.branch("woo") })
-      .toThrow("fatal: A branch named 'woo' already exists.");
+      .toThrow("fatal: A branch named woo already exists.");
   });
 
   it("should throw if -u passed but no commits", function() {
     g.init();
     expect(function() { g.branch(undefined, { u: "notthere/whatever" }) })
-      .toThrow("fatal: Not a valid object name: 'master'.");
+      .toThrow("fatal: Not a valid object name: master.");
   });
 
   it("should throw if -u passed, there are commits, but remote does not exist", function() {
@@ -70,7 +70,7 @@ describe("branch", function() {
     g.commit({ m: "first" });
 
     expect(function() { g.branch(undefined, { u: "notthere/whatever" }) })
-      .toThrow("error: the requested upstream branch 'notthere/whatever' does not exist");
+      .toThrow("error: the requested upstream branch notthere/whatever does not exist");
   });
 
   it("should throw if -u and detached head", function() {
@@ -93,7 +93,7 @@ describe("branch", function() {
     g.remote("add", "origin", "file://a/b/c/d");
 
     expect(function() { g.branch(undefined, { u: "origin/etuteuh" }) })
-      .toThrow("error: the requested upstream branch 'origin/etuteuh' does not exist");
+      .toThrow("error: the requested upstream branch origin/etuteuh does not exist");
   });
 
   it("should set branch to tracking if remote exists", function() {

@@ -31,7 +31,7 @@ var gitlet = module.exports = {
 
     var addedFiles = files.lsRecursive(path);
     if (addedFiles.length === 0) {
-      throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
+      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
     } else {
       for (var i = 0; i < addedFiles.length; i++) {
         this.update_index(addedFiles[i], { add: true });
@@ -69,7 +69,7 @@ var gitlet = module.exports = {
     opts = opts || {};
 
     if (!fs.existsSync(file)) {
-      throw "fatal: Cannot open '" + file + "': No such file or directory"
+      throw "fatal: Cannot open " + file + ": No such file or directory"
     } else {
       var fileContents = files.read(file);
       if (opts.w) {
@@ -112,7 +112,7 @@ var gitlet = module.exports = {
         return (branch === refs.readCurrentBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
-      throw "fatal: Not a valid object name: 'master'.";
+      throw "fatal: Not a valid object name: master.";
     } else if (name === undefined && opts.u !== undefined) {
       var rem = opts.u.split("/");
 
@@ -120,14 +120,14 @@ var gitlet = module.exports = {
         throw "fatal: could not set upstream of HEAD to " + opts.u +
           " when it does not point to any branch.";
       } else if (!refs.readExists(refs.toRemoteRef(rem[0], rem[1]))) {
-        throw "error: the requested upstream branch '" + opts.u + "' does not exist";
+        throw "error: the requested upstream branch " + opts.u + " does not exist";
       } else {
         config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
         return "Branch " + refs.readCurrentBranchName() +
           " set up to track remote branch " + rem[1] + " from " + rem[0] + ".";
       }
     } else if (refs.readExists(refs.toLocalRef(name))) {
-      throw "fatal: A branch named '" + name + "' already exists.";
+      throw "fatal: A branch named " + name + " already exists.";
     } else {
       refs.writeLocal(refs.toLocalRef(name), refs.readHash("HEAD"));
     }
@@ -158,7 +158,7 @@ var gitlet = module.exports = {
     } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
     } else if (ref === refs.readCurrentBranchName() || ref === refs.readHeadContent()) {
-      return "Already on '" + ref + "'";
+      return "Already on " + ref;
     } else {
       var paths = checkout.readChangedFilesCheckoutWouldOverwrite(toHash);
       if (paths.length > 0) {
@@ -173,8 +173,8 @@ var gitlet = module.exports = {
         refs.writeLocal("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         checkout.writeIndex(toHash);
         return isDetachingHead ?
-          "Note: checking out " + toHash + "\nYou are in 'detached HEAD' state." :
-          "Switched to branch '" + ref + "'";
+          "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
+          "Switched to branch " + ref;
       }
     }
   },
@@ -218,7 +218,7 @@ var gitlet = module.exports = {
     if (remote === undefined) {
       throw "unsupported";
     } else if (!(remote in config.read().remote)) {
-      throw "fatal: '" + remote + "' does not appear to be a git repository";
+      throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
       var localUrl = files.repoDir();
       var remoteUrl = config.read().remote[remote].url;
@@ -250,9 +250,9 @@ var gitlet = module.exports = {
     if (opts.f) {
       throw "unsupported";
     } else if (fileList.length === 0) {
-      throw "fatal: pathspec '" + files.pathFromRepoRoot(path) + "' did not match any files";
+      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
-      throw "fatal: not removing '" + path + "' recursively without -r";
+      throw "fatal: not removing " + path + " recursively without -r";
     } else {
       var headIndex = refs.readHash("HEAD") ? index.readCommitIndex(refs.readHash("HEAD")) : {}
       var wcDiff = diff.nameStatus(headIndex, index.readWorkingCopyIndex());
