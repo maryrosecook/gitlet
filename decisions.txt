@@ -31,7 +31,6 @@ todo
 * stop api commands returning newlines - make cli runner add them
 * reclocate checkout fns
 * cd back to repo root for all commands
-* git status?
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
 * fix heads being written w/o a newline
