@@ -28,7 +28,6 @@
 * always use default message when merging
 
 todo
-* stop api commands returning newlines - make cli runner add them
 * reclocate checkout fns
 * cd back to repo root for all commands
 * check all file ops are done on absolute paths
