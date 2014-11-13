@@ -130,7 +130,7 @@ var gitlet = module.exports = {
     } else if (refs.readExists(refs.toLocalRef(name))) {
       throw "fatal: A branch named " + name + " already exists.";
     } else {
-      refs.write(refs.toLocalRef(name), refs.readHash("HEAD"));
+      this.update_ref(refs.toLocalRef(name), refs.readHash("HEAD"));
     }
   },
 
@@ -231,7 +231,7 @@ var gitlet = module.exports = {
       process.chdir(localUrl);
       remoteObjects.forEach(objects.write);
       Object.keys(remoteRefs)
-        .forEach(function(r) { refs.write(refs.toRemoteRef(remote, r), remoteRefs[r]); });
+        .forEach(function(r) { gitlet.update_ref(refs.toRemoteRef(remote, r), remoteRefs[r])});
       refs.write("FETCH_HEAD", refs.composeFetchHead(remoteRefs, remoteUrl));
 
       return "From " + remoteUrl + "\n" +
@@ -292,7 +292,7 @@ var gitlet = module.exports = {
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
       } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-        refs.write(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+        this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
         checkout.writeWorkingCopy(receiverHash, giverHash);
         checkout.writeIndex(giverHash);
         return "Fast-forward";
@@ -302,7 +302,7 @@ var gitlet = module.exports = {
         var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
 
         var mergeCommitHash = objects.write(commitStr);
-        refs.write(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
+        this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
         checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
         checkout.writeIndex(mergeCommitHash);
         return "Merge made by the three-way strategy.";
