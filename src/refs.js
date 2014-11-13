@@ -7,7 +7,9 @@ var util = require("./util");
 
 var refs = module.exports = {
   isRef: function(ref) {
-    return ref === "HEAD" || isLocalHeadRef(ref);
+    return ["HEAD", "FETCH_HEAD"].indexOf(ref) !== -1 ||
+      isLocalHeadRef(ref) ||
+      isRemoteHeadRef(ref);
   },
 
   readTerminalRef: function(ref) {
@@ -46,9 +48,10 @@ var refs = module.exports = {
     return "refs/remotes/" + remote + "/" + name;
   },
 
-  writeLocal: function(ref, content) {
-    if (["HEAD", "FETCH_HEAD"].indexOf(ref) !== -1 || isLocalHeadRef(ref)) {
-      fs.writeFileSync(nodePath.join(files.gitletDir(), ref), content);
+  write: function(ref, content) {
+    if(refs.isRef(ref)) {
+      var tree = util.assocIn({}, ref.split(nodePath.sep).concat(content));
+      files.writeFilesFromTree(tree, files.gitletDir());
     }
   },
 
@@ -63,11 +66,6 @@ var refs = module.exports = {
 
       return remoteRefs[name] + notForMerge + " branch " + name + " of " + remoteUrl;
     }).join("\n") + "\n";
-  },
-
-  writeRemote: function(remote, name, content) {
-    var tree = util.assocIn({}, ["refs", "remotes", remote, name, content]);
-    files.writeFilesFromTree(tree, files.gitletDir());
   },
 
   readLocalHeads: function() {

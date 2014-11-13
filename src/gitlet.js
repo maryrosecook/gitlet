@@ -1,4 +1,5 @@
 var fs = require("fs");
+var nodePath = require("path");
 var files = require("./files");
 var index = require("./index");
 var objects = require("./objects");
@@ -129,7 +130,7 @@ var gitlet = module.exports = {
     } else if (refs.readExists(refs.toLocalRef(name))) {
       throw "fatal: A branch named " + name + " already exists.";
     } else {
-      refs.writeLocal(refs.toLocalRef(name), refs.readHash("HEAD"));
+      refs.write(refs.toLocalRef(name), refs.readHash("HEAD"));
     }
   },
 
@@ -145,7 +146,7 @@ var gitlet = module.exports = {
       throw "error: Trying to write non-commit object " + hash + " to branch " +
         refs.readTerminalRef(refToUpdate) + "\n";
     } else {
-      refs.writeLocal(refs.readTerminalRef(refToUpdate), hash);
+      refs.write(refs.readTerminalRef(refToUpdate), hash);
     }
   },
 
@@ -170,7 +171,7 @@ var gitlet = module.exports = {
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
         checkout.writeWorkingCopy(fromHash, toHash);
-        refs.writeLocal("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
+        refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         checkout.writeIndex(toHash);
         return isDetachingHead ?
           "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
@@ -229,8 +230,9 @@ var gitlet = module.exports = {
 
       process.chdir(localUrl);
       remoteObjects.forEach(objects.write);
-      Object.keys(remoteRefs).forEach(function(r){refs.writeRemote(remote, r, remoteRefs[r])});
-      refs.writeLocal("FETCH_HEAD", refs.composeFetchHead(remoteRefs, remoteUrl));
+      Object.keys(remoteRefs)
+        .forEach(function(r) { refs.write(refs.toRemoteRef(remote, r), remoteRefs[r]); });
+      refs.write("FETCH_HEAD", refs.composeFetchHead(remoteRefs, remoteUrl));
 
       return "From " + remoteUrl + "\n" +
         "Count " + remoteObjects.length + "\n" +
@@ -290,7 +292,7 @@ var gitlet = module.exports = {
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
       } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-        refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+        refs.write(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
         checkout.writeWorkingCopy(receiverHash, giverHash);
         checkout.writeIndex(giverHash);
         return "Fast-forward";
@@ -300,7 +302,7 @@ var gitlet = module.exports = {
         var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
 
         var mergeCommitHash = objects.write(commitStr);
-        refs.writeLocal(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
+        refs.write(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
         checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
         checkout.writeIndex(mergeCommitHash);
         return "Merge made by the three-way strategy.";
