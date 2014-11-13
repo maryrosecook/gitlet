@@ -43,6 +43,5 @@ todo
 * git push origin master
 * merge for conflicted files
 * block pushing to non bare repo
-* remove test index reader and use real one
 * see if "." works as a path?
 * can nameStatus and mergeIndices be the same fn?
