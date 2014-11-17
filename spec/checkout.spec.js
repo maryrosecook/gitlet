@@ -56,6 +56,26 @@ describe("checkout", function() {
 	             "1a/filea\n");
   });
 
+  it("should throw if file has unstaged changes even if they make it same as c/o", function() {
+    testUtil.createStandardFileStructure();
+    g.init();
+
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+
+    g.branch("other");
+
+    fs.writeFileSync("1a/filea", "fileachange1");
+    g.add("1a/filea");
+    g.commit({ m: "second" });
+
+    fs.writeFileSync("1a/filea", "filea");
+
+    expect(function() { g.checkout("other"); })
+      .toThrow("error: Aborting. Your local changes to these files would be overwritten:\n" +
+	             "1a/filea\n");
+  });
+
   it("should throw if file has staged changes w/o common orig content with c/o", function() {
     testUtil.createStandardFileStructure();
     g.init();
