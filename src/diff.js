@@ -5,7 +5,7 @@ var refs = require("./refs");
 var util = require("./util");
 
 var diff = module.exports = {
-  FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D" },
+  FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME" },
 
   readDiff: function(hash1, hash2) {
     if (hash1 === undefined && hash2 === undefined) {
@@ -17,18 +17,34 @@ var diff = module.exports = {
     }
   },
 
-  nameStatus: function(fromIndex, toIndex) {
-    return Object.keys(fromIndex).concat(Object.keys(toIndex))
-      .reduce(function(obj, path) {
-        if (toIndex[path] === undefined) {
-          obj[path] = diff.FILE_STATUS.DELETE;
-        } else if (fromIndex[path] === undefined) {
-          obj[path] = diff.FILE_STATUS.ADD;
-        } else if (fromIndex[path] !== toIndex[path]) {
-          obj[path] = diff.FILE_STATUS.MODIFY;
-        }
+  nameStatus: function(receiver, giver) {
+    var indexDiff = diff.diffIndices(receiver, receiver, giver);
+    return Object.keys(indexDiff)
+      .filter(function(p) { return indexDiff[p] !== diff.FILE_STATUS.SAME; })
+      .reduce(function(ns, p) { return util.assocIn(ns, [p, indexDiff[p]]); }, {});
+  },
 
-        return obj;
-      }, {});
+  fileStatus: function(receiver, base, giver) {
+    var receiverPresent = receiver !== undefined;
+    var basePresent = base !== undefined;
+    var giverPresent = giver !== undefined;
+    if (receiverPresent && giverPresent && receiver !== giver) {
+      return diff.FILE_STATUS.MODIFY;
+    } else if (receiver === giver) {
+      return diff.FILE_STATUS.SAME;
+    } else if ((!receiverPresent && !basePresent && giverPresent) ||
+               (receiverPresent && !basePresent && !giverPresent)) {
+      return diff.FILE_STATUS.ADD;
+    } else if ((receiverPresent && basePresent && !giverPresent) ||
+               (!receiverPresent && basePresent && giverPresent)) {
+      return diff.FILE_STATUS.DELETE;
+    }
+  },
+
+  diffIndices: function(receiver, base, giver) {
+    var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
+    return util.unique(paths).reduce(function(idx, p) {
+      return util.assocIn(idx, [p, diff.fileStatus(receiver[p], base[p], giver[p])]);
+    }, {});
   }
 };

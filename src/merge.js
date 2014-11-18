@@ -1,6 +1,7 @@
 var objects = require("./objects");
 var index = require("./index");
 var files = require("./files");
+var diff = require("./diff");
 var util = require("./util");
 
 var merge = module.exports = {
@@ -62,34 +63,27 @@ var merge = module.exports = {
   },
 
   composeMergeTree: function(receiverHash, giverHash) {
-    var baseHash = merge.readCommonAncestor(receiverHash, giverHash);
-    var mergedIndex = merge.mergeIndices(index.readCommitIndex(receiverHash),
-                                         index.readCommitIndex(baseHash),
-                                         index.readCommitIndex(giverHash));
-    return files.nestFlatTree(mergedIndex);
-  },
+    var receiver = index.readCommitIndex(receiverHash);
+    var base = index.readCommitIndex(merge.readCommonAncestor(receiverHash, giverHash));
+    var giver = index.readCommitIndex(giverHash);
 
-  mergeIndices: function(receiver, base, giver) {
-    return Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver))
-      .reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, [])
+    var indexDiff = diff.diffIndices(receiver, base, giver);
+    var mergedIndex = Object.keys(indexDiff)
       .reduce(function(idx, p) {
-        var receiverPresent = receiver[p] !== undefined;
-        var basePresent = base[p] !== undefined;
-        var giverPresent = giver[p] !== undefined;
-        if (receiverPresent && giverPresent && receiver[p] !== giver[p]) {
+        var fileStatus = diff.fileStatus(receiver[p], base[p], giver[p]);
+        if (fileStatus === diff.FILE_STATUS.MODIFY) {
           idx[p] = composeConflict(objects.read(receiver[p]),
                                    objects.read(giver[p]),
                                    "HEAD",
                                    giverHash);
-        } else if (receiver[p] === base[p] && base[p] === giver[p]) {
-          idx[p] = base[p];
-        } else if (receiverPresent && !basePresent && !giverPresent) {
-          idx[p] = receiver[p];
-        } else if (!receiverPresent && !basePresent && giverPresent) {
-          idx[p] = giver[p];
+        } else if (fileStatus === diff.FILE_STATUS.ADD ||
+                   fileStatus === diff.FILE_STATUS.SAME) {
+          idx[p] = receiver[p] || giver[p];
         }
 
         return idx;
       }, {});
+
+    return files.nestFlatTree(mergedIndex);
   }
 };
