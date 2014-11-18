@@ -82,7 +82,7 @@ var merge = module.exports = {
                                    "HEAD",
                                    giverHash);
         } else if (receiver[p] === base[p] && base[p] === giver[p]) {
-          idx[p] = receiver[p];
+          idx[p] = base[p];
         } else if (receiverPresent && !basePresent && !giverPresent) {
           idx[p] = receiver[p];
         } else if (!receiverPresent && !basePresent && giverPresent) {
