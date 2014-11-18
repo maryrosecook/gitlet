@@ -647,7 +647,6 @@ describe("merge", function() {
       });
 
       describe('rm', function() {
-
         it("should merge in rm of file", function() {
           //      a
           //     / \
@@ -686,3 +685,8 @@ describe("merge", function() {
     });
   });
 });
+
+// tree should have right files
+// wc should have right files
+// index should have right files
+// use MERGE_HEAD etc as backing mechanism for conflicts
