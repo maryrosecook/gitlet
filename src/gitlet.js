@@ -161,7 +161,7 @@ var gitlet = module.exports = {
     } else if (ref === refs.readCurrentBranchName() || ref === refs.readHeadContent()) {
       return "Already on " + ref;
     } else {
-      var paths = checkout.readChangedFilesCheckoutWouldOverwrite(toHash);
+      var paths = diff.readChangedFilesCommitWouldOverwrite(toHash);
       if (paths.length > 0) {
         throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	        paths.join("\n") + "\n";
@@ -292,7 +292,7 @@ var gitlet = module.exports = {
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
       } else {
-        var paths = checkout.readChangedFilesCheckoutWouldOverwrite(giverHash);
+        var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
         if (paths.length > 0) {
           throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	          paths.join("\n") + "\n";

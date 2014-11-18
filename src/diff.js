@@ -46,5 +46,13 @@ var diff = module.exports = {
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, diff.fileStatus(receiver[p], base[p], giver[p])]);
     }, {});
-  }
+  },
+
+  readChangedFilesCommitWouldOverwrite: function(hash) {
+    var headHash = refs.readHash("HEAD");
+    var localChanges = diff.readDiff(headHash);
+    var headToBranchChanges = diff.readDiff(headHash, hash);
+    return Object.keys(localChanges)
+      .filter(function(path) { return path in headToBranchChanges; });
+  },
 };

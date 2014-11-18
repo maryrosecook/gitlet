@@ -8,14 +8,6 @@ var diff = require("./diff");
 var util = require("./util");
 
 var checkout = module.exports = {
-  readChangedFilesCheckoutWouldOverwrite: function(checkoutHash) {
-    var headHash = refs.readHash("HEAD");
-    var localChanges = diff.readDiff(headHash);
-    var headToBranchChanges = diff.readDiff(headHash, checkoutHash);
-    return Object.keys(localChanges)
-      .filter(function(path) { return path in headToBranchChanges; });
-  },
-
   writeWorkingCopy: function(fromHash, toHash) {
     var changes = diff.readDiff(fromHash, toHash);
     var checkoutIndex = index.readCommitIndex(toHash);
