@@ -291,21 +291,27 @@ var gitlet = module.exports = {
       var receiverHash = refs.readHash("HEAD");
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
         return "Already up-to-date.";
-      } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-        this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-        checkout.writeWorkingCopy(receiverHash, giverHash);
-        checkout.writeIndex(giverHash);
-        return "Fast-forward";
       } else {
-        var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
-        var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
-        var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
+        var paths = checkout.readChangedFilesCheckoutWouldOverwrite(giverHash);
+        if (paths.length > 0) {
+          throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
+	          paths.join("\n") + "\n";
+        } else if (merge.readCanFastForward(receiverHash, giverHash)) {
+          this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+          checkout.writeWorkingCopy(receiverHash, giverHash);
+          checkout.writeIndex(giverHash);
+          return "Fast-forward";
+        } else {
+          var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
+          var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
+          var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
 
-        var mergeCommitHash = objects.write(commitStr);
-        this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
-        checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
-        checkout.writeIndex(mergeCommitHash);
-        return "Merge made by the three-way strategy.";
+          var mergeCommitHash = objects.write(commitStr);
+          this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
+          checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
+          checkout.writeIndex(mergeCommitHash);
+          return "Merge made by the three-way strategy.";
+        }
       }
     }
   }
