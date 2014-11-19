@@ -9,19 +9,19 @@ var diff = module.exports = {
 
   readDiff: function(hash1, hash2) {
     if (hash1 === undefined && hash2 === undefined) {
-      return diff.nameStatus(index.read(), index.readWorkingCopyIndex());
+      return diff.nameStatus(index.indexToToc(index.read()), index.readWorkingCopyToc());
     } else if (hash2 === undefined) {
-      return diff.nameStatus(index.readCommitIndex(hash1), index.readWorkingCopyIndex());
+      return diff.nameStatus(objects.readCommitToc(hash1), index.readWorkingCopyToc());
     } else {
-      return diff.nameStatus(index.readCommitIndex(hash1), index.readCommitIndex(hash2));
+      return diff.nameStatus(objects.readCommitToc(hash1), objects.readCommitToc(hash2));
     }
   },
 
   nameStatus: function(receiver, giver) {
-    var indexDiff = diff.diffIndices(receiver, receiver, giver);
-    return Object.keys(indexDiff)
-      .filter(function(p) { return indexDiff[p] !== diff.FILE_STATUS.SAME; })
-      .reduce(function(ns, p) { return util.assocIn(ns, [p, indexDiff[p]]); }, {});
+    var tocDiff = diff.diffTocs(receiver, receiver, giver);
+    return Object.keys(tocDiff)
+      .filter(function(p) { return tocDiff[p] !== diff.FILE_STATUS.SAME; })
+      .reduce(function(ns, p) { return util.assocIn(ns, [p, tocDiff[p]]); }, {});
   },
 
   fileStatus: function(receiver, base, giver) {
@@ -41,7 +41,7 @@ var diff = module.exports = {
     }
   },
 
-  diffIndices: function(receiver, base, giver) {
+  diffTocs: function(receiver, base, giver) {
     var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, diff.fileStatus(receiver[p], base[p], giver[p])]);

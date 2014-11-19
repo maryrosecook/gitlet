@@ -101,6 +101,11 @@ var objects = module.exports = {
     if (objects.type(str) === "commit") {
       return str.split(/\s/)[1];
     }
+  },
+
+  readCommitToc: function(commitHash) {
+    return files.flattenNestedTree(objects.readFileTree(objects.treeHash(
+      objects.read(commitHash))));
   }
 };
 

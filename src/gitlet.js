@@ -83,7 +83,7 @@ var gitlet = module.exports = {
 
   write_tree: function(_) {
     files.assertInRepo();
-    return objects.writeTree(files.nestFlatTree(index.read()));
+    return objects.writeTree(files.nestFlatTree(index.indexToToc(index.read())));
   },
 
   commit: function(opts) {
@@ -256,8 +256,8 @@ var gitlet = module.exports = {
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
       throw "fatal: not removing " + path + " recursively without -r";
     } else {
-      var headIndex = refs.readHash("HEAD") ? index.readCommitIndex(refs.readHash("HEAD")) : {}
-      var wcDiff = diff.nameStatus(headIndex, index.readWorkingCopyIndex());
+      var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
+      var wcDiff = diff.nameStatus(headToc, index.readWorkingCopyToc());
       var addedModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
       var changesToRm = util.intersection(addedModified, fileList);

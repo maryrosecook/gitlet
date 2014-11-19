@@ -63,12 +63,12 @@ var merge = module.exports = {
   },
 
   composeMergeTree: function(receiverHash, giverHash) {
-    var receiver = index.readCommitIndex(receiverHash);
-    var base = index.readCommitIndex(merge.readCommonAncestor(receiverHash, giverHash));
-    var giver = index.readCommitIndex(giverHash);
+    var receiver = objects.readCommitToc(receiverHash);
+    var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
+    var giver = objects.readCommitToc(giverHash);
 
-    var indexDiff = diff.diffIndices(receiver, base, giver);
-    var mergedIndex = Object.keys(indexDiff)
+    var tocDiff = diff.diffTocs(receiver, base, giver);
+    var mergedTree = Object.keys(tocDiff)
       .reduce(function(idx, p) {
         var fileStatus = diff.fileStatus(receiver[p], base[p], giver[p]);
         if (fileStatus === diff.FILE_STATUS.MODIFY) {
@@ -84,6 +84,6 @@ var merge = module.exports = {
         return idx;
       }, {});
 
-    return files.nestFlatTree(mergedIndex);
+    return files.nestFlatTree(mergedTree);
   }
 };

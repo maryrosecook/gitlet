@@ -10,7 +10,7 @@ var util = require("./util");
 var checkout = module.exports = {
   writeWorkingCopy: function(fromHash, toHash) {
     var changes = diff.readDiff(fromHash, toHash);
-    var checkoutIndex = index.readCommitIndex(toHash);
+    var checkoutIndex = objects.readCommitToc(toHash);
     Object.keys(changes).forEach(function(path) {
       if (changes[path] === diff.FILE_STATUS.ADD ||
           changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
@@ -29,6 +29,6 @@ var checkout = module.exports = {
   },
 
   writeIndex: function(hash) {
-    index.write(index.readCommitIndex(hash));
+    index.write(index.tocToIndex(objects.readCommitToc(hash)));
   }
 };

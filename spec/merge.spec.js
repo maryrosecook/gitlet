@@ -513,7 +513,7 @@ describe("merge", function() {
         g.checkout("other");
         g.merge("master");
 
-        testUtil.expectFile(".gitlet/index", "filea 5ceba65\nfileb 5ceba66\n");
+        testUtil.expectFile(".gitlet/index", "filea 1 5ceba65\nfileb 1 5ceba66\n");
       });
 
       it("should be able to fast foward a few commits", function() {

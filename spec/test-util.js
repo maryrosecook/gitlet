@@ -49,7 +49,7 @@ var testUtil = module.exports = {
       .filter(function(l) { return l !== ""; })
       .map(function(blobStr) {
         var blobData = blobStr.split(/ /);
-        return { path: blobData[0], hash: blobData[1] };
+        return { path: blobData[0], stage: parseInt(blobData[1]), hash: blobData[2] };
       });
   },
 
