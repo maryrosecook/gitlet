@@ -26,6 +26,7 @@
 * repeatedly checking out same commit or same branch seem to do nothing (no change to index which DOES happen if you checkout normally).  They have a different message, but I've made it the same for both.
 * when rming a set of files that include both staged and unstaged changes, print them all in a single list
 * always use default message when merging
+* automated merge messages
 
 todo
 * reclocate checkout fns
