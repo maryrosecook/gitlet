@@ -1,7 +1,10 @@
+var fs = require("fs");
+var nodePath = require("path");
 var objects = require("./objects");
 var index = require("./index");
 var files = require("./files");
 var diff = require("./diff");
+var refs = require("./refs");
 var util = require("./util");
 
 var merge = module.exports = {
@@ -73,6 +76,23 @@ var merge = module.exports = {
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
     return diff.diffTocs(receiver, base, giver);
+  },
+
+  writeMergeMsg: function(receiverHash, giverHash, ref) {
+    var msg = "Merge " + ref + " into " + refs.readCurrentBranchName();
+
+    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    var conflicts = Object.keys(mergeDiff)
+        .filter(function(p) { return mergeDiff[p].status === diff.FILE_STATUS.MODIFY });
+    if (conflicts.length > 0) {
+      msg += "\nConflicts:\n" + conflicts.join("\n");
+    }
+
+    fs.writeFileSync(nodePath.join(files.gitletDir(), "MERGE_MSG"), msg);
+  },
+
+  readMergeMsg: function() {
+    return files.read(nodePath.join(files.gitletDir(), "MERGE_MSG"));
   },
 
   composeMergeTree: function(receiverHash, giverHash) {
