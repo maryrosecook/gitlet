@@ -41,4 +41,3 @@ todo
 * merge for conflicted files
 * block pushing to non bare repo
 * see if "." works as a path?
-* can nameStatus and mergeIndices be the same fn?
