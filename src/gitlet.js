@@ -302,6 +302,7 @@ var gitlet = module.exports = {
           index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
+          refs.write("MERGE_HEAD", giverHash);
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             throw "unsupported";
           } else {

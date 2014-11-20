@@ -7,7 +7,7 @@ var util = require("./util");
 
 var refs = module.exports = {
   isRef: function(ref) {
-    return ["HEAD", "FETCH_HEAD"].indexOf(ref) !== -1 ||
+    return ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1 ||
       isLocalHeadRef(ref) ||
       isRemoteHeadRef(ref);
   },
