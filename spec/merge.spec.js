@@ -682,6 +682,33 @@ describe("merge", function() {
           expect(treeAsIndex["fileb"]).toBeDefined();
         });
       });
+
+      describe('conflicts', function() {
+        it("should throw unsupported", function() {
+          //      a
+          //     / \
+          // M  b  c
+          //     \/
+          //     m  EXCEPTION
+
+          g.init();
+          createNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+          g.branch("other");
+
+          g.add("fileb");
+          g.commit({ m: "b" });
+
+          g.checkout("other");
+
+          fs.writeFileSync("fileb", "b-other");
+          g.add("fileb");
+          g.commit({ m: "b-other" });
+
+          expect(function() { g.merge("master"); }).toThrow("unsupported");
+        });
+      });
     });
   });
 });

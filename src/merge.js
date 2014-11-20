@@ -62,6 +62,12 @@ var merge = module.exports = {
     return objects.readIsAncestor(giverHash, receiverHash);
   },
 
+  readHasConflicts: function(receiverHash, giverHash) {
+    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    return Object.keys(mergeDiff)
+      .filter(function(p) { return mergeDiff[p].status===diff.FILE_STATUS.MODIFY }).length > 0;
+  },
+
   readMergeTocDiff: function(receiverHash, giverHash) {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));

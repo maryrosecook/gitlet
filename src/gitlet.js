@@ -302,15 +302,19 @@ var gitlet = module.exports = {
           index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
-          var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
-          var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
-          var commitStr = objects.composeCommit(mergeHash, message, [receiverHash, giverHash]);
+          if (merge.readHasConflicts(receiverHash, giverHash)) {
+            throw "unsupported";
+          } else {
+            var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
+            var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
+            var commitStr = objects.composeCommit(mergeHash, message, [receiverHash,giverHash])
 
-          var mergeCommitHash = objects.write(commitStr);
-          this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
-          checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
-          index.write(index.tocToIndex(objects.readCommitToc(mergeCommitHash)));
-          return "Merge made by the three-way strategy.";
+            var mergeCommitHash = objects.write(commitStr);
+            this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
+            checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
+            index.write(index.tocToIndex(objects.readCommitToc(mergeCommitHash)));
+            return "Merge made by the three-way strategy.";
+          }
         }
       }
     }
