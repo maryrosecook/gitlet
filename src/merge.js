@@ -62,23 +62,25 @@ var merge = module.exports = {
     return objects.readIsAncestor(giverHash, receiverHash);
   },
 
-  composeMergeTree: function(receiverHash, giverHash) {
+  readMergeTocDiff: function(receiverHash, giverHash) {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
+    return diff.diffTocs(receiver, base, giver);
+  },
 
-    var tocDiff = diff.diffTocs(receiver, base, giver);
-    var mergedTree = Object.keys(tocDiff)
+  composeMergeTree: function(receiverHash, giverHash) {
+    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    var mergedTree = Object.keys(mergeDiff)
       .reduce(function(idx, p) {
-        var fileStatus = diff.fileStatus(receiver[p], base[p], giver[p]);
-        if (fileStatus === diff.FILE_STATUS.MODIFY) {
-          idx[p] = composeConflict(objects.read(receiver[p]),
-                                   objects.read(giver[p]),
+        if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
+          idx[p] = composeConflict(objects.read(mergeDiff[p].receiver),
+                                   objects.read(mergeDiff[p].giver),
                                    "HEAD",
                                    giverHash);
-        } else if (fileStatus === diff.FILE_STATUS.ADD ||
-                   fileStatus === diff.FILE_STATUS.SAME) {
-          idx[p] = receiver[p] || giver[p];
+        } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
+                   mergeDiff[p].status === diff.FILE_STATUS.SAME) {
+          idx[p] = mergeDiff[p].receiver || mergeDiff[p].giver;
         }
 
         return idx;
