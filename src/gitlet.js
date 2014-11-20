@@ -46,19 +46,19 @@ var gitlet = module.exports = {
 
     var pathFromRoot = files.pathFromRepoRoot(path);
     var isOnDisk = fs.existsSync(path);
-    var isInIndex = index.readHasFile(path);
+    var isInIndex = index.readHasFile(path, 1);
 
     if (isOnDisk && fs.statSync(path).isDirectory()) {
       throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
     } else if (opts.remove && !isOnDisk && isInIndex) {
-      index.removeFile(path);
+      index.removeFile(path, 1);
       return "\n";
     } else if (opts.remove && !isOnDisk && !isInIndex) {
       return "\n";
     } else if (!opts.add && isOnDisk && !isInIndex) {
       throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
     } else if (isOnDisk && (opts.add || isInIndex)) {
-      index.writeFile(path);
+      index.writeFileContent(path, 1, files.read(nodePath.join(files.repoDir(), path)));
       return "\n";
     } else if (!opts.remove && !isOnDisk) {
       throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
@@ -83,7 +83,7 @@ var gitlet = module.exports = {
 
   write_tree: function(_) {
     files.assertInRepo();
-    return objects.writeTree(files.nestFlatTree(index.indexToToc(index.read())));
+    return objects.writeTree(files.nestFlatTree(index.readToc()));
   },
 
   commit: function(opts) {
@@ -172,7 +172,7 @@ var gitlet = module.exports = {
         var isDetachingHead = objects.readExists(ref);
         checkout.writeWorkingCopy(fromHash, toHash);
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
-        checkout.writeIndex(toHash);
+        index.write(index.tocToIndex(objects.readCommitToc(toHash)));
         return isDetachingHead ?
           "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
           "Switched to branch " + ref;
@@ -247,7 +247,7 @@ var gitlet = module.exports = {
     opts = opts || {};
 
     var diskFiles = files.lsRecursive(path);
-    var fileList = Object.keys(index.read()).
+    var fileList = Object.keys(index.readToc()).
         filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
     if (opts.f) {
       throw "unsupported";
@@ -299,7 +299,7 @@ var gitlet = module.exports = {
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
           checkout.writeWorkingCopy(receiverHash, giverHash);
-          checkout.writeIndex(giverHash);
+          index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
           var message = "Merge " + ref + " into " + refs.readCurrentBranchName();
@@ -309,7 +309,7 @@ var gitlet = module.exports = {
           var mergeCommitHash = objects.write(commitStr);
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
           checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
-          checkout.writeIndex(mergeCommitHash);
+          index.write(index.tocToIndex(objects.readCommitToc(mergeCommitHash)));
           return "Merge made by the three-way strategy.";
         }
       }

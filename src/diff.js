@@ -9,7 +9,7 @@ var diff = module.exports = {
 
   readDiff: function(hash1, hash2) {
     if (hash1 === undefined && hash2 === undefined) {
-      return diff.nameStatus(index.indexToToc(index.read()), index.readWorkingCopyToc());
+      return diff.nameStatus(index.readToc(), index.readWorkingCopyToc());
     } else if (hash2 === undefined) {
       return diff.nameStatus(objects.readCommitToc(hash1), index.readWorkingCopyToc());
     } else {

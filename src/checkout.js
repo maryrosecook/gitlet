@@ -26,9 +26,5 @@ var checkout = module.exports = {
       .filter(function(dirChild) { return dirChild !== ".gitlet"; })
       .filter(function(dirChild) { return fs.statSync(dirChild).isDirectory(); })
       .forEach(files.deleteEmptyDirs);
-  },
-
-  writeIndex: function(hash) {
-    index.write(index.tocToIndex(objects.readCommitToc(hash)));
   }
 };
