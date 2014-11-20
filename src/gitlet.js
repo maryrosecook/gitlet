@@ -304,19 +304,16 @@ var gitlet = module.exports = {
         } else {
           refs.write("MERGE_HEAD", giverHash);
           merge.writeMergeMsg(receiverHash, giverHash, ref);
+          merge.writeMergeIndex(receiverHash, giverHash);
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             throw "unsupported";
           } else {
-            var mergeIndex = merge.composeMergeTree(receiverHash, giverHash);
-            var mergeHash = objects.writeTree(merge.composeMergeTree(receiverHash, giverHash));
-            var commitStr = objects.composeCommit(mergeHash,
-                                                  merge.readMergeMsg(),
-                                                  [receiverHash, giverHash]);
-
-            var mergeCommitHash = objects.write(commitStr);
-            this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), mergeCommitHash);
-            checkout.writeWorkingCopy(receiverHash, mergeCommitHash);
-            index.write(index.tocToIndex(objects.readCommitToc(mergeCommitHash)));
+            var commitHash = objects.write(objects.composeCommit(this.write_tree(),
+                                                                 merge.readMergeMsg(),
+                                                                 [receiverHash, giverHash]));
+            this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
+            checkout.writeWorkingCopy(receiverHash, commitHash);
+            index.write(index.tocToIndex(objects.readCommitToc(commitHash)));
             return "Merge made by the three-way strategy.";
           }
         }

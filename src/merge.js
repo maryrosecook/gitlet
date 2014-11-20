@@ -95,23 +95,29 @@ var merge = module.exports = {
     return files.read(nodePath.join(files.gitletDir(), "MERGE_MSG"));
   },
 
-  composeMergeTree: function(receiverHash, giverHash) {
+  writeMergeIndex: function(receiverHash, giverHash) {
     var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
-    var mergedTree = Object.keys(mergeDiff)
-      .reduce(function(idx, p) {
+    Object.keys(mergeDiff)
+      .forEach(function(p) {
         if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-          idx[p] = composeConflict(objects.read(mergeDiff[p].receiver),
-                                   objects.read(mergeDiff[p].giver),
-                                   "HEAD",
-                                   giverHash);
+          if (mergeDiff[p].base !== undefined) {
+            index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
+          }
+
+          if (mergeDiff[p].receiver !== undefined) {
+            index.writeFileContent(p, 2, objects.read(mergeDiff[p].receiver));
+          }
+
+          if (mergeDiff[p].giver !== undefined) {
+            index.writeFileContent(p, 3, objects.read(mergeDiff[p].giver));
+          }
         } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                    mergeDiff[p].status === diff.FILE_STATUS.SAME) {
-          idx[p] = mergeDiff[p].receiver || mergeDiff[p].giver;
+          var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
+          index.writeFileContent(p, 1, content);
+        } else if (mergeDiff[p].status === diff.FILE_STATUS.DELETE) {
+          index.removeFile(p, 1);
         }
-
-        return idx;
-      }, {});
-
-    return files.nestFlatTree(mergedTree);
+      });
   }
 };
