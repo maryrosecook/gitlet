@@ -313,7 +313,6 @@ var gitlet = module.exports = {
                                                                  [receiverHash, giverHash]));
             this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
             checkout.writeWorkingCopy(receiverHash, commitHash);
-            index.write(index.tocToIndex(objects.readCommitToc(commitHash)));
             return "Merge made by the three-way strategy.";
           }
         }
