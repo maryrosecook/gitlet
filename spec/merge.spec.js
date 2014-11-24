@@ -348,8 +348,7 @@ describe("merge", function() {
           fs.writeFileSync("1a/filea", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: Aborting. Your local changes to these files would be " +
-                     "overwritten:\n1a/filea\n");
+            .toThrow("Aborting. Local changes would be overwritten:\n1a/filea\n");
         });
 
         it("should throw if file has changes even if make it same as giver", function() {
@@ -369,8 +368,7 @@ describe("merge", function() {
           fs.writeFileSync("1a/filea", "fileachange1");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: Aborting. Your local changes to these files would be " +
-                     "overwritten:\n1a/filea\n");
+            .toThrow("Aborting. Local changes would be overwritten:\n1a/filea\n");
         });
 
         it("should throw if file has staged changes w/o common orig content with c/o", function() {
@@ -391,8 +389,7 @@ describe("merge", function() {
           g.add("1a/filea");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: Aborting. Your local changes to these files would be " +
-                     "overwritten:\n1a/filea\n");
+            .toThrow("Aborting. Local changes would be overwritten:\n1a/filea\n");
         });
 
         it("should list all files that would be overwritten when throwing", function() {
@@ -420,8 +417,8 @@ describe("merge", function() {
           fs.writeFileSync("1b/2b/filec", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: Aborting. Your local changes to these files would be " +
-                     "overwritten:\n" + "1a/filea\n1b/fileb\n1b/2b/filec\n");
+            .toThrow("Aborting. Local changes would be overwritten:\n" +
+                     "1a/filea\n1b/fileb\n1b/2b/filec\n");
         });
       });
     });

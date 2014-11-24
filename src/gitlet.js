@@ -294,8 +294,7 @@ var gitlet = module.exports = {
       } else {
         var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
         if (paths.length > 0) {
-          throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
-	          paths.join("\n") + "\n";
+          throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
           checkout.writeWorkingCopy(receiverHash, giverHash);
