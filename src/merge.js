@@ -97,27 +97,20 @@ var merge = module.exports = {
 
   writeMergeIndex: function(receiverHash, giverHash) {
     var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
-    Object.keys(mergeDiff)
-      .forEach(function(p) {
-        if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-          if (mergeDiff[p].base !== undefined) {
-            index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
-          }
-
-          if (mergeDiff[p].receiver !== undefined) {
-            index.writeFileContent(p, 2, objects.read(mergeDiff[p].receiver));
-          }
-
-          if (mergeDiff[p].giver !== undefined) {
-            index.writeFileContent(p, 3, objects.read(mergeDiff[p].giver));
-          }
-        } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
-                   mergeDiff[p].status === diff.FILE_STATUS.SAME) {
-          var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-          index.writeFileContent(p, 1, content);
-        } else if (mergeDiff[p].status === diff.FILE_STATUS.DELETE) {
-          index.removeFile(p, 1);
+    index.write({});
+    Object.keys(mergeDiff).forEach(function(p) {
+      if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
+        if (mergeDiff[p].base !== undefined) { // if same filepath ADDED w dif content
+          index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
         }
-      });
+
+        index.writeFileContent(p, 2, objects.read(mergeDiff[p].receiver));
+        index.writeFileContent(p, 3, objects.read(mergeDiff[p].giver));
+      } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
+                 mergeDiff[p].status === diff.FILE_STATUS.SAME) {
+        var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
+        index.writeFileContent(p, 1, content);
+      }
+    });
   }
 };
