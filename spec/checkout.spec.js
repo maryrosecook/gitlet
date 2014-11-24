@@ -253,7 +253,7 @@ describe("checkout", function() {
         g.commit({ m: "second" });
 
         g.checkout("other");
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 5ceba65\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 5ceba65\n");
       });
 
       it("should add files to index that are now in checked out branch", function() {
@@ -268,9 +268,9 @@ describe("checkout", function() {
         g.commit({ m: "second" });
 
         g.checkout("other");
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 5ceba65\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 5ceba65\n");
         g.checkout("master");
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 5ceba65\n1b/fileb 1 5ceba66\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 5ceba65\n1b/fileb 0 5ceba66\n");
       });
     });
   });
@@ -330,11 +330,11 @@ describe("checkout", function() {
         g.commit({ m: "first" });
         fs.writeFileSync("1a/filea", "somethingelse");
 
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 5ceba65\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 5ceba65\n");
         g.add("1a/filea");
 
         g.checkout("master");
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 17b748b3\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 17b748b3\n");
       });
 
       it("should not meddle with HEAD commit on second checkout", function() {
@@ -384,11 +384,11 @@ describe("checkout", function() {
 
         fs.writeFileSync("1a/filea", "somethingelse");
 
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 5ceba65\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 5ceba65\n");
         g.add("1a/filea");
 
         g.checkout("17a11ad4");
-        testUtil.expectFile(".gitlet/index", "1a/filea 1 17b748b3\n");
+        testUtil.expectFile(".gitlet/index", "1a/filea 0 17b748b3\n");
       });
 
       it("should not meddle with HEAD commit on second checkout", function() {

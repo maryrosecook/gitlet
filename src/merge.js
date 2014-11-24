@@ -109,7 +109,7 @@ var merge = module.exports = {
       } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-        index.writeFileContent(p, 1, content);
+        index.writeFileContent(p, 0, content);
       }
     });
   }

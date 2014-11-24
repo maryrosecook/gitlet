@@ -60,6 +60,6 @@ var index = module.exports = {
 
   tocToIndex: function(toc) {
     return Object.keys(toc)
-      .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 1), toc[p]]); }, {});
+      .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 0), toc[p]]); }, {});
   }
 };
