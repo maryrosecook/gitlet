@@ -266,7 +266,7 @@ describe("merge", function() {
       it("should throw if can't resolve ref/hash passed", function() {
         g.init();
         expect(function() { g.merge("blah"); })
-          .toThrow("merge: blah - not something we can merge");
+          .toThrow("error: blah: expected commit type");
       });
 
       it("should throw if try to merge when head detached", function() {

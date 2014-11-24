@@ -280,11 +280,9 @@ var gitlet = module.exports = {
     files.assertInRepo();
 
     var giverHash = refs.readHash(ref);
-    if (giverHash === undefined) {
-      throw "merge: " + ref + " - not something we can merge";
-    } else if (refs.readIsHeadDetached()) {
+    if (refs.readIsHeadDetached()) {
       throw "unsupported";
-    } else if (objects.type(objects.read(giverHash)) !== "commit") {
+    } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
       throw "error: " + ref + ": expected commit type";
     } else {
       var receiverHash = refs.readHash("HEAD");
