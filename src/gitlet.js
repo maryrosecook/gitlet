@@ -285,8 +285,7 @@ var gitlet = module.exports = {
     } else if (refs.readIsHeadDetached()) {
       throw "unsupported";
     } else if (objects.type(objects.read(giverHash)) !== "commit") {
-      throw "error: " + ref + ": expected commit type, but the object " +
-        "dereferences to " + objects.type(objects.read(giverHash)) + " type";
+      throw "error: " + ref + ": expected commit type";
     } else {
       var receiverHash = refs.readHash("HEAD");
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {

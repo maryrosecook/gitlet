@@ -326,8 +326,7 @@ describe("merge", function() {
         g.commit({ m: "first" });
 
         expect(function() { g.merge("5ceba65"); })
-          .toThrow("error: 5ceba65: expected commit type, but the object " +
-                   "dereferences to blob type");
+          .toThrow("error: 5ceba65: expected commit type");
       });
 
       describe('working copy changes', function() {
