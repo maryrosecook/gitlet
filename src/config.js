@@ -43,6 +43,6 @@ var config = module.exports = {
         })
         .join("") + "\n";
 
-    fs.writeFileSync(nodePath.join(files.gitletDir(), "config"), configStr);
+    files.write(nodePath.join(files.gitletDir(), "config"), configStr);
   }
 };

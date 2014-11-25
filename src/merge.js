@@ -88,7 +88,7 @@ var merge = module.exports = {
       msg += "\nConflicts:\n" + conflicts.join("\n");
     }
 
-    fs.writeFileSync(nodePath.join(files.gitletDir(), "MERGE_MSG"), msg);
+    files.write(nodePath.join(files.gitletDir(), "MERGE_MSG"), msg);
   },
 
   readMergeMsg: function() {

@@ -41,7 +41,7 @@ var objects = module.exports = {
     var contentHash = util.hash(str);
     if (!objects.readExists(contentHash)) {
       var filePath = nodePath.join(files.gitletDir(), "objects", contentHash);
-      fs.writeFileSync(filePath, str);
+      files.write(filePath, str);
     }
 
     return contentHash;

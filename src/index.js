@@ -45,7 +45,7 @@ var index = module.exports = {
     var indexStr = Object.keys(index)
         .map(function(k) { return k.split(",")[0] + " " + k.split(",")[1] + " " + index[k] })
         .join("\n") + "\n";
-    fs.writeFileSync(nodePath.join(files.gitletDir(), "index"), indexStr);
+    files.write(nodePath.join(files.gitletDir(), "index"), indexStr);
   },
 
   readWorkingCopyToc: function() {
