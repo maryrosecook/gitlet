@@ -170,7 +170,7 @@ var gitlet = module.exports = {
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
-        workingCopy.writeCheckout(fromHash, toHash);
+        workingCopy.write(fromHash, toHash);
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         index.write(index.tocToIndex(objects.readCommitToc(toHash)));
         return isDetachingHead ?
@@ -294,7 +294,7 @@ var gitlet = module.exports = {
           throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-          workingCopy.writeCheckout(receiverHash, giverHash);
+          workingCopy.write(receiverHash, giverHash);
           index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
@@ -308,7 +308,7 @@ var gitlet = module.exports = {
                                                                  merge.readMergeMsg(),
                                                                  [receiverHash, giverHash]));
             this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
-            workingCopy.writeCheckout(receiverHash, commitHash);
+            workingCopy.write(receiverHash, commitHash);
             return "Merge made by the three-way strategy.";
           }
         }
