@@ -8,14 +8,15 @@ var diff = require("./diff");
 var util = require("./util");
 
 var workingCopy = module.exports = {
-  writeCheckout: function(fromHash, toHash) {
-    var dif = diff.diffTocs(objects.readCommitToc(fromHash), objects.readCommitToc(toHash));
+  writeCheckout: function(receiverHash, giverHash) {
+    var dif = diff.diffTocs(objects.readCommitToc(receiverHash),
+                            objects.readCommitToc(giverHash));
     Object.keys(dif).forEach(function(p) {
       if (dif[p].status === diff.FILE_STATUS.ADD) {
         files.write(nodePath.join(files.repoDir(), p), objects.read(dif[p].giver));
       } else if (dif[p].status === diff.FILE_STATUS.MODIFY) {
         files.write(nodePath.join(files.repoDir(), p),
-                    composeConflict(dif[p].receiver, dif[p].giver, toHash));
+                    composeConflict(dif[p].receiver, dif[p].giver, giverHash));
       } else if (dif[p].status === diff.FILE_STATUS.DELETE) {
         fs.unlinkSync(p);
       }
