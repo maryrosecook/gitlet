@@ -22,12 +22,12 @@ var merge = module.exports = {
   },
 
   readHasConflicts: function(receiverHash, giverHash) {
-    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     return Object.keys(mergeDiff)
       .filter(function(p) { return mergeDiff[p].status===diff.FILE_STATUS.MODIFY }).length > 0;
   },
 
-  readMergeTocDiff: function(receiverHash, giverHash) {
+  readMergeDiff: function(receiverHash, giverHash) {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
@@ -37,7 +37,7 @@ var merge = module.exports = {
   writeMergeMsg: function(receiverHash, giverHash, ref) {
     var msg = "Merge " + ref + " into " + refs.readCurrentBranchName();
 
-    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     var conflicts = Object.keys(mergeDiff)
         .filter(function(p) { return mergeDiff[p].status === diff.FILE_STATUS.MODIFY });
     if (conflicts.length > 0) {
@@ -52,7 +52,7 @@ var merge = module.exports = {
   },
 
   writeMergeIndex: function(receiverHash, giverHash) {
-    var mergeDiff = merge.readMergeTocDiff(receiverHash, giverHash);
+    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     index.write({});
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
