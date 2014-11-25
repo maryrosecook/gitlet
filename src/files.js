@@ -56,12 +56,13 @@ var files = module.exports = {
   },
 
   deleteEmptyDirs: function(path) {
-    fs.readdirSync(path)
-      .filter(function(c) { return fs.statSync(nodePath.join(path, c)).isDirectory(); })
-      .forEach(function(c) { files.deleteEmptyDirs(nodePath.join(path, c)); });
+    if (fs.statSync(path).isDirectory()) {
+      fs.readdirSync(path)
+        .forEach(function(c) { files.deleteEmptyDirs(nodePath.join(path, c)); });
 
-    if (fs.readdirSync(path).length === 0) {
-      fs.rmdirSync(path);
+      if (fs.readdirSync(path).length === 0) {
+        fs.rmdirSync(path);
+      }
     }
   },
 
