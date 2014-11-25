@@ -11,9 +11,11 @@ var workingCopy = module.exports = {
   writeCheckout: function(fromHash, toHash) {
     var dif = diff.diffTocs(objects.readCommitToc(fromHash), objects.readCommitToc(toHash));
     Object.keys(dif).forEach(function(p) {
-      if (dif[p].status === diff.FILE_STATUS.ADD ||
-          dif[p].status === diff.FILE_STATUS.MODIFY) {
+      if (dif[p].status === diff.FILE_STATUS.ADD) {
         files.write(nodePath.join(files.repoDir(), p), objects.read(dif[p].giver));
+      } else if (dif[p].status === diff.FILE_STATUS.MODIFY) {
+        files.write(nodePath.join(files.repoDir(), p),
+                    composeConflict(dif[p].receiver, dif[p].giver, toHash));
       } else if (dif[p].status === diff.FILE_STATUS.DELETE) {
         fs.unlinkSync(p);
       }
@@ -27,4 +29,10 @@ var workingCopy = module.exports = {
       .filter(function(n) { return n !== ".gitlet"; })
       .forEach(files.rmEmptyDirs);
   }
+};
+
+function composeConflict(receiverFileHash, giverFileHash, giverHash) {
+  return "<<<<<< HEAD\n" + objects.read(receiverFileHash)
+    + "\n======\n" + objects.read(giverFileHash);
+    + "\n>>>>>> " + giverHash + "\n";
 };
