@@ -34,7 +34,6 @@ todo
 * check fetch works for merge commits
 * fix heads being written w/o a newline
 * cannot add config to an empty-with-a-newline config file
-* merge for non-conflicted files
 * init --bare
 * git pull origin master
 * git push origin master
