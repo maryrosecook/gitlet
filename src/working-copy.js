@@ -22,13 +22,7 @@ var workingCopy = module.exports = {
       }
     });
 
-    workingCopy.rmEmptyDirs();
-  },
-
-  rmEmptyDirs: function() {
-    fs.readdirSync(files.repoDir())
-      .filter(function(n) { return n !== ".gitlet"; })
-      .forEach(files.rmEmptyDirs);
+    rmEmptyDirs();
   }
 };
 
@@ -37,3 +31,9 @@ function composeConflict(receiverFileHash, giverFileHash, giverHash) {
     + "\n======\n" + objects.read(giverFileHash);
     + "\n>>>>>> " + giverHash + "\n";
 };
+
+function rmEmptyDirs() {
+  fs.readdirSync(files.repoDir())
+    .filter(function(n) { return n !== ".gitlet"; })
+    .forEach(files.rmEmptyDirs);
+}
