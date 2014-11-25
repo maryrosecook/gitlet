@@ -7,7 +7,7 @@ var refs = require("./refs");
 var diff = require("./diff");
 var util = require("./util");
 
-var checkout = module.exports = {
+var workingCopy = module.exports = {
   writeWorkingCopy: function(fromHash, toHash) {
     var changes = diff.readDiff(fromHash, toHash);
     var checkoutIndex = objects.readCommitToc(toHash);
@@ -21,7 +21,7 @@ var checkout = module.exports = {
     });
 
     fs.readdirSync(files.repoDir())
-      .filter(function(n) { return n !== ".gitlet"; })
+      .filter(function(n){return n!==".gitlet"})
       .forEach(files.rmEmptyDirs);
   }
 };

@@ -5,7 +5,7 @@ var index = require("./index");
 var objects = require("./objects");
 var refs = require("./refs");
 var diff = require("./diff");
-var checkout = require("./checkout");
+var workingCopy = require("./working-copy");
 var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
@@ -170,7 +170,7 @@ var gitlet = module.exports = {
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
-        checkout.writeWorkingCopy(fromHash, toHash);
+        workingCopy.writeWorkingCopy(fromHash, toHash);
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         index.write(index.tocToIndex(objects.readCommitToc(toHash)));
         return isDetachingHead ?
@@ -294,7 +294,7 @@ var gitlet = module.exports = {
           throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-          checkout.writeWorkingCopy(receiverHash, giverHash);
+          workingCopy.writeWorkingCopy(receiverHash, giverHash);
           index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
@@ -308,7 +308,7 @@ var gitlet = module.exports = {
                                                                  merge.readMergeMsg(),
                                                                  [receiverHash, giverHash]));
             this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
-            checkout.writeWorkingCopy(receiverHash, commitHash);
+            workingCopy.writeWorkingCopy(receiverHash, commitHash);
             return "Merge made by the three-way strategy.";
           }
         }
