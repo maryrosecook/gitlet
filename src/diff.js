@@ -25,10 +25,10 @@ var diff = module.exports = {
   },
 
   diff: function(receiver, giver) {
-    return diff.baseDiffTocs(receiver, receiver, giver);
+    return diff.diffWithBase(receiver, receiver, giver);
   },
 
-  baseDiffTocs: function(receiver, base, giver) {
+  diffWithBase: function(receiver, base, giver) {
     var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, {
