@@ -8,7 +8,7 @@ var diff = require("./diff");
 var util = require("./util");
 
 var workingCopy = module.exports = {
-  writeWorkingCopy: function(fromHash, toHash) {
+  write: function(fromHash, toHash) {
     var changes = diff.readDiff(fromHash, toHash);
     var checkoutIndex = objects.readCommitToc(toHash);
     Object.keys(changes).forEach(function(path) {
