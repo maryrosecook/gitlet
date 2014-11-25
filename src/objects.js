@@ -85,10 +85,6 @@ var objects = module.exports = {
     return util.flatten(parents.concat(parents.map(objects.readAncestors)));
   },
 
-  readHashesRequiredForCommit: function(commitHash) {
-    return treeHashes(objects.treeHash(objects.read(commitHash))).concat(commitHash);
-  },
-
   parentHashes: function(str) {
     if (objects.type(str) === "commit") {
       return str.split("\n")
