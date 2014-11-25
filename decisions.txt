@@ -44,6 +44,4 @@ todo
 * change api command names to camel case
 * make all privatable functions private
 * see if can make ynlinkSync in write working copy use nodePath.join like lines above it
-* change from and to to receiver in writeCheckout
-* change writeCheckout name
 * change all from and to hashes to receiver and giver where pos
