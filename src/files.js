@@ -55,11 +55,9 @@ var files = module.exports = {
     });
   },
 
-  deleteEmptyDirs: function(path) {
+  rmEmptyDirs: function(path) {
     if (fs.statSync(path).isDirectory()) {
-      fs.readdirSync(path)
-        .forEach(function(c) { files.deleteEmptyDirs(nodePath.join(path, c)); });
-
+      fs.readdirSync(path).forEach(function(c) { files.rmEmptyDirs(nodePath.join(path, c)); });
       if (fs.readdirSync(path).length === 0) {
         fs.rmdirSync(path);
       }

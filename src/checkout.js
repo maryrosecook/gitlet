@@ -21,7 +21,7 @@ var checkout = module.exports = {
     });
 
     fs.readdirSync(files.repoDir())
-      .filter(function(dirChild) { return dirChild !== ".gitlet"; })
-      .forEach(files.deleteEmptyDirs);
+      .filter(function(n) { return n !== ".gitlet"; })
+      .forEach(files.rmEmptyDirs);
   }
 };
