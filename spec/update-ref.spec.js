@@ -1,5 +1,6 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
+var objects = require("../src/objects");
 var testUtil = require("./test-util");
 
 describe("update-ref", function() {
@@ -34,7 +35,7 @@ describe("update-ref", function() {
   it("should throw if try to update HEAD to hash that is not a commit", function() {
     g.init();
     fs.writeFileSync("a", "a");
-    var hash = g.hash_object("a", { w: true });
+    var hash = objects.write("a");
     expect(function() { g.update_ref("HEAD", hash); })
       .toThrow("error: Trying to write non-commit object " + hash +
                " to branch refs/heads/master\n");
@@ -43,7 +44,7 @@ describe("update-ref", function() {
   it("should throw if try to update master to hash that is not a commit", function() {
     g.init();
     fs.writeFileSync("a", "a");
-    var hash = g.hash_object("a", { w: true });
+    var hash = objects.write("a");
     expect(function() { g.update_ref("refs/heads/master", hash); })
       .toThrow("error: Trying to write non-commit object " + hash +
                " to branch refs/heads/master\n");

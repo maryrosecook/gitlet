@@ -52,13 +52,6 @@ describe("gitlet cli", function() {
       testUtil.unpinDate();
     });
 
-    it("hash-object and write", function() {
-      testUtil.createFilesFromTree({ "1": { filea: "filea" }});
-      g.init();
-      g.runCli(["node", "gitlet", "hash-object", "1/filea", "-w"]);
-      testUtil.expectFile(".gitlet/objects/5ceba65", "filea");
-    });
-
     it("update HEAD ref to prior commit", function() {
       testUtil.pinDate();
 

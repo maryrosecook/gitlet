@@ -65,22 +65,6 @@ var gitlet = module.exports = {
     }
   },
 
-  hash_object: function(file, opts) {
-    files.assertInRepo();
-    opts = opts || {};
-
-    if (!fs.existsSync(file)) {
-      throw "fatal: Cannot open " + file + ": No such file or directory"
-    } else {
-      var fileContents = files.read(file);
-      if (opts.w) {
-        return objects.write(fileContents);
-      }
-
-      return util.hash(fileContents);
-    }
-  },
-
   write_tree: function(_) {
     files.assertInRepo();
     return objects.writeTree(files.nestFlatTree(index.readToc()));

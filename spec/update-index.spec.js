@@ -1,5 +1,6 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
+var util = require("../src/util");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -38,11 +39,12 @@ describe("update-index", function() {
   describe("adding files to index", function() {
     it("should add a file to an empty index and create object", function() {
       g.init();
-      fs.writeFileSync("README.md", "this is a readme");
+
+      var content = "this is a readme";
+      fs.writeFileSync("README.md", content);
       g.update_index("README.md", { add: true });
 
-      var readmeHash = g.hash_object("README.md");
-      testUtil.expectFile(nodePath.join(".gitlet/objects", readmeHash), "this is a readme");
+      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash(content)), content);
 
       expect(testUtil.index()[0].path).toEqual("README.md");
     });
@@ -53,9 +55,9 @@ describe("update-index", function() {
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", g.hash_object("README1.md")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("this is a readme1")),
                           "this is a readme1");
-      testUtil.expectFile(nodePath.join(".gitlet/objects", g.hash_object("README2.md")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("this is a readme2")),
                           "this is a readme2");
 
       expect(testUtil.index()[0].path).toEqual("README1.md");
@@ -73,12 +75,11 @@ describe("update-index", function() {
     it("should still refer to staged version if file changes after stage", function() {
       g.init();
       fs.writeFileSync("README.md", "this is a readme");
-      var origContentHash = g.hash_object("README.md");
       g.update_index("README.md", { add: true });
       fs.writeFileSync("README.md", "this is a readme1");
 
       testUtil.expectFile("README.md", "this is a readme1");
-      expect(testUtil.index()[0].hash).toEqual(origContentHash);
+      expect(testUtil.index()[0].hash).toEqual(util.hash("this is a readme"));
     });
 
     it("should update file hash in index and add new obj if update file", function() {
@@ -86,7 +87,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", "this is a readme");
       g.update_index("README.md", { add: true });
       expect(testUtil.index()[0].hash)
-        .toEqual(g.hash_object("README.md")); // sanity check hash added for first version
+        .toEqual(util.hash("this is a readme")); // sanity check hash added for first version
 
       // update file and update index again
       fs.writeFileSync("README.md", "this is a readme1");
@@ -95,7 +96,7 @@ describe("update-index", function() {
       var newVersionHash = testUtil.index()[0].hash;
 
       testUtil.expectFile(nodePath.join(".gitlet/objects", newVersionHash), "this is a readme1");
-      expect(newVersionHash).toEqual(g.hash_object("README.md"));
+      expect(newVersionHash).toEqual(util.hash("this is a readme1"));
     });
   });
 
