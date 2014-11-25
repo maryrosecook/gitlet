@@ -18,13 +18,13 @@ var diff = module.exports = {
   },
 
   nameStatus: function(receiver, giver) {
-    var tocDiff = diff.diffTocs(receiver, giver);
+    var tocDiff = diff.diff(receiver, giver);
     return Object.keys(tocDiff)
       .filter(function(p) { return tocDiff[p].status !== diff.FILE_STATUS.SAME; })
       .reduce(function(ns, p) { return util.assocIn(ns, [p, tocDiff[p].status]); }, {});
   },
 
-  diffTocs: function(receiver, giver) {
+  diff: function(receiver, giver) {
     return diff.baseDiffTocs(receiver, receiver, giver);
   },
 

@@ -154,8 +154,8 @@ var gitlet = module.exports = {
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
-        workingCopy.write(diff.diffTocs(objects.readCommitToc(fromHash),
-                                        objects.readCommitToc(toHash)));
+        workingCopy.write(diff.diff(objects.readCommitToc(fromHash),
+                                    objects.readCommitToc(toHash)));
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         index.write(index.tocToIndex(objects.readCommitToc(toHash)));
         return isDetachingHead ?
@@ -279,8 +279,8 @@ var gitlet = module.exports = {
           throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-          workingCopy.write(diff.diffTocs(objects.readCommitToc(receiverHash),
-                                          objects.readCommitToc(giverHash)));
+          workingCopy.write(diff.diff(objects.readCommitToc(receiverHash),
+                                      objects.readCommitToc(giverHash)));
           index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
           return "Fast-forward";
         } else {
