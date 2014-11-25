@@ -36,6 +36,10 @@ var files = module.exports = {
     return nodePath.relative(files.repoDir(), nodePath.join(process.cwd(), path));
   },
 
+  write: function(path, content) {
+    files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)), "/");
+  },
+
   writeFilesFromTree: function(tree, prefix) {
     Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
