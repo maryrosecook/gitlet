@@ -286,7 +286,7 @@ var gitlet = module.exports = {
         } else {
           refs.write("MERGE_HEAD", giverHash);
           merge.writeMergeMsg(receiverHash, giverHash, ref);
-          merge.writeMergeIndex(receiverHash, giverHash);
+          merge.writeIndex(receiverHash, giverHash);
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             throw "unsupported";
           } else {
