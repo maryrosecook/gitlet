@@ -14,9 +14,7 @@ var checkout = module.exports = {
     Object.keys(changes).forEach(function(path) {
       if (changes[path] === diff.FILE_STATUS.ADD ||
           changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
-          var content = objects.read(checkoutIndex[path]);
-        files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)),
-                                 files.repoDir());
+        files.write(nodePath.join(files.repoDir(), path), objects.read(checkoutIndex[path]));
       } else if (changes[path] === diff.FILE_STATUS.DELETE) {
         fs.unlinkSync(path);
       }
