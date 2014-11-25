@@ -43,4 +43,3 @@ todo
 * see if "." works as a path?
 * change api command names to camel case
 * make all privatable functions private
-* see if can make ynlinkSync in write working copy use nodePath.join like lines above it
