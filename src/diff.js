@@ -18,7 +18,7 @@ var diff = module.exports = {
   },
 
   nameStatus: function(receiver, giver) {
-    var tocDiff = diff.diffTocs(receiver, receiver, giver);
+    var tocDiff = diff.diffTocs(receiver, giver);
     return Object.keys(tocDiff)
       .filter(function(p) { return tocDiff[p].status !== diff.FILE_STATUS.SAME; })
       .reduce(function(ns, p) { return util.assocIn(ns, [p, tocDiff[p].status]); }, {});
@@ -41,7 +41,11 @@ var diff = module.exports = {
     }
   },
 
-  diffTocs: function(receiver, base, giver) {
+  diffTocs: function(receiver, giver) {
+    return diff.baseDiffTocs(receiver, receiver, giver);
+  },
+
+  baseDiffTocs: function(receiver, base, giver) {
     var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, {

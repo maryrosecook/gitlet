@@ -75,7 +75,7 @@ var merge = module.exports = {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
-    return diff.diffTocs(receiver, base, giver);
+    return diff.baseDiffTocs(receiver, base, giver);
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {

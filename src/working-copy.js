@@ -9,14 +9,13 @@ var util = require("./util");
 
 var workingCopy = module.exports = {
   writeCheckout: function(fromHash, toHash) {
-    var changes = diff.readDiff(fromHash, toHash);
-    var checkoutIndex = objects.readCommitToc(toHash);
-    Object.keys(changes).forEach(function(path) {
-      if (changes[path] === diff.FILE_STATUS.ADD ||
-          changes[path] === diff.FILE_STATUS.MODIFY) { // no line by line for now
-        files.write(nodePath.join(files.repoDir(), path), objects.read(checkoutIndex[path]));
-      } else if (changes[path] === diff.FILE_STATUS.DELETE) {
-        fs.unlinkSync(path);
+    var dif = diff.diffTocs(objects.readCommitToc(fromHash), objects.readCommitToc(toHash));
+    Object.keys(dif).forEach(function(p) {
+      if (dif[p].status === diff.FILE_STATUS.ADD ||
+          dif[p].status === diff.FILE_STATUS.MODIFY) {
+        files.write(nodePath.join(files.repoDir(), p), objects.read(dif[p].giver));
+      } else if (dif[p].status === diff.FILE_STATUS.DELETE) {
+        fs.unlinkSync(p);
       }
     });
 
