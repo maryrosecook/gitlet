@@ -44,20 +44,5 @@ var util = module.exports = {
 
   intersection: function(a, b) {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
-  },
-
-  // assumes args to fn have unique toString
-  memoize: function(fn) {
-    var cache = {};
-    return function() {
-      var key = Array.prototype.slice.apply(arguments)
-          .map(function(a) { return a.toString(); }).join(",");
-      if (cache[key] !== undefined) {
-        return cache[key];
-      } else {
-        cache[key] = fn.apply(null, arguments);
-        return cache[key];
-      }
-    }
   }
 };
