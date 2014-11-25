@@ -18,7 +18,7 @@ var workingCopy = module.exports = {
         files.write(nodePath.join(files.repoDir(), p),
                     composeConflict(dif[p].receiver, dif[p].giver, giverHash));
       } else if (dif[p].status === diff.FILE_STATUS.DELETE) {
-        fs.unlinkSync(p);
+        fs.unlinkSync(nodePath.join(files.repoDir(), p));
       }
     });
 
