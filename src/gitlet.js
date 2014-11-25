@@ -287,13 +287,13 @@ var gitlet = module.exports = {
           refs.write("MERGE_HEAD", giverHash);
           merge.writeMergeMsg(receiverHash, giverHash, ref);
           merge.writeIndex(receiverHash, giverHash);
+          workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             throw "unsupported";
           } else {
             var commitHash = objects.write(objects.composeCommit(this.write_tree(),
                                                                  merge.readMergeMsg(),
                                                                  [receiverHash, giverHash]));
-            workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
             this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
             return "Merge made by the three-way strategy.";
           }
