@@ -20,8 +20,12 @@ var workingCopy = module.exports = {
       }
     });
 
+    workingCopy.rmEmptyDirs();
+  },
+
+  rmEmptyDirs: function() {
     fs.readdirSync(files.repoDir())
-      .filter(function(n){return n!==".gitlet"})
+      .filter(function(n) { return n !== ".gitlet"; })
       .forEach(files.rmEmptyDirs);
   }
 };
