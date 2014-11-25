@@ -29,7 +29,6 @@
 * automated merge messages
 
 todo
-* reclocate checkout fns
 * cd back to repo root for all commands
 * check all file ops are done on absolute paths
 * check fetch works for merge commits
