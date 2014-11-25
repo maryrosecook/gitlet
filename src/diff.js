@@ -24,23 +24,6 @@ var diff = module.exports = {
       .reduce(function(ns, p) { return util.assocIn(ns, [p, tocDiff[p].status]); }, {});
   },
 
-  fileStatus: function(receiver, base, giver) {
-    var receiverPresent = receiver !== undefined;
-    var basePresent = base !== undefined;
-    var giverPresent = giver !== undefined;
-    if (receiverPresent && giverPresent && receiver !== giver) {
-      return diff.FILE_STATUS.MODIFY;
-    } else if (receiver === giver) {
-      return diff.FILE_STATUS.SAME;
-    } else if ((!receiverPresent && !basePresent && giverPresent) ||
-               (receiverPresent && !basePresent && !giverPresent)) {
-      return diff.FILE_STATUS.ADD;
-    } else if ((receiverPresent && basePresent && !giverPresent) ||
-               (!receiverPresent && basePresent && giverPresent)) {
-      return diff.FILE_STATUS.DELETE;
-    }
-  },
-
   diffTocs: function(receiver, giver) {
     return diff.baseDiffTocs(receiver, receiver, giver);
   },
@@ -49,7 +32,7 @@ var diff = module.exports = {
     var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, {
-        status: diff.fileStatus(receiver[p], base[p], giver[p]),
+        status: fileStatus(receiver[p], base[p], giver[p]),
         receiver: receiver[p],
         base: base[p],
         giver: giver[p]
@@ -64,4 +47,21 @@ var diff = module.exports = {
     return Object.keys(localChanges)
       .filter(function(path) { return path in headToBranchChanges; });
   },
+};
+
+function fileStatus(receiver, base, giver) {
+  var receiverPresent = receiver !== undefined;
+  var basePresent = base !== undefined;
+  var giverPresent = giver !== undefined;
+  if (receiverPresent && giverPresent && receiver !== giver) {
+    return diff.FILE_STATUS.MODIFY;
+  } else if (receiver === giver) {
+    return diff.FILE_STATUS.SAME;
+  } else if ((!receiverPresent && !basePresent && giverPresent) ||
+             (receiverPresent && !basePresent && !giverPresent)) {
+    return diff.FILE_STATUS.ADD;
+  } else if ((receiverPresent && basePresent && !giverPresent) ||
+             (!receiverPresent && basePresent && giverPresent)) {
+    return diff.FILE_STATUS.DELETE;
+  }
 };
