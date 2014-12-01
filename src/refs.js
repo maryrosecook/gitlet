@@ -97,3 +97,7 @@ function isLocalHeadRef(ref) {
 function isRemoteHeadRef(ref) {
   return ref !== undefined && ref.match("refs/remotes/[A-Za-z-]+/[A-Za-z-]+");
 };
+
+function isSymbolicRef(ref) {
+  return ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1;
+};
