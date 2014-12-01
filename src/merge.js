@@ -17,6 +17,10 @@ var merge = module.exports = {
     return util.intersection(aAncestors, bAncestors)[0];
   },
 
+  readIsMergeInProgress: function() {
+    return refs.readHash("MERGE_HEAD");
+  },
+
   readCanFastForward: function(receiverHash, giverHash) {
     return objects.readIsAncestor(giverHash, receiverHash);
   },
