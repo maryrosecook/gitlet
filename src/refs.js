@@ -15,10 +15,10 @@ var refs = module.exports = {
   readTerminalRef: function(ref) {
     if (isRemoteHeadRef(ref)) {
       return ref;
-    } else if (ref === "HEAD" && this.readIsHeadDetached()) {
-      return "HEAD";
     } else if (ref === "HEAD" && !this.readIsHeadDetached()) {
       return refs.readSymbolicRefContent("HEAD").match("ref: (refs/heads/.+)")[1];
+    } else if (isSymbolicRef(ref)) {
+      return ref;
     } else if (isLocalHeadRef(ref)) {
       return ref;
     } else {
@@ -29,7 +29,8 @@ var refs = module.exports = {
   readHash: function(refOrHash) {
     if (objects.readExists(refOrHash)) {
       return refOrHash;
-    } else if (refs.readTerminalRef(refOrHash) === "HEAD") {
+    } else if (refs.readTerminalRef(refOrHash) === "HEAD" ||
+               refs.readTerminalRef(refOrHash) === "MERGE_HEAD") {
       return refs.readSymbolicRefContent(refs.readTerminalRef(refOrHash));
     } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
       return files.read(nodePath.join(files.gitletDir(), refs.readTerminalRef(refOrHash)));
@@ -86,8 +87,9 @@ var refs = module.exports = {
   },
 
   readSymbolicRefContent: function(ref) {
-    if (isSymbolicRef(ref)) {
-      return files.read(nodePath.join(files.gitletDir(), ref));
+    var path = nodePath.join(files.gitletDir(), ref);
+    if (isSymbolicRef(ref) && fs.existsSync(path)) {
+      return files.read(path);
     }
   }
 };

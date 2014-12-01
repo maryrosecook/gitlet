@@ -10,6 +10,7 @@ var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
+var commit = require("./commit");
 
 var gitlet = module.exports = {
   init: function(_) {
@@ -81,10 +82,16 @@ var gitlet = module.exports = {
         treeHash === objects.treeHash(objects.read(headHash))) {
       throw "# On " + headDesc + "\n" + "nothing to commit, working directory clean";
     } else {
-      var parentHashes = headHash === undefined ? [] : [headHash];
-      var commmitHash = objects.write(objects.composeCommit(treeHash, opts.m, parentHashes));
+      var message = merge.readIsMergeInProgress() ? merge.readMergeMsg() : opts.m;
+      var commmitHash = objects.write(objects.composeCommit(treeHash,
+                                                            message,
+                                                            commit.readParentHashes()));
       this.update_ref("HEAD", commmitHash);
-      return "[" + headDesc + " " + commmitHash + "] " + opts.m;
+      if (merge.readIsMergeInProgress()) {
+        return "Merge made by the three-way strategy.";
+      } else {
+        return "[" + headDesc + " " + commmitHash + "] " + message;
+      }
     }
   },
 
@@ -292,11 +299,7 @@ var gitlet = module.exports = {
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             throw "unsupported";
           } else {
-            var commitHash = objects.write(objects.composeCommit(this.write_tree(),
-                                                                 merge.readMergeMsg(),
-                                                                 [receiverHash, giverHash]));
-            this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), commitHash);
-            return "Merge made by the three-way strategy.";
+            return this.commit();
           }
         }
       }
