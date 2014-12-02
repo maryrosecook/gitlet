@@ -560,6 +560,11 @@ describe("merge", function() {
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge master into other");
         });
+
+        it("should remove MERGE_MSG after committing merge", function() {
+          g.merge("master");
+          expect(fs.existsSync(nodePath.join(files.gitletDir(), "MERGE_MSG"))).toEqual(false);
+        });
       });
 
       describe('rm', function() {

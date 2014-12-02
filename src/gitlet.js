@@ -88,6 +88,7 @@ var gitlet = module.exports = {
                                                             commit.readParentHashes()));
       this.update_ref("HEAD", commmitHash);
       if (merge.readIsMergeInProgress()) {
+        merge.rmMergeMsg();
         return "Merge made by the three-way strategy.";
       } else {
         return "[" + headDesc + " " + commmitHash + "] " + message;

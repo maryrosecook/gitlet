@@ -55,6 +55,10 @@ var merge = module.exports = {
     return files.read(nodePath.join(files.gitletDir(), "MERGE_MSG"));
   },
 
+  rmMergeMsg: function() {
+    return fs.unlinkSync(nodePath.join(files.gitletDir(), "MERGE_MSG"));
+  },
+
   writeIndex: function(receiverHash, giverHash) {
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     index.write({});
