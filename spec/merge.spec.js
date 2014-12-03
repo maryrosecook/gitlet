@@ -716,7 +716,3 @@ describe("merge", function() {
     });
   });
 });
-
-// tree should have right files
-// wc should have right files
-// index should have right files
