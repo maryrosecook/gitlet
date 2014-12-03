@@ -82,7 +82,7 @@ var gitlet = module.exports = {
         treeHash === objects.treeHash(objects.read(headHash))) {
       throw "# On " + headDesc + "\n" + "nothing to commit, working directory clean";
     } else {
-      var message = merge.readIsMergeInProgress() ? merge.readMergeMsg() : opts.m;
+      var message = merge.readIsMergeInProgress() ? files.readGitlet("MERGE_MSG") : opts.m;
       var commmitHash = objects.write(objects.composeCommit(treeHash,
                                                             message,
                                                             commit.readParentHashes()));

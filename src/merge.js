@@ -51,10 +51,6 @@ var merge = module.exports = {
     files.write(nodePath.join(files.gitletDir(), "MERGE_MSG"), msg);
   },
 
-  readMergeMsg: function() {
-    return files.readGitlet("MERGE_MSG");
-  },
-
   rmMergeMsg: function() {
     return fs.unlinkSync(nodePath.join(files.gitletDir(), "MERGE_MSG"));
   },
