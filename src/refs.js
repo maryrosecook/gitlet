@@ -16,7 +16,7 @@ var refs = module.exports = {
     if (isRemoteHeadRef(ref)) {
       return ref;
     } else if (ref === "HEAD" && !this.readIsHeadDetached()) {
-      return refs.readSymbolicRefContent("HEAD").match("ref: (refs/heads/.+)")[1];
+      return files.read(files.gitletPath("HEAD")).match("ref: (refs/heads/.+)")[1];
     } else if (isSymbolicRef(ref)) {
       return ref;
     } else if (isLocalHeadRef(ref)) {
@@ -31,14 +31,14 @@ var refs = module.exports = {
       return refOrHash;
     } else if (refs.readTerminalRef(refOrHash) === "HEAD" ||
                refs.readTerminalRef(refOrHash) === "MERGE_HEAD") {
-      return refs.readSymbolicRefContent(refs.readTerminalRef(refOrHash));
+      return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
     } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
       return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
     }
   },
 
   readIsHeadDetached: function() {
-    return refs.readSymbolicRefContent("HEAD").match("refs") === null;
+    return files.read(files.gitletPath("HEAD")).match("refs") === null;
   },
 
   toLocalRef: function(name) {
@@ -88,13 +88,7 @@ var refs = module.exports = {
 
   readCurrentBranchName: function() {
     if (!refs.readIsHeadDetached()) {
-      return refs.readSymbolicRefContent("HEAD").match("refs/heads/(.+)")[1];
-    }
-  },
-
-  readSymbolicRefContent: function(ref) {
-    if (isSymbolicRef(ref) && fs.existsSync(files.gitletPath(ref))) {
-      return files.read(files.gitletPath(ref));
+      return files.read(files.gitletPath("HEAD")).match("refs/heads/(.+)")[1];
     }
   }
 };

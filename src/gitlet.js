@@ -153,7 +153,7 @@ var gitlet = module.exports = {
     } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
     } else if (ref === refs.readCurrentBranchName() ||
-               ref === refs.readSymbolicRefContent("HEAD")) {
+               ref === files.read(files.gitletPath("HEAD"))) {
       return "Already on " + ref;
     } else {
       var paths = diff.readChangedFilesCommitWouldOverwrite(toHash);
