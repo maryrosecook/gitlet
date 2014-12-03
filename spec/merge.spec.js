@@ -691,7 +691,7 @@ describe("merge", function() {
         it("should throw unsupported", function() {
           //      a
           //     / \
-          // M  b  c
+          // M  b  bb
           //     \/
           //     m  EXCEPTION
 
@@ -706,9 +706,9 @@ describe("merge", function() {
 
           g.checkout("other");
 
-          fs.writeFileSync("fileb", "b-other");
+          fs.writeFileSync("fileb", "bb");
           g.add("fileb");
-          g.commit({ m: "b-other" });
+          g.commit({ m: "bb" });
 
           expect(function() { g.merge("master"); }).toThrow("unsupported");
         });
