@@ -687,30 +687,43 @@ describe("merge", function() {
         });
       });
 
-      describe('conflicts', function() {
-        it("should throw unsupported", function() {
-          //      a
-          //     / \
-          // M  b  bb
-          //     \/
-          //     m  EXCEPTION
+      describe('conflict', function() {
+        describe('writing conflict', function() {
+          beforeEach(function() {
+            //       a
+            //       |
+            //       aa
+            //      /  \
+            // M aaa   aaaa
+            //     \   /
+            //       m      O >>>aaa===aaaa<<<
 
-          g.init();
-          createNestedFileStructure();
-          g.add("filea");
-          g.commit({ m: "a" });
-          g.branch("other");
+            g.init();
+            createNestedFileStructure();
+            g.add("filea");
+            g.commit({ m: "a" });
 
-          g.add("fileb");
-          g.commit({ m: "b" });
+            fs.writeFileSync("filea", "fileaa");
+            g.add("filea");
+            g.commit({ m: "aa" });
 
-          g.checkout("other");
+            g.branch("other");
 
-          fs.writeFileSync("fileb", "bb");
-          g.add("fileb");
-          g.commit({ m: "bb" });
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea");
+            g.commit({ m: "aaa" });
 
-          expect(function() { g.merge("master"); }).toThrow("unsupported");
+            g.checkout("other");
+
+            fs.writeFileSync("filea", "fileaaaa");
+            g.add("filea");
+            g.commit({ m: "aaaa" });
+          });
+
+          iit("should say there is a conflict", function() {
+            expect(g.merge("master"))
+              .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
+          });
         });
       });
     });
