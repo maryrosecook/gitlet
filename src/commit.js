@@ -1,5 +1,3 @@
-var fs = require("fs");
-var nodePath = require("path");
 var refs = require("./refs");
 var merge = require("./merge");
 

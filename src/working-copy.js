@@ -1,11 +1,8 @@
 var fs = require("fs");
 var nodePath = require("path");
-var index = require("./index");
 var files = require("./files");
 var objects = require("./objects");
-var refs = require("./refs");
 var diff = require("./diff");
-var util = require("./util");
 
 var workingCopy = module.exports = {
   write: function(dif) {

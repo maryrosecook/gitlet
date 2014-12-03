@@ -1,4 +1,3 @@
-var files = require("./files");
 var index = require("./index");
 var objects = require("./objects");
 var refs = require("./refs");
