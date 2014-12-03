@@ -602,10 +602,9 @@ describe("merge", function() {
           expect(fs.existsSync("c1/filec")).toEqual(true); // sanity
           testUtil.expectFile("fileb", "fileb");
 
-          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
-            objects.treeHash(objects.read(refs.readHash("HEAD")))));
-          expect(Object.keys(treeAsIndex).length).toEqual(1);
-          expect(treeAsIndex["fileb"]).toBeDefined();
+          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          expect(Object.keys(toc).length).toEqual(1);
+          expect(toc["fileb"]).toBeDefined();
         });
       });
 
@@ -641,12 +640,11 @@ describe("merge", function() {
           testUtil.expectFile("fileb", "fileb");
           testUtil.expectFile("c1/filec", "filec");
 
-          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
-            objects.treeHash(objects.read(refs.readHash("HEAD")))));
-          expect(Object.keys(treeAsIndex).length).toEqual(3);
-          expect(treeAsIndex["filea"]).toBeDefined();
-          expect(treeAsIndex["fileb"]).toBeDefined();
-          expect(treeAsIndex["c1/filec"]).toBeDefined();
+          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          expect(Object.keys(toc).length).toEqual(3);
+          expect(toc["filea"]).toBeDefined();
+          expect(toc["fileb"]).toBeDefined();
+          expect(toc["c1/filec"]).toBeDefined();
         });
       });
 
@@ -682,11 +680,10 @@ describe("merge", function() {
           testUtil.expectFile("filea", "fileaa");
           testUtil.expectFile("fileb", "fileb");
 
-          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
-            objects.treeHash(objects.read(refs.readHash("HEAD")))));
-          expect(Object.keys(treeAsIndex).length).toEqual(2);
-          expect(treeAsIndex["filea"]).toBeDefined();
-          expect(treeAsIndex["fileb"]).toBeDefined();
+          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          expect(Object.keys(toc).length).toEqual(2);
+          expect(toc["filea"]).toBeDefined();
+          expect(toc["fileb"]).toBeDefined();
         });
       });
 
