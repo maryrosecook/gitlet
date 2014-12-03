@@ -26,14 +26,22 @@ var merge = module.exports = {
   readHasConflicts: function(receiverHash, giverHash) {
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     return Object.keys(mergeDiff)
-      .filter(function(p) { return mergeDiff[p].status===diff.FILE_STATUS.MODIFY }).length > 0;
+      .filter(function(p) {return mergeDiff[p].status===diff.FILE_STATUS.CONFLICT }).length > 0
   },
 
   readMergeDiff: function(receiverHash, giverHash) {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
-    return diff.diffWithBase(receiver, base, giver);
+
+    var dif = diff.diffWithBase(receiver, base, giver);
+    Object.keys(dif).forEach(function(p) {
+      if (dif[p].status === diff.FILE_STATUS.MODIFY) {
+        dif[p].status = diff.FILE_STATUS.CONFLICT;
+      }
+    });
+
+    return dif;
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {
@@ -41,7 +49,7 @@ var merge = module.exports = {
 
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     var conflicts = Object.keys(mergeDiff)
-        .filter(function(p) { return mergeDiff[p].status === diff.FILE_STATUS.MODIFY });
+        .filter(function(p) { return mergeDiff[p].status === diff.FILE_STATUS.CONFLICT });
     if (conflicts.length > 0) {
       msg += "\nConflicts:\n" + conflicts.join("\n");
     }
@@ -53,7 +61,7 @@ var merge = module.exports = {
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     index.write({});
     Object.keys(mergeDiff).forEach(function(p) {
-      if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
+      if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
         if (mergeDiff[p].base !== undefined) { // same filepath ADDED w dif content
           index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
         }
