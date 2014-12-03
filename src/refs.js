@@ -56,6 +56,12 @@ var refs = module.exports = {
     }
   },
 
+  rm: function(ref) {
+    if(refs.isRef(ref)) {
+      fs.unlinkSync(nodePath.join(files.gitletDir(), ref));
+    }
+  },
+
   composeFetchHead: function(remoteRefs, remoteUrl) {
     return Object.keys(remoteRefs).map(function(name) {
       var notForMerge;

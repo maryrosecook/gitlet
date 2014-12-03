@@ -565,6 +565,11 @@ describe("merge", function() {
           g.merge("master");
           expect(fs.existsSync(nodePath.join(files.gitletDir(), "MERGE_MSG"))).toEqual(false);
         });
+
+        it("should remove MERGE_HEAD after committing merge", function() {
+          g.merge("master");
+          expect(fs.existsSync(nodePath.join(files.gitletDir(), "MERGE_HEAD"))).toEqual(false);
+        });
       });
 
       describe('rm', function() {
