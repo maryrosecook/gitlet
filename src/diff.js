@@ -4,7 +4,7 @@ var refs = require("./refs");
 var util = require("./util");
 
 var diff = module.exports = {
-  FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME" },
+  FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME", CONFLICT: "CONFLICT" },
 
   readDiff: function(hash1, hash2) {
     if (hash1 === undefined && hash2 === undefined) {
