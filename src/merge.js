@@ -60,6 +60,8 @@ var merge = module.exports = {
 
         index.writeFileContent(p, 2, objects.read(mergeDiff[p].receiver));
         index.writeFileContent(p, 3, objects.read(mergeDiff[p].giver));
+      } else if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
+        index.writeFileContent(p, 0, mergeDiff[p].giver);
       } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
