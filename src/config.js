@@ -5,7 +5,7 @@ var util = require("./util");
 
 var config = module.exports = {
   read: function() {
-    var content = files.read(nodePath.join(files.gitletDir(), "config"));
+    var content = files.readGitlet("config");
     var l = content.split("[")
       .map(function(item) { return item.trim(); })
       .filter(function(item) { return item !== ""; })

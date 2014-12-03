@@ -59,7 +59,7 @@ var gitlet = module.exports = {
     } else if (!opts.add && isOnDisk && !isInIndex) {
       throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
     } else if (isOnDisk && (opts.add || isInIndex)) {
-      index.writeFileContent(path, 0, files.read(nodePath.join(files.repoDir(), path)));
+      index.writeFileContent(path, 0, files.readRepo(path));
       return "\n";
     } else if (!opts.remove && !isOnDisk) {
       throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";

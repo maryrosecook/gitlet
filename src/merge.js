@@ -52,7 +52,7 @@ var merge = module.exports = {
   },
 
   readMergeMsg: function() {
-    return files.read(nodePath.join(files.gitletDir(), "MERGE_MSG"));
+    return files.readGitlet("MERGE_MSG");
   },
 
   rmMergeMsg: function() {

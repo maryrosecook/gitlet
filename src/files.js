@@ -68,6 +68,14 @@ var files = module.exports = {
     return fs.readFileSync(path, "utf8");
   },
 
+  readGitlet: function(path) {
+    return files.read(nodePath.join(files.gitletDir(), path));
+  },
+
+  readRepo: function(path) {
+    return files.read(nodePath.join(files.repoDir(), path));
+  },
+
   lsRecursive: function(path) {
     if (!fs.existsSync(path)) {
       return [];
