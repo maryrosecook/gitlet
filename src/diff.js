@@ -53,7 +53,11 @@ function fileStatus(receiver, base, giver) {
   var basePresent = base !== undefined;
   var giverPresent = giver !== undefined;
   if (receiverPresent && giverPresent && receiver !== giver) {
-    return diff.FILE_STATUS.MODIFY;
+    if (receiver !== base && giver !== base) {
+      return diff.FILE_STATUS.CONFLICT;
+    } else {
+      return diff.FILE_STATUS.MODIFY;
+    }
   } else if (receiver === giver) {
     return diff.FILE_STATUS.SAME;
   } else if ((!receiverPresent && !basePresent && giverPresent) ||

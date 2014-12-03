@@ -33,15 +33,7 @@ var merge = module.exports = {
     var receiver = objects.readCommitToc(receiverHash);
     var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
     var giver = objects.readCommitToc(giverHash);
-
-    var dif = diff.diffWithBase(receiver, base, giver);
-    Object.keys(dif).forEach(function(p) {
-      if (dif[p].status === diff.FILE_STATUS.MODIFY) {
-        dif[p].status = diff.FILE_STATUS.CONFLICT;
-      }
-    });
-
-    return dif;
+    return diff.diffWithBase(receiver, base, giver);
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {
