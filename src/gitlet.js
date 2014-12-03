@@ -59,7 +59,7 @@ var gitlet = module.exports = {
     } else if (!opts.add && isOnDisk && !isInIndex) {
       throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
     } else if (isOnDisk && (opts.add || isInIndex)) {
-      index.writeFileContent(path, 0, files.readRepo(path));
+      index.writeFileContent(path, 0, files.read(files.repoPath(path)));
       return "\n";
     } else if (!opts.remove && !isOnDisk) {
       throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
@@ -82,13 +82,15 @@ var gitlet = module.exports = {
         treeHash === objects.treeHash(objects.read(headHash))) {
       throw "# On " + headDesc + "\n" + "nothing to commit, working directory clean";
     } else {
-      var message = merge.readIsMergeInProgress() ? files.readGitlet("MERGE_MSG") : opts.m;
+      var message = merge.readIsMergeInProgress() ?
+          files.read(files.gitletPath("MERGE_MSG")) :
+          opts.m;
       var commmitHash = objects.write(objects.composeCommit(treeHash,
                                                             message,
                                                             commit.readParentHashes()));
       this.update_ref("HEAD", commmitHash);
       if (merge.readIsMergeInProgress()) {
-        fs.unlinkSync(nodePath.join(files.gitletDir(), "MERGE_MSG"));
+        fs.unlinkSync(files.gitletPath("MERGE_MSG"));
         refs.rm("MERGE_HEAD");
         return "Merge made by the three-way strategy.";
       } else {

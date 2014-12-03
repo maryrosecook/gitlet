@@ -47,7 +47,7 @@ var merge = module.exports = {
       msg += "\nConflicts:\n" + conflicts.join("\n");
     }
 
-    files.write(nodePath.join(files.gitletDir(), "MERGE_MSG"), msg);
+    files.write(files.gitletPath("MERGE_MSG"), msg);
   },
 
   writeIndex: function(receiverHash, giverHash) {

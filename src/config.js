@@ -4,7 +4,7 @@ var util = require("./util");
 
 var config = module.exports = {
   read: function() {
-    var content = files.readGitlet("config");
+    var content = files.read(files.gitletPath("config"));
     var l = content.split("[")
       .map(function(item) { return item.trim(); })
       .filter(function(item) { return item !== ""; })
@@ -42,6 +42,6 @@ var config = module.exports = {
         })
         .join("") + "\n";
 
-    files.write(nodePath.join(files.gitletDir(), "config"), configStr);
+    files.write(files.gitletPath("config"), configStr);
   }
 };

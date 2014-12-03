@@ -33,7 +33,7 @@ var refs = module.exports = {
                refs.readTerminalRef(refOrHash) === "MERGE_HEAD") {
       return refs.readSymbolicRefContent(refs.readTerminalRef(refOrHash));
     } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
-      return files.readGitlet(refs.readTerminalRef(refOrHash));
+      return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
     }
   },
 
@@ -52,13 +52,13 @@ var refs = module.exports = {
   write: function(ref, content) {
     if(refs.isRef(ref)) {
       var tree = util.assocIn({}, ref.split(nodePath.sep).concat(content));
-      files.writeFilesFromTree(tree, files.gitletDir());
+      files.writeFilesFromTree(tree, files.gitletPath());
     }
   },
 
   rm: function(ref) {
     if(refs.isRef(ref)) {
-      fs.unlinkSync(nodePath.join(files.gitletDir(), ref));
+      fs.unlinkSync(files.gitletPath(ref));
     }
   },
 
@@ -76,14 +76,14 @@ var refs = module.exports = {
   },
 
   readLocalHeads: function() {
-    return fs.readdirSync(nodePath.join(files.gitletDir(), "refs/heads/"))
+    return fs.readdirSync(nodePath.join(files.gitletPath(), "refs", "heads"))
       .reduce(function(o, n) { return util.assocIn(o, [n, refs.readHash(n)]); }, {});
   },
 
   readExists: function(ref) {
     return ref !== undefined &&
       (isLocalHeadRef(ref) || isRemoteHeadRef(ref)) &&
-      fs.existsSync(nodePath.join(files.gitletDir(), ref));
+      fs.existsSync(files.gitletPath(ref));
   },
 
   readCurrentBranchName: function() {
@@ -93,9 +93,8 @@ var refs = module.exports = {
   },
 
   readSymbolicRefContent: function(ref) {
-    var path = nodePath.join(files.gitletDir(), ref);
-    if (isSymbolicRef(ref) && fs.existsSync(path)) {
-      return files.read(path);
+    if (isSymbolicRef(ref) && fs.existsSync(files.gitletPath(ref))) {
+      return files.read(files.gitletPath(ref));
     }
   }
 };

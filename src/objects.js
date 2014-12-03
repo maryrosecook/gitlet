@@ -40,7 +40,7 @@ var objects = module.exports = {
   write: function(str) {
     var contentHash = util.hash(str);
     if (!objects.readExists(contentHash)) {
-      var filePath = nodePath.join(files.gitletDir(), "objects", contentHash);
+      var filePath = nodePath.join(files.gitletPath(), "objects", contentHash);
       files.write(filePath, str);
     }
 
@@ -49,12 +49,12 @@ var objects = module.exports = {
 
   readExists: function(objectHash) {
     return objectHash !== undefined &&
-      fs.existsSync(nodePath.join(files.gitletDir(), "objects", objectHash));
+      fs.existsSync(nodePath.join(files.gitletPath(), "objects", objectHash));
   },
 
   read: function(objectHash) {
     if (objectHash !== undefined) {
-      var objectPath = nodePath.join(files.gitletDir(), "objects", objectHash);
+      var objectPath = nodePath.join(files.gitletPath(), "objects", objectHash);
       if (fs.existsSync(objectPath)) {
         return files.read(objectPath);
       }
@@ -62,7 +62,7 @@ var objects = module.exports = {
   },
 
   readAllHashes: function() {
-    return fs.readdirSync(nodePath.join(files.gitletDir(), "objects"));
+    return fs.readdirSync(files.gitletPath("objects"));
   },
 
   type: function(str) {

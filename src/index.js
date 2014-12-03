@@ -10,7 +10,7 @@ var index = module.exports = {
   },
 
   read: function() {
-    var indexFilePath = nodePath.join(files.gitletDir(), "index");
+    var indexFilePath = files.gitletPath("index");
     return util.lines(fs.existsSync(indexFilePath) ? files.read(indexFilePath) : "\n")
       .reduce(function(idx, blobStr) {
         var blobData = blobStr.split(/ /);
@@ -45,7 +45,7 @@ var index = module.exports = {
     var indexStr = Object.keys(index)
         .map(function(k) { return k.split(",")[0] + " " + k.split(",")[1] + " " + index[k] })
         .join("\n") + "\n";
-    files.write(nodePath.join(files.gitletDir(), "index"), indexStr);
+    files.write(files.gitletPath("index"), indexStr);
   },
 
   readWorkingCopyToc: function() {
@@ -53,7 +53,7 @@ var index = module.exports = {
       .map(function(k) { return k.split(",")[0]; })
       .filter(function(p) { return fs.existsSync(nodePath.join(files.repoDir(), p)); })
       .reduce(function(idx, p) {
-        idx[p] = util.hash(files.read(nodePath.join(files.repoDir(), p)))
+        idx[p] = util.hash(files.read(files.repoPath(p)))
         return idx;
       }, {});
   },

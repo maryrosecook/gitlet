@@ -563,12 +563,12 @@ describe("merge", function() {
 
         it("should remove MERGE_MSG after committing merge", function() {
           g.merge("master");
-          expect(fs.existsSync(nodePath.join(files.gitletDir(), "MERGE_MSG"))).toEqual(false);
+          expect(fs.existsSync(files.gitletPath("MERGE_MSG"))).toEqual(false);
         });
 
         it("should remove MERGE_HEAD after committing merge", function() {
           g.merge("master");
-          expect(fs.existsSync(nodePath.join(files.gitletDir(), "MERGE_HEAD"))).toEqual(false);
+          expect(fs.existsSync(files.gitletPath("MERGE_HEAD"))).toEqual(false);
         });
       });
 
