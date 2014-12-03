@@ -1,4 +1,3 @@
-var nodePath = require("path");
 var files = require("./files");
 var util = require("./util");
 

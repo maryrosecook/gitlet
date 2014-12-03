@@ -1,5 +1,4 @@
 var fs = require("fs");
-var nodePath = require("path");
 var files = require("./files");
 var objects = require("./objects");
 var util = require("./util");
