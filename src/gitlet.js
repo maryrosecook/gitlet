@@ -300,7 +300,7 @@ var gitlet = module.exports = {
           merge.writeIndex(receiverHash, giverHash);
           workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
           if (merge.readHasConflicts(receiverHash, giverHash)) {
-            throw "unsupported";
+            return "Automatic merge failed. Fix conflicts and commit the result.";
           } else {
             return this.commit();
           }
