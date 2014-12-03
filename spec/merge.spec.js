@@ -649,6 +649,47 @@ describe("merge", function() {
           expect(treeAsIndex["c1/filec"]).toBeDefined();
         });
       });
+
+      describe('non-conflicting modify', function() {
+        it("should merge in file change", function() {
+          //       a
+          //     /    \
+          // M mod-aa  add-b
+          //      \   /
+          //       m O    files: aa, b
+
+          g.init();
+          createNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+          g.branch("other");
+
+          fs.writeFileSync("filea", "fileaa");
+          g.add("filea");
+          g.commit({ m: "aa" });
+
+          g.checkout("other");
+
+          g.add("fileb");
+          g.commit({ m: "b" });
+
+          g.merge("master");
+
+          expect(testUtil.index().length).toEqual(2);
+          expect(testUtil.index()[0].path).toEqual("filea");
+          expect(testUtil.index()[1].path).toEqual("fileb");
+
+          testUtil.expectFile("filea", "fileaa");
+          testUtil.expectFile("fileb", "fileb");
+
+          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
+            objects.treeHash(objects.read(refs.readHash("HEAD")))));
+          expect(Object.keys(treeAsIndex).length).toEqual(2);
+          expect(treeAsIndex["filea"]).toBeDefined();
+          expect(treeAsIndex["fileb"]).toBeDefined();
+        });
+      });
+
       describe('conflicts', function() {
         it("should throw unsupported", function() {
           //      a
