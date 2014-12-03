@@ -609,6 +609,46 @@ describe("merge", function() {
         });
       });
 
+      describe('add', function() {
+        it("should merge in addition of file", function() {
+          //      a
+          //     / \
+          // M  b  c
+          //     \/
+          //     m O    files: a, b, c
+
+          g.init();
+          createNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+          g.branch("other");
+
+          g.add("fileb");
+          g.commit({ m: "b" });
+
+          g.checkout("other");
+          g.add("c1/filec");
+          g.commit({ m: "c" });
+
+          g.merge("master");
+
+          expect(testUtil.index().length).toEqual(3);
+          expect(testUtil.index()[0].path).toEqual("filea");
+          expect(testUtil.index()[1].path).toEqual("c1/filec");
+          expect(testUtil.index()[2].path).toEqual("fileb");
+
+          testUtil.expectFile("filea", "filea");
+          testUtil.expectFile("fileb", "fileb");
+          testUtil.expectFile("c1/filec", "filec");
+
+          var treeAsIndex = files.flattenNestedTree(objects.readFileTree(
+            objects.treeHash(objects.read(refs.readHash("HEAD")))));
+          expect(Object.keys(treeAsIndex).length).toEqual(3);
+          expect(treeAsIndex["filea"]).toBeDefined();
+          expect(treeAsIndex["fileb"]).toBeDefined();
+          expect(treeAsIndex["c1/filec"]).toBeDefined();
+        });
+      });
       describe('conflicts', function() {
         it("should throw unsupported", function() {
           //      a
