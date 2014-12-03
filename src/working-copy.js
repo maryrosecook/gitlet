@@ -8,13 +8,11 @@ var workingCopy = module.exports = {
   write: function(dif) {
     Object.keys(dif).forEach(function(p) {
       if (dif[p].status === diff.FILE_STATUS.ADD) {
-        files.write(nodePath.join(files.repoDir(), p),
-                    objects.read(dif[p].receiver || dif[p].giver));
+        files.write(files.repoPath(p), objects.read(dif[p].receiver || dif[p].giver));
       } else if (dif[p].status === diff.FILE_STATUS.MODIFY) {
-        files.write(nodePath.join(files.repoDir(), p),
-                    composeConflict(dif[p].receiver, dif[p].giver));
+        files.write(files.repoPath(p), composeConflict(dif[p].receiver, dif[p].giver));
       } else if (dif[p].status === diff.FILE_STATUS.DELETE) {
-        fs.unlinkSync(nodePath.join(files.repoDir(), p));
+        fs.unlinkSync(files.repoPath(p));
       }
     });
 
@@ -29,7 +27,7 @@ function composeConflict(receiverFileHash, giverFileHash) {
 };
 
 function rmEmptyDirs() {
-  fs.readdirSync(files.repoDir())
+  fs.readdirSync(files.repoPath())
     .filter(function(n) { return n !== ".gitlet"; })
     .forEach(files.rmEmptyDirs);
 };

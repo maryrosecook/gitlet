@@ -51,7 +51,7 @@ var index = module.exports = {
   readWorkingCopyToc: function() {
     return Object.keys(index.read())
       .map(function(k) { return k.split(",")[0]; })
-      .filter(function(p) { return fs.existsSync(nodePath.join(files.repoDir(), p)); })
+      .filter(function(p) { return fs.existsSync(files.repoPath(p)); })
       .reduce(function(idx, p) {
         idx[p] = util.hash(files.read(files.repoPath(p)))
         return idx;

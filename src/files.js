@@ -3,12 +3,6 @@ var nodePath = require("path");
 var util = require("./util");
 
 var files = module.exports = {
-  repoDir: function() {
-    if (gitletDir() !== undefined) {
-      return nodePath.join(gitletDir(), "..")
-    }
-  },
-
   inRepo: function(cwd) {
     return gitletDir(cwd) !== undefined;
   },
@@ -20,7 +14,7 @@ var files = module.exports = {
   },
 
   pathFromRepoRoot: function(path) {
-    return nodePath.relative(files.repoDir(), nodePath.join(process.cwd(), path));
+    return nodePath.relative(files.repoPath(), nodePath.join(process.cwd(), path));
   },
 
   write: function(path, content) {
@@ -60,7 +54,7 @@ var files = module.exports = {
   },
 
   repoPath: function(path) {
-    return nodePath.join(files.repoDir(), path);
+    return nodePath.join(repoDir(), path || "");
   },
 
   lsRecursive: function(path) {
@@ -111,5 +105,11 @@ function gitletDir(dir) {
     } else if (dir !== "/") {
       return gitletDir(nodePath.join(dir, ".."));
     }
+  }
+};
+
+function repoDir() {
+  if (gitletDir() !== undefined) {
+    return nodePath.join(gitletDir(), "..")
   }
 };
