@@ -46,7 +46,9 @@ var files = module.exports = {
   },
 
   read: function(path) {
-    return fs.readFileSync(path, "utf8");
+    if (fs.existsSync(path)) {
+      return fs.readFileSync(path, "utf8");
+    }
   },
 
   gitletPath: function(path) {
