@@ -13,13 +13,9 @@ var refs = module.exports = {
   },
 
   readTerminalRef: function(ref) {
-    if (isRemoteHeadRef(ref)) {
-      return ref;
-    } else if (ref === "HEAD" && !this.readIsHeadDetached()) {
+    if (ref === "HEAD" && !this.readIsHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("ref: (refs/heads/.+)")[1];
-    } else if (isSymbolicRef(ref)) {
-      return ref;
-    } else if (isLocalHeadRef(ref)) {
+    } else if (refs.isRef(ref)) {
       return ref;
     } else {
       return refs.toLocalRef(ref);
