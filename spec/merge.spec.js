@@ -720,7 +720,7 @@ describe("merge", function() {
             g.commit({ m: "aaaa" });
           });
 
-          iit("should say there is a conflict", function() {
+          it("should say there is a conflict", function() {
             expect(g.merge("master"))
               .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
           });
