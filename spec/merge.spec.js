@@ -729,16 +729,16 @@ describe("merge", function() {
             g.merge("master");
 
             expect(testUtil.index().length).toEqual(3);
-            expect(testUtil.index()[0].path).toEqual("filea");
-            expect(testUtil.index()[1].path).toEqual("filea");
-            expect(testUtil.index()[2].path).toEqual("filea");
 
+            expect(testUtil.index()[0].path).toEqual("filea");
             expect(testUtil.index()[0].stage).toEqual(1);
             expect(objects.read(testUtil.index()[0].hash)).toEqual("fileaa");
 
+            expect(testUtil.index()[1].path).toEqual("filea");
             expect(testUtil.index()[1].stage).toEqual(2);
             expect(objects.read(testUtil.index()[1].hash)).toEqual("fileaaaa");
 
+            expect(testUtil.index()[2].path).toEqual("filea");
             expect(testUtil.index()[2].stage).toEqual(3);
             expect(objects.read(testUtil.index()[2].hash)).toEqual("fileaaa");
           });
