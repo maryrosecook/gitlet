@@ -696,7 +696,7 @@ describe("merge", function() {
             //      /  \
             // M aaa   aaaa
             //     \   /
-            //       m      O <<<aaa===aaaa>>>
+            //       m      O <<<aaaa===aaa>>>
 
             g.init();
             createNestedFileStructure();
