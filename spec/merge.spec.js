@@ -742,6 +742,12 @@ describe("merge", function() {
             expect(testUtil.index()[2].stage).toEqual(3);
             expect(objects.read(testUtil.index()[2].hash)).toEqual("fileaaa");
           });
+
+          it("should write conflict to working copy", function() {
+            g.merge("master");
+
+            testUtil.expectFile("filea", "<<<<<<\nfileaaaa\n======\nfileaaa\n>>>>>>\n");
+          });
         });
       });
     });
