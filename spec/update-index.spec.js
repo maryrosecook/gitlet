@@ -64,6 +64,17 @@ describe("update-index", function() {
       expect(testUtil.index()[1].path).toEqual("README2.md");
     });
 
+    it("should allow adding file repeatedly", function() {
+      g.init();
+      testUtil.createFilesFromTree({ filea: "filea", });
+      g.update_index("filea", { add: true });
+      g.update_index("filea");
+      g.update_index("filea");
+
+      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("filea")), "filea");
+      expect(testUtil.index()[0].path).toEqual("filea");
+    });
+
     it("should throw if try to add new file w/o --add flag", function() {
       g.init();
       fs.writeFileSync("README.md", "this is a readme");
