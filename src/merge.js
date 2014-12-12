@@ -54,7 +54,7 @@ var merge = module.exports = {
     index.write({});
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
-        if (mergeDiff[p].base !== undefined) { // same filepath ADDED w dif content
+        if (mergeDiff[p].base !== undefined) { // (undef if same filepath ADDED w dif content)
           index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
         }
 
