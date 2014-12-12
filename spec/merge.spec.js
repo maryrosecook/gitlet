@@ -748,6 +748,12 @@ describe("merge", function() {
 
             testUtil.expectFile("filea", "<<<<<<\nfileaaaa\n======\nfileaaa\n>>>>>>\n");
           });
+
+          it("should still have merge head when conflict happens", function() {
+            g.merge("master");
+
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea");
+          });
         });
       });
     });
