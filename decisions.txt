@@ -42,3 +42,4 @@ todo
 * see if "." works as a path?
 * make all privatable functions private
 * go through and add throws in places where action not allowed if currently merging
+* test conflict on new file
