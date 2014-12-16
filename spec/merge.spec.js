@@ -6,6 +6,7 @@ var objects = require("../src/objects");
 var files = require("../src/files");
 var index = require("../src/index");
 var g = require("../src/gitlet");
+var util = require("../src/util");
 var testUtil = require("./test-util");
 
 function spToUnd(charr) {
@@ -21,17 +22,6 @@ function createFlatFileStructure() {
                                  filef: "filea",
                                  fileg: "filea",
                                  fileh: "filea" });
-};
-
-function createNestedFileStructure() {
-  testUtil.createFilesFromTree({ filea: "filea",
-                                 fileb: "fileb",
-                                 c1: { filec: "filec" },
-                                 d1: { filed: "filed" },
-                                 e1: { e2: { filee: "filee" }},
-                                 f1: { f2: { filef: "filef" }},
-                                 g1: { g2: { g3: { fileg: "fileg" }}},
-                                 h1: { h2: { h3: { fileh: "fileh" }}}});
 };
 
 describe("merge", function() {
@@ -345,7 +335,7 @@ describe("merge", function() {
     describe('fast forward', function() {
       it("should report that ancestor has been fast forwarded", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -359,7 +349,7 @@ describe("merge", function() {
 
       it("should set destination branch to merged commit", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -379,7 +369,7 @@ describe("merge", function() {
 
       it("should stay on branch after merge", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -395,7 +385,7 @@ describe("merge", function() {
 
       it("should update working copy after merge", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -415,7 +405,7 @@ describe("merge", function() {
 
       it("should update index after merge", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -434,7 +424,7 @@ describe("merge", function() {
 
       it("should be able to fast foward a few commits", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -461,7 +451,7 @@ describe("merge", function() {
 
       it("should not have created merge commit, so HEAD should have one parent", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -476,7 +466,7 @@ describe("merge", function() {
 
       it("should be able to pass hash when fast-forwarding", function() {
         g.init();
-        createNestedFileStructure();
+        testUtil.createDeeplyNestedFileStructure();
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
@@ -500,7 +490,7 @@ describe("merge", function() {
           //     m O
 
           g.init();
-          createNestedFileStructure();
+          testUtil.createDeeplyNestedFileStructure();
           g.add("filea");
           g.commit({ m: "a" });
           g.branch("other");
@@ -581,7 +571,7 @@ describe("merge", function() {
           //     m O    files: b
 
           g.init();
-          createNestedFileStructure();
+          testUtil.createDeeplyNestedFileStructure();
           g.add("filea");
           g.commit({ m: "a" });
           g.branch("other");
@@ -617,7 +607,7 @@ describe("merge", function() {
           //     m O    files: a, b, c
 
           g.init();
-          createNestedFileStructure();
+          testUtil.createDeeplyNestedFileStructure();
           g.add("filea");
           g.commit({ m: "a" });
           g.branch("other");
@@ -657,7 +647,7 @@ describe("merge", function() {
           //       m O    files: aa, b
 
           g.init();
-          createNestedFileStructure();
+          testUtil.createDeeplyNestedFileStructure();
           g.add("filea");
           g.commit({ m: "a" });
           g.branch("other");
@@ -688,39 +678,39 @@ describe("merge", function() {
       });
 
       describe('conflict', function() {
+        beforeEach(function() {
+          //       a
+          //       |
+          //       aa
+          //      /  \
+          // M aaa   aaaa
+          //     \   /
+          //       m      O <<<aaaa===aaa>>>
+
+          g.init();
+          testUtil.createDeeplyNestedFileStructure();
+          g.add("filea");
+          g.commit({ m: "a" });
+
+          fs.writeFileSync("filea", "fileaa");
+          g.add("filea");
+          g.commit({ m: "aa" });
+
+          g.branch("other");
+
+          fs.writeFileSync("filea", "fileaaa");
+          g.add("filea");
+          g.commit({ m: "aaa" });
+
+          g.checkout("other");
+
+          fs.writeFileSync("filea", "fileaaaa");
+          g.add("filea");
+          g.commit({ m: "aaaa" });
+        });
+
         describe('writing conflict', function() {
-          beforeEach(function() {
-            //       a
-            //       |
-            //       aa
-            //      /  \
-            // M aaa   aaaa
-            //     \   /
-            //       m      O <<<aaaa===aaa>>>
-
-            g.init();
-            createNestedFileStructure();
-            g.add("filea");
-            g.commit({ m: "a" });
-
-            fs.writeFileSync("filea", "fileaa");
-            g.add("filea");
-            g.commit({ m: "aa" });
-
-            g.branch("other");
-
-            fs.writeFileSync("filea", "fileaaa");
-            g.add("filea");
-            g.commit({ m: "aaa" });
-
-            g.checkout("other");
-
-            fs.writeFileSync("filea", "fileaaaa");
-            g.add("filea");
-            g.commit({ m: "aaaa" });
-          });
-
-          it("should say there is a conflict", function() {
+          it("should report there is a conflict when merging", function() {
             expect(g.merge("master"))
               .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
           });
@@ -753,6 +743,111 @@ describe("merge", function() {
             g.merge("master");
 
             testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea");
+          });
+        });
+
+        describe("committing with unresolved conflict", function() {
+          it("should mention conflicted file", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            expect(function() { g.commit(); })
+              .toThrow("U filea\n" +
+                       "error: 'commit' is not possible because you have unmerged files.\n");
+          });
+
+          it("should leave repo in merging stage", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            expect(function() { g.commit(); }).toThrow();
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea");
+          });
+        });
+
+        describe("committing a resolved conflict", function() {
+          it("should say that merge happened", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            expect(g.commit()).toEqual("Merge made by the three-way strategy.");
+          });
+
+          it("should not be merging after commit", function() {
+            g.merge("master");
+
+            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_HEAD")))
+              .toEqual(true);
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_HEAD")))
+              .toEqual(false);
+          });
+
+          it("should remove MERGE_MSG after commit", function() {
+            g.merge("master");
+
+            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_MSG")))
+              .toEqual(true);
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_MSG")))
+              .toEqual(false);
+          });
+
+          it("should update index with merge", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            expect(testUtil.index().length).toEqual(1);
+            expect(testUtil.index()[0].path).toEqual("filea");
+          });
+
+          it("should leave WC file as it was committed", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            testUtil.expectFile("filea", "fileaaa");
+          });
+
+          it("should commit merge commit with merged content", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            var toc = objects.readCommitToc(refs.readHash("HEAD"));
+            expect(Object.keys(toc).length).toEqual(1);
+            expect(toc["filea"]).toEqual(util.hash("fileaaa"));
+          });
+
+          it("should leave head pointed at current branch", function() {
+            g.merge("master");
+            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+            fs.writeFileSync("filea", "fileaaa");
+            g.add("filea"); // resolve conflict
+            g.commit();
+
+            expect(refs.readTerminalRef("HEAD")).toEqual("refs/heads/other");
           });
         });
       });

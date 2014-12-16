@@ -95,9 +95,15 @@ var gitlet = module.exports = {
                                                             commit.readParentHashes()));
       this.update_ref("HEAD", commmitHash);
       if (merge.readIsMergeInProgress()) {
-        fs.unlinkSync(files.gitletPath("MERGE_MSG"));
-        refs.rm("MERGE_HEAD");
-        return "Merge made by the three-way strategy.";
+        var conflictedPaths = index.readConflictedPaths();
+        if (conflictedPaths.length > 0) {
+          throw conflictedPaths.map(function(p) { return "U " + p; }).join("\n") + "\n" +
+            "error: 'commit' is not possible because you have unmerged files.\n";
+        } else {
+          fs.unlinkSync(files.gitletPath("MERGE_MSG"));
+          refs.rm("MERGE_HEAD");
+          return "Merge made by the three-way strategy.";
+        }
       } else {
         return "[" + headDesc + " " + commmitHash + "] " + message;
       }
