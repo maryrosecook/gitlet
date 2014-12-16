@@ -22,6 +22,11 @@ var index = module.exports = {
     return path + "," + stage;
   },
 
+  keyPieces: function(key) {
+    var pieces = key.split(/,/);
+    return { path: pieces[0], stage: parseInt(pieces[1]) };
+  },
+
   readToc: function() {
     var idx = index.read();
     return Object.keys(idx)
@@ -31,6 +36,14 @@ var index = module.exports = {
   readFileInConflict: function(path) {
     return index.readHasFile(path, 2);
   },
+
+  readConflictedPaths: function() {
+    var idx = index.read();
+    return Object.keys(idx)
+      .filter(function(k) { return index.keyPieces(k).stage === 2; })
+      .map(function(k) { return index.keyPieces(k).path; });
+  },
+
   writeFileContent: function(path, stage, content) {
     var idx = index.read();
     idx[index.key(path, stage)] = objects.write(content);
