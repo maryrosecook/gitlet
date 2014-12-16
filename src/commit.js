@@ -6,8 +6,10 @@ var commit = module.exports = {
     var headHash = refs.readHash("HEAD");
     if (merge.readIsMergeInProgress()) {
       return [headHash, refs.readHash("MERGE_HEAD")];
+    } else if (headHash === undefined) {
+      return [];
     } else {
-      return headHash === undefined ? [] : [headHash];
+      return [headHash];
     }
   }
 };
