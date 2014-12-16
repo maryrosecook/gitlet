@@ -40,40 +40,38 @@ var gitlet = module.exports = {
     }
   },
 
-  update_index: function(path, opts) {
+  rm: function(path, opts) {
     files.assertInRepo();
     opts = opts || {};
 
-    var pathFromRoot = files.pathFromRepoRoot(path);
-    var isOnDisk = fs.existsSync(path);
-    var isInIndex = index.readHasFile(path, 0);
+    var diskFiles = files.lsRecursive(path);
+    var fileList = Object.keys(index.readToc()).
+        filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
+    if (opts.f) {
+      throw "unsupported";
+    } else if (fileList.length === 0) {
+      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
+    } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
+      throw "fatal: not removing " + path + " recursively without -r";
+    } else {
+      var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
+      var wcDiff = diff.nameStatus(headToc, index.readWorkingCopyToc());
+      var addedModified = Object.keys(wcDiff)
+          .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
+      var changesToRm = util.intersection(addedModified, fileList);
 
-    if (isOnDisk && fs.statSync(path).isDirectory()) {
-      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
-    } else if (opts.remove && !isOnDisk && isInIndex) {
-      index.removeFile(path, 0);
-      return "\n";
-    } else if (opts.remove && !isOnDisk && !isInIndex) {
-      return "\n";
-    } else if (!opts.add && isOnDisk && !isInIndex) {
-      throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
-    } else if (isOnDisk && (opts.add || isInIndex)) {
-      if (index.readFileInConflict(path)) {
-        index.removeFile(path, 1);
-        index.removeFile(path, 2);
-        index.removeFile(path, 3);
+      if (changesToRm.length > 0) {
+        throw "error: the following files have changes:\n" + changesToRm.join("\n") + "\n";
+      } else {
+        for (var i = 0; i < fileList.length; i++) {
+          if (fs.existsSync(fileList[i])) {
+            fs.unlinkSync(fileList[i]);
+          }
+
+          this.update_index(fileList[i], { remove: true });
+        }
       }
-
-      index.writeFileContent(path, 0, files.read(files.repoPath(path)));
-      return "\n";
-    } else if (!opts.remove && !isOnDisk) {
-      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
     }
-  },
-
-  write_tree: function(_) {
-    files.assertInRepo();
-    return objects.writeTree(files.nestFlatTree(index.readToc()));
   },
 
   commit: function(opts) {
@@ -137,22 +135,6 @@ var gitlet = module.exports = {
       throw "fatal: A branch named " + name + " already exists.";
     } else {
       this.update_ref(refs.toLocalRef(name), refs.readHash("HEAD"));
-    }
-  },
-
-  update_ref: function(refToUpdate, refToUpdateTo, _) {
-    files.assertInRepo();
-
-    var hash = refs.readHash(refToUpdateTo);
-    if (!objects.readExists(hash)) {
-      throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
-    } else if (!refs.isRef(refToUpdate)) {
-      throw "fatal: Cannot lock the ref " + refToUpdate + ".";
-    } else if (objects.type(objects.read(hash)) !== "commit") {
-      throw "error: Trying to write non-commit object " + hash + " to branch " +
-        refs.readTerminalRef(refToUpdate) + "\n";
-    } else {
-      refs.write(refs.readTerminalRef(refToUpdate), hash);
     }
   },
 
@@ -250,40 +232,6 @@ var gitlet = module.exports = {
     }
   },
 
-  rm: function(path, opts) {
-    files.assertInRepo();
-    opts = opts || {};
-
-    var diskFiles = files.lsRecursive(path);
-    var fileList = Object.keys(index.readToc()).
-        filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
-    if (opts.f) {
-      throw "unsupported";
-    } else if (fileList.length === 0) {
-      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
-    } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
-      throw "fatal: not removing " + path + " recursively without -r";
-    } else {
-      var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
-      var wcDiff = diff.nameStatus(headToc, index.readWorkingCopyToc());
-      var addedModified = Object.keys(wcDiff)
-          .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
-      var changesToRm = util.intersection(addedModified, fileList);
-
-      if (changesToRm.length > 0) {
-        throw "error: the following files have changes:\n" + changesToRm.join("\n") + "\n";
-      } else {
-        for (var i = 0; i < fileList.length; i++) {
-          if (fs.existsSync(fileList[i])) {
-            fs.unlinkSync(fileList[i]);
-          }
-
-          this.update_index(fileList[i], { remove: true });
-        }
-      }
-    }
-  },
-
   merge: function(ref, _) {
     files.assertInRepo();
 
@@ -318,6 +266,58 @@ var gitlet = module.exports = {
           }
         }
       }
+    }
+  },
+
+  update_index: function(path, opts) {
+    files.assertInRepo();
+    opts = opts || {};
+
+    var pathFromRoot = files.pathFromRepoRoot(path);
+    var isOnDisk = fs.existsSync(path);
+    var isInIndex = index.readHasFile(path, 0);
+
+    if (isOnDisk && fs.statSync(path).isDirectory()) {
+      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
+    } else if (opts.remove && !isOnDisk && isInIndex) {
+      index.removeFile(path, 0);
+      return "\n";
+    } else if (opts.remove && !isOnDisk && !isInIndex) {
+      return "\n";
+    } else if (!opts.add && isOnDisk && !isInIndex) {
+      throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
+    } else if (isOnDisk && (opts.add || isInIndex)) {
+      if (index.readFileInConflict(path)) {
+        index.removeFile(path, 1);
+        index.removeFile(path, 2);
+        index.removeFile(path, 3);
+      }
+
+      index.writeFileContent(path, 0, files.read(files.repoPath(path)));
+      return "\n";
+    } else if (!opts.remove && !isOnDisk) {
+      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
+    }
+  },
+
+  write_tree: function(_) {
+    files.assertInRepo();
+    return objects.writeTree(files.nestFlatTree(index.readToc()));
+  },
+
+  update_ref: function(refToUpdate, refToUpdateTo, _) {
+    files.assertInRepo();
+
+    var hash = refs.readHash(refToUpdateTo);
+    if (!objects.readExists(hash)) {
+      throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
+    } else if (!refs.isRef(refToUpdate)) {
+      throw "fatal: Cannot lock the ref " + refToUpdate + ".";
+    } else if (objects.type(objects.read(hash)) !== "commit") {
+      throw "error: Trying to write non-commit object " + hash + " to branch " +
+        refs.readTerminalRef(refToUpdate) + "\n";
+    } else {
+      refs.write(refs.readTerminalRef(refToUpdate), hash);
     }
   }
 };
