@@ -1,11 +1,14 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
+var files = require("../src/files");
 var util = require("../src/util");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
 describe("update-index", function() {
   beforeEach(testUtil.initTestDataDir);
+  beforeEach(testUtil.pinDate);
+  afterEach(testUtil.unpinDate);
 
   it("should throw if not in repo", function() {
     expect(function() { g.update_index(); })
@@ -150,6 +153,68 @@ describe("update-index", function() {
       expect(testUtil.index()[0].path).toEqual("filea"); // sanity
       g.update_index("filea", { remove: true });
       expect(testUtil.index().length).toEqual(0); // gone
+    });
+  });
+
+  describe("resolving conflicts", function() {
+    beforeEach(function() {
+      //       a
+      //       |
+      //       aa
+      //      /  \
+      // M aaa   aaaa
+      //     \   /
+      //       m      O <<<aaaa===aaa>>>
+
+      g.init();
+      testUtil.createDeeplyNestedFileStructure();
+      g.add("filea");
+      g.commit({ m: "a" });
+
+      fs.writeFileSync("filea", "fileaa");
+      g.add("filea");
+      g.commit({ m: "aa" });
+
+      g.branch("other");
+
+      fs.writeFileSync("filea", "fileaaa");
+      g.add("filea");
+      g.commit({ m: "aaa" });
+
+      g.checkout("other");
+
+      fs.writeFileSync("filea", "fileaaaa");
+      g.add("filea");
+      g.commit({ m: "aaaa" });
+
+      g.merge("master");
+    });
+
+    it("should resolve conflict in index", function() {
+      testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+      // sanity check file was conflicted
+      expect(testUtil.index()[1].stage).toEqual(2);
+
+      g.add("filea"); // resolve conflict
+
+      expect(testUtil.index().length).toEqual(1);
+      expect(testUtil.index()[0].path).toEqual("filea");
+      expect(testUtil.index()[0].stage).toEqual(0);
+    });
+
+    it("should add file to objects", function() {
+      testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+
+      // sanity check file was conflicted
+      expect(testUtil.index()[1].stage).toEqual(2);
+
+      var resolvedContent = "sorted out";
+      fs.writeFileSync("filea", resolvedContent);
+      g.add("filea"); // resolve conflict
+
+      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash(resolvedContent)),
+                          resolvedContent);
     });
   });
 });
