@@ -43,6 +43,17 @@ var testUtil = module.exports = {
                                                      "4b": { filed: "filed" }}}}});
   },
 
+  createDeeplyNestedFileStructure: function() {
+    testUtil.createFilesFromTree({ filea: "filea",
+                                   fileb: "fileb",
+                                   c1: { filec: "filec" },
+                                   d1: { filed: "filed" },
+                                   e1: { e2: { filee: "filee" }},
+                                   f1: { f2: { filef: "filef" }},
+                                   g1: { g2: { g3: { fileg: "fileg" }}},
+                                   h1: { h2: { h3: { fileh: "fileh" }}}});
+  },
+
   index: function() {
     return (fs.existsSync(".gitlet/index") ? fs.readFileSync(".gitlet/index", "utf8") : "\n")
       .split("\n")
