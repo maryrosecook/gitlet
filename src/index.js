@@ -28,6 +28,9 @@ var index = module.exports = {
       .reduce(function(obj, k) { return util.assocIn(obj, [k.split(",")[0], idx[k]]); }, {});
   },
 
+  readFileInConflict: function(path) {
+    return index.readHasFile(path, 2);
+  },
   writeFileContent: function(path, stage, content) {
     var idx = index.read();
     idx[index.key(path, stage)] = objects.write(content);
