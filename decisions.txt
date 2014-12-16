@@ -37,9 +37,7 @@ todo
 * init --bare
 * git pull origin master
 * git push origin master
-* merge for conflicted files
 * block pushing to non bare repo
 * see if "." works as a path?
 * make all privatable functions private
 * go through and add throws in places where action not allowed if currently merging
-* test conflict on new file
