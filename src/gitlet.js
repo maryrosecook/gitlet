@@ -272,11 +272,7 @@ var gitlet = module.exports = {
   pull: function(remote, _) {
     files.assertInRepo();
 
-    if (remote === undefined) {
-      throw "unsupported";
-    } else if (!(remote in config.read().remote)) {
-      throw "fatal: " + remote + " does not appear to be a git repository";
-    }
+    this.fetch(remote);
   },
 
   update_index: function(path, opts) {
