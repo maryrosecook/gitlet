@@ -269,6 +269,10 @@ var gitlet = module.exports = {
     }
   },
 
+  pull: function() {
+    files.assertInRepo();
+  },
+
   update_index: function(path, opts) {
     files.assertInRepo();
     opts = opts || {};
