@@ -269,8 +269,12 @@ var gitlet = module.exports = {
     }
   },
 
-  pull: function() {
+  pull: function(remote, _) {
     files.assertInRepo();
+
+    if (remote === undefined) {
+      throw "unsupported";
+    }
   },
 
   update_index: function(path, opts) {

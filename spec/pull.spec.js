@@ -12,4 +12,9 @@ describe("pull", function() {
     expect(function() { g.pull(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
+
+  it("should not support git pull with no name", function() {
+    g.init();
+    expect(function() { g.pull(); }).toThrow("unsupported");
+  });
 });
