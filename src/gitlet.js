@@ -274,6 +274,8 @@ var gitlet = module.exports = {
 
     if (remote === undefined) {
       throw "unsupported";
+    } else if (!(remote in config.read().remote)) {
+      throw "fatal: " + remote + " does not appear to be a git repository";
     }
   },
 

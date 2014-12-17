@@ -17,4 +17,10 @@ describe("pull", function() {
     g.init();
     expect(function() { g.pull(); }).toThrow("unsupported");
   });
+
+  it("should throw if remote does not exist", function() {
+    g.init();
+    expect(function() { g.pull("origin"); })
+      .toThrow("fatal: origin does not appear to be a git repository");
+  });
 });
