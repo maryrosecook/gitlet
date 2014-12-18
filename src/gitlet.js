@@ -249,16 +249,10 @@ var gitlet = module.exports = {
         if (paths.length > 0) {
           throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-          this.update_ref(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
-          workingCopy.write(diff.diff(objects.readCommitToc(receiverHash),
-                                      objects.readCommitToc(giverHash)));
-          index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
+          merge.writeFastForwardMerge(receiverHash, giverHash);
           return "Fast-forward";
         } else {
-          refs.write("MERGE_HEAD", giverHash);
-          merge.writeMergeMsg(receiverHash, giverHash, ref);
-          merge.writeIndex(receiverHash, giverHash);
-          workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
+          merge.writeNonFastForwardMerge(receiverHash, giverHash, ref);
           if (merge.readHasConflicts(receiverHash, giverHash)) {
             return "Automatic merge failed. Fix conflicts and commit the result.";
           } else {

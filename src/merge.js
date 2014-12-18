@@ -3,6 +3,7 @@ var index = require("./index");
 var files = require("./files");
 var diff = require("./diff");
 var refs = require("./refs");
+var workingCopy = require("./working-copy");
 var util = require("./util");
 
 var merge = module.exports = {
@@ -68,5 +69,19 @@ var merge = module.exports = {
         index.writeFileContent(p, 0, content);
       }
     });
+  },
+
+  writeFastForwardMerge: function(receiverHash, giverHash) {
+    refs.write(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+    workingCopy.write(diff.diff(objects.readCommitToc(receiverHash),
+                                objects.readCommitToc(giverHash)));
+    index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
+  },
+
+  writeNonFastForwardMerge: function(receiverHash, giverHash, giverRef) {
+    refs.write("MERGE_HEAD", giverHash);
+    merge.writeMergeMsg(receiverHash, giverHash, giverRef);
+    merge.writeIndex(receiverHash, giverHash);
+    workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
   }
 };
