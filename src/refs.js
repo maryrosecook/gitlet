@@ -7,9 +7,7 @@ var util = require("./util");
 
 var refs = module.exports = {
   isRef: function(ref) {
-    return isSymbolicRef(ref) ||
-      isLocalHeadRef(ref) ||
-      isRemoteHeadRef(ref);
+    return isSymbolicRef(ref) || isLocalHeadRef(ref) || isRemoteHeadRef(ref);
   },
 
   readTerminalRef: function(ref) {
@@ -74,9 +72,7 @@ var refs = module.exports = {
   },
 
   readExists: function(ref) {
-    return ref !== undefined &&
-      (isLocalHeadRef(ref) || isRemoteHeadRef(ref)) &&
-      fs.existsSync(files.gitletPath(ref));
+    return refs.isRef(ref) && fs.existsSync(files.gitletPath(ref));
   },
 
   readCurrentBranchName: function() {
