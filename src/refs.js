@@ -60,14 +60,11 @@ var refs = module.exports = {
 
   composeFetchHead: function(remoteRefs, remoteUrl) {
     return Object.keys(remoteRefs).map(function(name) {
-      var notForMerge;
-      if (name !== refs.readCurrentBranchName() || config.read().branch[name] === undefined) {
-        notForMerge = " not-for-merge";
-      } else {
-        notForMerge = "";
-      }
+      var forMerge =  name === refs.readCurrentBranchName() &&
+          config.read().branch[name] !== undefined;
 
-      return remoteRefs[name] + notForMerge + " branch " + name + " of " + remoteUrl;
+      return remoteRefs[name] + (forMerge ? "" : " not-for-merge") +
+        " branch " + name + " of " + remoteUrl;
     }).join("\n") + "\n";
   },
 
