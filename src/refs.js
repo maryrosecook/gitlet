@@ -23,11 +23,15 @@ var refs = module.exports = {
   readHash: function(refOrHash) {
     if (objects.readExists(refOrHash)) {
       return refOrHash;
-    } else if (refs.readTerminalRef(refOrHash) === "HEAD" ||
-               refs.readTerminalRef(refOrHash) === "MERGE_HEAD") {
-      return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
-    } else if (refs.readExists(refs.readTerminalRef(refOrHash))) {
-      return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
+    } else {
+      var terminalRef = refs.readTerminalRef(refOrHash);
+      if (terminalRef === "HEAD" || terminalRef === "MERGE_HEAD") {
+        return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
+      } else if (terminalRef === "FETCH_HEAD") {
+        return this.readFetchHeadBranchToMerge(refs.readCurrentBranchName());
+      } else if (refs.readExists(terminalRef)) {
+        return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
+      }
     }
   },
 
@@ -64,6 +68,13 @@ var refs = module.exports = {
       return remoteRefs[name] + (forMerge ? "" : " not-for-merge") +
         " branch " + name + " of " + remoteUrl;
     }).join("\n") + "\n";
+  },
+
+  readFetchHeadBranchToMerge: function(branchName) {
+    return util.lines(files.read(files.gitletPath("FETCH_HEAD")))
+      .filter(function(l) { return l.match("not-for-merge") === null; })
+      .filter(function(l) { return l.match("^.+ branch " + branchName + " of"); })
+      .map(function(l) { return l.match("^([^ ]+) ")[1]; })[0];
   },
 
   readLocalHeads: function() {
