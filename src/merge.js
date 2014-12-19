@@ -56,17 +56,17 @@ var merge = module.exports = {
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
         if (mergeDiff[p].base !== undefined) { // (undef if same filepath ADDED w dif content)
-          index.writeFileContent(p, 1, objects.read(mergeDiff[p].base));
+          index.writeEntry(p, 1, objects.read(mergeDiff[p].base));
         }
 
-        index.writeFileContent(p, 2, objects.read(mergeDiff[p].receiver));
-        index.writeFileContent(p, 3, objects.read(mergeDiff[p].giver));
+        index.writeEntry(p, 2, objects.read(mergeDiff[p].receiver));
+        index.writeEntry(p, 3, objects.read(mergeDiff[p].giver));
       } else if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-        index.writeFileContent(p, 0, mergeDiff[p].giver);
+        index.writeEntry(p, 0, mergeDiff[p].giver);
       } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-        index.writeFileContent(p, 0, content);
+        index.writeEntry(p, 0, content);
       }
     });
   },

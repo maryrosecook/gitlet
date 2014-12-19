@@ -44,13 +44,27 @@ var index = module.exports = {
       .map(function(k) { return index.keyPieces(k).path; });
   },
 
-  writeFileContent: function(path, stage, content) {
+  writeAdd: function(path) {
+    if (index.readFileInConflict(path)) {
+      index.rmEntry(path, 1);
+      index.rmEntry(path, 2);
+      index.rmEntry(path, 3);
+    }
+
+    index.writeEntry(path, 0, files.read(files.repoPath(path)));
+  },
+
+  writeRm: function(path) {
+    index.rmEntry(path, 0);
+  },
+
+  writeEntry: function(path, stage, content) {
     var idx = index.read();
     idx[index.key(path, stage)] = objects.write(content);
     index.write(idx);
   },
 
-  removeFile: function(path, stage) {
+  rmEntry: function(path, stage) {
     var idx = index.read();
     delete idx[index.key(path, stage)];
     index.write(idx);

@@ -280,20 +280,18 @@ var gitlet = module.exports = {
     if (isOnDisk && fs.statSync(path).isDirectory()) {
       throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
     } else if (opts.remove && !isOnDisk && isInIndex) {
-      index.removeFile(path, 0);
-      return "\n";
+      if (index.readFileInConflict(path)) {
+        throw "unsupported";
+      } else {
+        index.writeRm(path);
+        return "\n";
+      }
     } else if (opts.remove && !isOnDisk && !isInIndex) {
       return "\n";
     } else if (!opts.add && isOnDisk && !isInIndex) {
       throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
     } else if (isOnDisk && (opts.add || isInIndex)) {
-      if (index.readFileInConflict(path)) {
-        index.removeFile(path, 1);
-        index.removeFile(path, 2);
-        index.removeFile(path, 3);
-      }
-
-      index.writeFileContent(path, 0, files.read(files.repoPath(path)));
+      index.writeAdd(path);
       return "\n";
     } else if (!opts.remove && !isOnDisk) {
       throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
