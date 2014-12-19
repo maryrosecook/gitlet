@@ -67,4 +67,29 @@ describe("pull", function() {
     expect(toc["1a/filea"]).toBeDefined();
     expect(toc["1b/fileb"]).toBeDefined();
   });
+
+  it("should say up to date if already up to date", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    testUtil.createStandardFileStructure();
+    fs.unlinkSync("1b/fileb"); // rm local file to prove we got it into WC from remote
+    gr.add("1a/filea");
+    gr.commit({ m: "first" }); // add identical commits
+
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin"); // fetch to tell local repo about branch
+    gl.branch(undefined, { u: "origin/master" }); // add branch as tracking
+
+    expect(gl.pull("origin")).toEqual("Already up-to-date.");
+  });
 });
