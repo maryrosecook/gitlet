@@ -155,7 +155,7 @@ var gitlet = module.exports = {
         throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
 	        paths.join("\n") + "\n";
       } else {
-        process.chdir(files.repoPath());
+        process.chdir(files.workingCopyPath());
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
@@ -211,7 +211,7 @@ var gitlet = module.exports = {
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
-      var localUrl = files.repoPath();
+      var localUrl = files.workingCopyPath();
       var remoteUrl = config.read().remote[remote].url;
 
       process.chdir(remoteUrl);

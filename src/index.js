@@ -51,7 +51,7 @@ var index = module.exports = {
       index.rmEntry(path, 3);
     }
 
-    index.writeEntry(path, 0, files.read(files.repoPath(path)));
+    index.writeEntry(path, 0, files.read(files.workingCopyPath(path)));
   },
 
   writeRm: function(path) {
@@ -80,9 +80,9 @@ var index = module.exports = {
   readWorkingCopyToc: function() {
     return Object.keys(index.read())
       .map(function(k) { return k.split(",")[0]; })
-      .filter(function(p) { return fs.existsSync(files.repoPath(p)); })
+      .filter(function(p) { return fs.existsSync(files.workingCopyPath(p)); })
       .reduce(function(idx, p) {
-        idx[p] = util.hash(files.read(files.repoPath(p)))
+        idx[p] = util.hash(files.read(files.workingCopyPath(p)))
         return idx;
       }, {});
   },

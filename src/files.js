@@ -14,7 +14,7 @@ var files = module.exports = {
   },
 
   pathFromRepoRoot: function(path) {
-    return nodePath.relative(files.repoPath(), nodePath.join(process.cwd(), path));
+    return nodePath.relative(files.workingCopyPath(), nodePath.join(process.cwd(), path));
   },
 
   write: function(path, content) {
@@ -55,8 +55,8 @@ var files = module.exports = {
     return nodePath.join(gitletDir(), path || "");
   },
 
-  repoPath: function(path) {
-    return nodePath.join(repoDir(), path || "");
+  workingCopyPath: function(path) {
+    return nodePath.join(workingCopyDir(), path || "");
   },
 
   lsRecursive: function(path) {
@@ -110,7 +110,7 @@ function gitletDir(dir) {
   }
 };
 
-function repoDir() {
+function workingCopyDir() {
   if (gitletDir() !== undefined) {
     return nodePath.join(gitletDir(), "..")
   }
