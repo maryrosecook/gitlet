@@ -266,7 +266,7 @@ var gitlet = module.exports = {
   pull: function(remote, _) {
     files.assertInRepo();
     this.fetch(remote);
-    this.merge("FETCH_HEAD");
+    return this.merge("FETCH_HEAD");
   },
 
   update_index: function(path, opts) {
