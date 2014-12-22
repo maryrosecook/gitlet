@@ -12,6 +12,12 @@ describe("diff", function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.diff(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   it("should throw if do not pass --name-status option", function() {
     g.init();
     expect(function() { g.diff(undefined, undefined, {}); }).toThrow("unsupported");

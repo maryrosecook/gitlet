@@ -32,6 +32,7 @@ var gitlet = module.exports = {
 
   add: function(path, _) {
     files.assertInRepo();
+    config.assertNotBare();
 
     var addedFiles = files.lsRecursive(path);
     if (addedFiles.length === 0) {
@@ -45,6 +46,7 @@ var gitlet = module.exports = {
 
   rm: function(path, opts) {
     files.assertInRepo();
+    config.assertNotBare();
     opts = opts || {};
 
     var diskFiles = files.lsRecursive(path);
@@ -79,6 +81,7 @@ var gitlet = module.exports = {
 
   commit: function(opts) {
     files.assertInRepo();
+    config.assertNotBare();
 
     var headHash = refs.readHash("HEAD");
     var treeHash = this.write_tree();
@@ -143,6 +146,7 @@ var gitlet = module.exports = {
 
   checkout: function(ref, _) {
     files.assertInRepo();
+    config.assertNotBare();
 
     var toHash = refs.readHash(ref);
     if (!objects.readExists(toHash)) {
@@ -175,6 +179,7 @@ var gitlet = module.exports = {
 
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
+    config.assertNotBare();
 
     if (ref1 !== undefined && refs.readHash(ref1) === undefined) {
       throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
@@ -237,6 +242,7 @@ var gitlet = module.exports = {
 
   merge: function(ref, _) {
     files.assertInRepo();
+    config.assertNotBare();
 
     var giverHash = refs.readHash(ref);
     if (refs.readIsHeadDetached()) {
@@ -268,12 +274,14 @@ var gitlet = module.exports = {
 
   pull: function(remote, _) {
     files.assertInRepo();
+    config.assertNotBare();
     this.fetch(remote);
     return this.merge("FETCH_HEAD");
   },
 
   update_index: function(path, opts) {
     files.assertInRepo();
+    config.assertNotBare();
     opts = opts || {};
 
     var pathFromRoot = files.pathFromRepoRoot(path);

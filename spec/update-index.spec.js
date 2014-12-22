@@ -15,6 +15,12 @@ describe("update-index", function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.update_index(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   describe("pathspec stipulations", function() {
     it("should throw if path does not match existing working copy file", function() {
       g.init();

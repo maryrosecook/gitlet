@@ -34,6 +34,12 @@ describe("merge", function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.merge(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   describe('common ancestors', function() {
     it("should return hash if same hash passed", function() {
       g.init();

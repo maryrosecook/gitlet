@@ -12,6 +12,12 @@ describe("checkout", function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.checkout(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   it("should throw if pass ref that does not resolve to a hash", function() {
     g.init();
     expect(function() { g.checkout("woo"); })

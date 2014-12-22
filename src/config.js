@@ -2,6 +2,12 @@ var files = require("./files");
 var util = require("./util");
 
 var config = module.exports = {
+  assertNotBare: function() {
+    if (config.read().core[""].bare === "true") {
+      throw "fatal: This operation must be run in a work tree";
+    }
+  },
+
   read: function() {
     return config.strToObj(files.read(files.gitletPath("config")));
   },

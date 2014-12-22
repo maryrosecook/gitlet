@@ -11,6 +11,12 @@ describe("rm", function() {
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.rm(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   describe("pathspec matching", function() {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
