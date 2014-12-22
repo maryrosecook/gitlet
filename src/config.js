@@ -41,7 +41,8 @@ var config = module.exports = {
         }, [])
         .map(function(entry) {
           var settings = configObj[entry.section][entry.subsection];
-          return "[" + entry.section + " " + "\"" + entry.subsection + "\"]\n" +
+          var subsection = entry.subsection === undefined ? "" : " \"" + entry.subsection +"\""
+          return "[" + entry.section + subsection + "]\n" +
             Object.keys(settings)
             .map(function(k) { return "  " + k + " = " + settings[k]; })
             .join("\n") + "\n";
