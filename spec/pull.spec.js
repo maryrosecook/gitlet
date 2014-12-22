@@ -20,6 +20,12 @@ describe("pull", function() {
     expect(function() { g.pull(); }).toThrow("unsupported");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.add(); })
+      .toThrow("fatal: This operation must be run in a work tree");
+  });
+
   it("should throw if remote does not exist", function() {
     g.init();
     expect(function() { g.pull("origin"); })
