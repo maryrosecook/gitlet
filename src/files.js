@@ -104,7 +104,7 @@ function gitletDir(dir) {
     var potentialConfigFile = nodePath.join(dir, "config");
     var potentialGitletPath = nodePath.join(dir, ".gitlet");
     if (fs.existsSync(potentialConfigFile) &&
-        files.read(potentialConfigFile).match(/^\[core\]/)) {
+        files.read(potentialConfigFile).match(/\[core\]/)) {
       return dir;
     } else if (fs.existsSync(potentialGitletPath)) {
       return potentialGitletPath;
