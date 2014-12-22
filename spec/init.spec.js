@@ -12,7 +12,8 @@ describe("init", function() {
     expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/heads/")).toEqual(true);
     testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/HEAD", "ref: refs/heads/master\n")
-    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config", "[core]\n");
+    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config",
+                        "[core]\n  bare = false\n");
   });
 
   it("should not change anything if init run twice", function() {
@@ -23,6 +24,20 @@ describe("init", function() {
     expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/")).toEqual(true);
     expect(fs.existsSync(__dirname + "/testData/repo1/.gitlet/refs/heads/")).toEqual(true);
     testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/HEAD", "ref: refs/heads/master\n")
-    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config", "[core]\n");
+    testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config",
+                        "[core]\n  bare = false\n");
+  });
+
+  describe("bare repos", function() {
+    it("should put all gitlet files and folders in root if specify bare", function() {
+      g.init({ bare: true });
+
+      expect(fs.existsSync(__dirname + "/testData/repo1/objects/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/testData/repo1/refs/")).toEqual(true);
+      expect(fs.existsSync(__dirname + "/testData/repo1/refs/heads/")).toEqual(true);
+      testUtil.expectFile(__dirname + "/testData/repo1/HEAD", "ref: refs/heads/master\n")
+      testUtil.expectFile(__dirname + "/testData/repo1/config",
+                          "[core]\n  bare = true\n");
+    });
   });
 });

@@ -12,19 +12,22 @@ var merge = require("./merge");
 var commit = require("./commit");
 
 var gitlet = module.exports = {
-  init: function(_) {
+  init: function(opts) {
     if (files.inRepo()) { return; }
+    opts = opts || {};
 
-    files.writeFilesFromTree({
-      ".gitlet": {
-        HEAD: "ref: refs/heads/master\n",
-        config: "[core]\n",
-        objects: {},
-        refs: {
-          heads: {},
-        }
+    var conf = config.objToStr({ core: { "": { bare: (opts.bare === true).toString() }}});
+    var gitletStructure = {
+      HEAD: "ref: refs/heads/master\n",
+      config: conf,
+      objects: {},
+      refs: {
+        heads: {},
       }
-    }, process.cwd());
+    };
+
+    files.writeFilesFromTree(opts.bare ? gitletStructure : { ".gitlet": gitletStructure },
+                             process.cwd());
   },
 
   add: function(path, _) {

@@ -101,9 +101,13 @@ function gitletDir(dir) {
   if (dir === undefined) { return gitletDir(process.cwd()); }
 
   if (fs.existsSync(dir)) {
-    var potentialGitletDir = nodePath.join(dir, ".gitlet");
-    if (fs.existsSync(potentialGitletDir)) {
-      return potentialGitletDir;
+    var potentialConfigFile = nodePath.join(dir, "config");
+    var potentialGitletPath = nodePath.join(dir, ".gitlet");
+    if (fs.existsSync(potentialConfigFile) &&
+        files.read(potentialConfigFile).match(/^\[core\]/)) {
+      return dir;
+    } else if (fs.existsSync(potentialGitletPath)) {
+      return potentialGitletPath;
     } else if (dir !== "/") {
       return gitletDir(nodePath.join(dir, ".."));
     }
