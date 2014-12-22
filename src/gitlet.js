@@ -219,6 +219,7 @@ var gitlet = module.exports = {
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
+      var originalDir = process.cwd();
       var localUrl = files.gitletPath();
       var remoteUrl = config.read().remote[remote].url;
 
@@ -232,6 +233,7 @@ var gitlet = module.exports = {
         .forEach(function(r) { gitlet.update_ref(refs.toRemoteRef(remote, r), remoteRefs[r])});
       refs.write("FETCH_HEAD", refs.composeFetchHead(remoteRefs, remoteUrl));
 
+      process.chdir(originalDir);
       return "From " + remoteUrl + "\n" +
         "Count " + remoteObjects.length + "\n" +
         util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
