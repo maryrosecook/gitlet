@@ -11,12 +11,12 @@ var config = module.exports = {
         var lines = item.split("\n");
         var entry = [];
 
-        // category eg "branch" or "core"
+        // section eg "branch" or "core"
         entry.push(lines[0].match(/([^ \]]+)( |\])/)[1]);
 
-        var nameMatch = lines[0].match(/\"(.+)\"/);
-        if (nameMatch !== null) {
-          entry.push(nameMatch[1]); // eg "master"
+        var subsectionMatch = lines[0].match(/\"(.+)\"/);
+        if (subsectionMatch !== null) {
+          entry.push(subsectionMatch[1]); // eg "master"
         }
 
         // options and their values
@@ -33,15 +33,15 @@ var config = module.exports = {
 
   write: function(configObj) {
     var configStr = Object.keys(configObj)
-        .reduce(function(arr, category) {
+        .reduce(function(arr, section) {
           return arr.concat(
-            Object.keys(configObj[category])
-              .map(function(name) { return { name: name, category: category }})
+            Object.keys(configObj[section])
+              .map(function(subsection) { return { section: section, subsection: subsection }})
           );
         }, [])
         .map(function(entry) {
-          var settings = configObj[entry.category][entry.name];
-          return "[" + entry.category + " " + "\"" + entry.name + "\"]\n" +
+          var settings = configObj[entry.section][entry.subsection];
+          return "[" + entry.section + " " + "\"" + entry.subsection + "\"]\n" +
             Object.keys(settings)
             .map(function(k) { return "  " + k + " = " + settings[k]; })
             .join("\n") + "\n";
