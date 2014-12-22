@@ -219,7 +219,7 @@ var gitlet = module.exports = {
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
-      var localUrl = files.workingCopyPath();
+      var localUrl = files.gitletPath();
       var remoteUrl = config.read().remote[remote].url;
 
       process.chdir(remoteUrl);
