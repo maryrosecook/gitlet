@@ -18,7 +18,7 @@ var gitlet = module.exports = {
     files.writeFilesFromTree({
       ".gitlet": {
         HEAD: "ref: refs/heads/master\n",
-        config: "\n",
+        config: "[core]\n",
         objects: {},
         refs: {
           heads: {},

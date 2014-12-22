@@ -9,16 +9,23 @@ var config = module.exports = {
       .filter(function(item) { return item !== ""; })
       .reduce(function(c, item) {
         var lines = item.split("\n");
+        var entry = [];
 
-        var category = lines[0].match(/(.+) /)[1]; // eg "branch"
-        var name = lines[0].match(/\"(.+)\"/)[1];
+        // category eg "branch" or "core"
+        entry.push(lines[0].match(/([^ \]]+)( |\])/)[1]);
 
-        var settings = lines.slice(1).reduce(function(s, l) {
+        var nameMatch = lines[0].match(/\"(.+)\"/);
+        if (nameMatch !== null) {
+          entry.push(nameMatch[1]); // eg "master"
+        }
+
+        // options and their values
+        entry.push(lines.slice(1).reduce(function(s, l) {
           s[l.split("=")[0].trim()] = l.split("=")[1].trim();
           return s;
-        }, {});
+        }, {}));
 
-        return util.assocIn(c, [category, name, settings]);
+        return util.assocIn(c, entry);
       }, { "remote": {}, "branch": {} });
 
     return l;
