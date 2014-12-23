@@ -281,6 +281,10 @@ var gitlet = module.exports = {
     return this.merge("FETCH_HEAD");
   },
 
+  push: function() {
+    files.assertInRepo();
+  },
+
   update_index: function(path, opts) {
     files.assertInRepo();
     config.assertNotBare();
