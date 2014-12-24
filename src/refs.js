@@ -82,6 +82,18 @@ var refs = module.exports = {
       .reduce(function(o, n) { return util.assocIn(o, [n, refs.readHash(n)]); }, {});
   },
 
+  readRemoteHeads: function(remote) {
+    var remoteHeadPath = nodePath.join(files.gitletPath(), "refs", "remotes", remote);
+    if (fs.existsSync(remoteHeadPath)) {
+      return fs.readdirSync(remoteHeadPath)
+        .reduce(function(o, n) {
+          return util.assocIn(o, [n, refs.readHash(refs.toRemoteRef(remote, n))]);
+        }, {});
+    } else {
+      return [];
+    }
+  },
+
   readExists: function(ref) {
     return refs.isRef(ref) && fs.existsSync(files.gitletPath(ref));
   },

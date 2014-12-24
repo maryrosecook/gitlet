@@ -10,6 +10,7 @@ var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
 var commit = require("./commit");
+var fetch = require("./fetch");
 
 var gitlet = module.exports = {
   init: function(opts) {
@@ -224,21 +225,31 @@ var gitlet = module.exports = {
       var remoteUrl = config.read().remote[remote].url;
 
       process.chdir(remoteUrl);
-      var remoteRefs = refs.readLocalHeads();
+      var giverRemoteRefs = refs.readLocalHeads();
       var remoteObjects = objects.readAllHashes().map(objects.read);
 
       process.chdir(localUrl);
       remoteObjects.forEach(objects.write);
-      Object.keys(remoteRefs)
-        .forEach(function(r) { gitlet.update_ref(refs.toRemoteRef(remote, r), remoteRefs[r])});
-      refs.write("FETCH_HEAD", refs.composeFetchHead(remoteRefs, remoteUrl));
+      var receiverRemoteRefs = refs.readRemoteHeads(remote);
+      var changedRefs = Object.keys(giverRemoteRefs)
+          .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
+
+      refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remoteUrl));
+      changedRefs.forEach(function(b) {
+        gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
+      });
 
       process.chdir(originalDir);
-      return "From " + remoteUrl + "\n" +
-        "Count " + remoteObjects.length + "\n" +
-        util.difference(Object.keys(remoteRefs), Object.keys(refs.readLocalHeads()))
-          .map(function(b) { return "* [new branch] " + b + " -> " + remote + "/" + b; })
-          .join("\n") + "\n";
+
+      var refUpdateReport = changedRefs.map(function(b) {
+        return b + " -> " + remote + "/" + b +
+          (fetch.readIsForced(receiverRemoteRefs[b], giverRemoteRefs[b]) ? "" : "forced");
+      });
+
+      return ["From " + remoteUrl,
+              "Count " + remoteObjects.length]
+        .concat(refUpdateReport)
+        .join("\n") + "\n";
     }
   },
 

@@ -215,8 +215,8 @@ describe("fetch", function() {
     gl.remote("add", "origin", remoteRepo);
 
     var fetchReport = gl.fetch("origin");
-    expect(fetchReport).toMatch(/\* \[new branch\] other1 -> origin\/other1/);
-    expect(fetchReport).toMatch(/\* \[new branch\] other2 -> origin\/other2/);
+    expect(fetchReport).toMatch(/other1 -> origin\/other1/);
+    expect(fetchReport).toMatch(/other2 -> origin\/other2/);
   });
 
   it("should format return value nicely", function() {
@@ -238,9 +238,31 @@ describe("fetch", function() {
 
     expect(gl.fetch("origin")).toEqual("From " + remoteRepo + "\n" +
                                        "Count 4\n" +
-                                       "* [new branch] master -> origin/master\n" +
-                                       "* [new branch] other1 -> origin/other1\n" +
-                                       "* [new branch] other2 -> origin/other2\n");
+                                       "master -> origin/master\n" +
+                                       "other1 -> origin/other1\n" +
+                                       "other2 -> origin/other2\n");
+  });
+
+  it("should not report any changed branches if all up to date", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other1");
+    gr.branch("other2");
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+
+    gl.fetch("origin");
+    expect(gl.fetch("origin")).toEqual("From " + remoteRepo + "\n" +
+                                       "Count 4\n");
   });
 
   describe("fetch head", function() {
@@ -378,3 +400,7 @@ describe("fetch", function() {
     });
   });
 });
+
+
+// test one being forced other not
+// test updating one ref and another being unchanged

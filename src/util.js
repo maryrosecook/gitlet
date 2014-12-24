@@ -34,10 +34,6 @@ var util = module.exports = {
     }, []);
   },
 
-  difference: function(a, b) {
-    return a.filter(function(e) { return b.indexOf(e) === -1; });
-  },
-
   unique: function(array) {
     return array.reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, []);
   },
