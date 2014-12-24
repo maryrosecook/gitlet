@@ -303,8 +303,8 @@ describe("fetch", function() {
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gr.add("1a/filea");
-      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+      gl.add("1a/filea");
+      gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
 
       gl.remote("add", "origin", remoteRepo);
       gl.fetch("origin");
@@ -330,8 +330,8 @@ describe("fetch", function() {
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gr.add("1a/filea");
-      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+      gl.add("1a/filea");
+      gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
 
       gl.remote("add", "origin", remoteRepo);
       gl.fetch("origin");
@@ -360,8 +360,8 @@ describe("fetch", function() {
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gr.add("1a/filea");
-      gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
+      gl.add("1a/filea");
+      gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
       gl.remote("add", "origin", remoteRepo);
 
       gl.branch("other");
