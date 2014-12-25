@@ -243,7 +243,7 @@ var gitlet = module.exports = {
 
       var refUpdateReport = changedRefs.map(function(b) {
         return b + " -> " + remote + "/" + b +
-          (fetch.readIsForced(receiverRemoteRefs[b], giverRemoteRefs[b]) ? "" : "forced");
+          (fetch.readIsForced(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
       });
 
       return ["From " + remoteUrl,
