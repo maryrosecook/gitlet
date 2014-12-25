@@ -76,8 +76,8 @@ var objects = module.exports = {
     }
   },
 
-  readIsAncestor: function(intoHash, fromHash) {
-    return objects.readAncestors(intoHash).indexOf(fromHash) !== -1;
+  readIsAncestor: function(descendentHash, ancestorHash) {
+    return objects.readAncestors(descendentHash).indexOf(ancestorHash) !== -1;
   },
 
   readAncestors: function(commitHash) {
