@@ -1,6 +1,7 @@
 var fs = require("fs");
 var nodePath = require("path");
 var g = require("../src/gitlet");
+var util = require("../src/util");
 var testUtil = require("./test-util");
 
 describe("fetch", function() {
@@ -265,6 +266,49 @@ describe("fetch", function() {
                                        "Count 4\n");
   });
 
+  it("should report force updated branch forced and non forced non forced", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+    gr.branch("other");
+
+    process.chdir(localRepo);
+
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+
+    process.chdir(remoteRepo);
+
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" }); // just change something on master - no force
+
+    // add fake commit and use it to amend
+    gr.checkout("other");
+    gr.add("1b/2b/filec");
+    gr.commit({ m: "fake third" }); // add commit
+    var orig = fs.readFileSync(".gitlet/objects/31ad4cf3", "utf8");
+    var amended = orig.replace("parent 17a11ad4\n", "");
+    var amendedCommitHash = util.hash(amended);
+    var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
+    fs.writeFileSync(amendedCommitPath, amended);
+    expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);
+    gr.update_ref("HEAD", amendedCommitHash);
+
+    process.chdir(localRepo);
+
+    expect(gl.fetch("origin")).toEqual("From " + remoteRepo + "\n" +
+                                       "Count 14\n" +
+                                       "master -> origin/master\n" +
+                                       "other -> origin/other (forced)\n");
+  });
+
   describe("fetch head", function() {
     it("should say that all branches not for merge if no tracking branches", function() {
       var gl = g, gr = g;
@@ -400,7 +444,3 @@ describe("fetch", function() {
     });
   });
 });
-
-
-// test one being forced other not
-// test updating one ref and another being unchanged
