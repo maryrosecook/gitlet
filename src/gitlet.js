@@ -220,16 +220,14 @@ var gitlet = module.exports = {
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
-      var originalDir = process.cwd();
-      var localUrl = files.gitletPath();
       var remoteUrl = config.read().remote[remote].url;
+      var remoteObjects = util.runIn(remoteUrl, function() {
+        return objects.readAllHashes().map(objects.read);
+      });
 
-      process.chdir(remoteUrl);
-      var giverRemoteRefs = refs.readLocalHeads();
-      var remoteObjects = objects.readAllHashes().map(objects.read);
-
-      process.chdir(localUrl);
       remoteObjects.forEach(objects.write);
+
+      var giverRemoteRefs = util.runIn(remoteUrl, refs.readLocalHeads);
       var receiverRemoteRefs = refs.readRemoteHeads(remote);
       var changedRefs = Object.keys(giverRemoteRefs)
           .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
@@ -238,8 +236,6 @@ var gitlet = module.exports = {
       changedRefs.forEach(function(b) {
         gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
       });
-
-      process.chdir(originalDir);
 
       var refUpdateReport = changedRefs.map(function(b) {
         return b + " -> " + remote + "/" + b +
