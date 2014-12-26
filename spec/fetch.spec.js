@@ -442,5 +442,25 @@ describe("fetch", function() {
       expect(fetchHeadLines[1])
         .toEqual("17a11ad4 branch other of " + remoteRepo);
     });
+
+    it("should be able to fetch remote even if local has no commits", function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = testUtil.makeRemoteRepo();
+
+      gr.init();
+      testUtil.createStandardFileStructure();
+
+      gr.add("1a/filea");
+      gr.commit({ m: "first" });
+
+      process.chdir(localRepo);
+      gl.init();
+      gl.remote("add", "origin", remoteRepo);
+      gl.fetch("origin");
+
+      expect(fs.readFileSync(".gitlet/FETCH_HEAD", "utf8").split("\n")[0])
+        .toEqual("17a11ad4 not-for-merge branch master of " + remoteRepo);
+    });
   });
 });
