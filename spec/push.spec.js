@@ -33,6 +33,17 @@ describe("push", function() {
       .toThrow("fatal: Current branch master has no upstream branch");
   });
 
+  it("should throw if try to push when head detached", function() {
+    testUtil.createStandardFileStructure();
+    g.init();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+    g.checkout("17a11ad4");
+
+    expect(function() { g.push("origin"); })
+      .toThrow("fatal: You are not currently on a branch");
+  });
+
   it("should not throw if current branch has an upstream branch", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
