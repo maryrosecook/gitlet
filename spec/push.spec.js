@@ -5,7 +5,7 @@ var objects = require("../src/objects");
 var refs = require("../src/refs");
 var testUtil = require("./test-util");
 
-describe("pull", function() {
+describe("push", function() {
   beforeEach(testUtil.initTestDataDir);
   beforeEach(testUtil.pinDate);
   afterEach(testUtil.unpinDate);
