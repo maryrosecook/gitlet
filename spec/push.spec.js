@@ -25,4 +25,34 @@ describe("push", function() {
     expect(function() { g.push("origin"); })
       .toThrow("fatal: origin does not appear to be a git repository");
   });
+
+  it("should throw if current branch does not have an upstream branch", function() {
+    g.init();
+    g.remote("add", "origin", "whatever");
+    expect(function() { g.push("origin"); })
+      .toThrow("fatal: Current branch master has no upstream branch");
+  });
+
+  it("should not throw if current branch has an upstream branch", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    gr.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    testUtil.createStandardFileStructure();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" }); // have to create commits to avoid "never heard of master"
+
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+    gl.branch(undefined, { u: "origin/master" });
+
+    gl.push("origin");
+  });
 });

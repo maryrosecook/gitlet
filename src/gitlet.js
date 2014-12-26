@@ -299,6 +299,8 @@ var gitlet = module.exports = {
       throw "unsupported";
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
+    } else if (config.read().branch[refs.readCurrentBranchName()] === undefined) {
+      throw "fatal: Current branch " + refs.readCurrentBranchName() +" has no upstream branch";
     }
   },
 
