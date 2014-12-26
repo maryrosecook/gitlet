@@ -292,8 +292,12 @@ var gitlet = module.exports = {
     return this.merge("FETCH_HEAD");
   },
 
-  push: function() {
+  push: function(remote, _) {
     files.assertInRepo();
+
+    if (remote === undefined) {
+      throw "unsupported";
+    }
   },
 
   update_index: function(path, opts) {

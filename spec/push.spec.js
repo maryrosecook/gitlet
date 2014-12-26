@@ -14,4 +14,9 @@ describe("push", function() {
     expect(function() { g.push(); })
       .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
   });
+
+  it("should not support git push with no remote name", function() {
+    g.init();
+    expect(function() { g.push(); }).toThrow("unsupported");
+  });
 });
