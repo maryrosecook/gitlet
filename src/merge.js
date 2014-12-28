@@ -38,7 +38,7 @@ var merge = module.exports = {
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {
-    var msg = "Merge " + ref + " into " + refs.readCurrentBranchName();
+    var msg = "Merge " + ref + " into " + refs.readHeadBranchName();
 
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     var conflicts = Object.keys(mergeDiff)
@@ -72,7 +72,7 @@ var merge = module.exports = {
   },
 
   writeFastForwardMerge: function(receiverHash, giverHash) {
-    refs.write(refs.toLocalRef(refs.readCurrentBranchName()), giverHash);
+    refs.write(refs.toLocalRef(refs.readHeadBranchName()), giverHash);
     workingCopy.write(diff.diff(objects.readCommitToc(receiverHash),
                                 objects.readCommitToc(giverHash)));
     index.write(index.tocToIndex(objects.readCommitToc(giverHash)));

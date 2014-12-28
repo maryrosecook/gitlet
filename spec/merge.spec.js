@@ -386,7 +386,7 @@ describe("merge", function() {
         g.checkout("other");
 
         expect(g.merge("master")).toEqual("Fast-forward");
-        expect(refs.readCurrentBranchName()).toEqual("other");
+        expect(refs.readHeadBranchName()).toEqual("other");
       });
 
       it("should update working copy after merge", function() {
@@ -529,7 +529,7 @@ describe("merge", function() {
 
         it("should stay on branch after merge", function() {
           g.merge("master");
-          expect(refs.readCurrentBranchName()).toEqual("other");
+          expect(refs.readHeadBranchName()).toEqual("other");
         });
 
         it("should return string describing merge strategy", function() {

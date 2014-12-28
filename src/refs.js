@@ -28,7 +28,7 @@ var refs = module.exports = {
       if (terminalRef === "HEAD" || terminalRef === "MERGE_HEAD") {
         return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
       } else if (terminalRef === "FETCH_HEAD") {
-        return this.readFetchHeadBranchToMerge(refs.readCurrentBranchName());
+        return this.readFetchHeadBranchToMerge(refs.readHeadBranchName());
       } else if (refs.readExists(terminalRef)) {
         return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
       }
@@ -62,7 +62,7 @@ var refs = module.exports = {
 
   composeFetchHead: function(remoteRefs, remoteUrl) {
     return Object.keys(remoteRefs).map(function(name) {
-      var forMerge =  name === refs.readCurrentBranchName() &&
+      var forMerge =  name === refs.readHeadBranchName() &&
           config.read().branch[name] !== undefined;
 
       return remoteRefs[name] + (forMerge ? "" : " not-for-merge") +
@@ -98,8 +98,8 @@ var refs = module.exports = {
     return refs.isRef(ref) && fs.existsSync(files.gitletPath(ref));
   },
 
-  readCurrentBranchName: function() {
-    if (!refs.readIsHeadDetached()) {
+  readHeadBranchName: function() {
+    if (!refs.readIsHeadDetached() && !config.readIsBare()) {
       return files.read(files.gitletPath("HEAD")).match("refs/heads/(.+)")[1];
     }
   }

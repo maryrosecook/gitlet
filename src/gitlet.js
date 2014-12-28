@@ -86,7 +86,7 @@ var gitlet = module.exports = {
 
     var headHash = refs.readHash("HEAD");
     var treeHash = this.write_tree();
-    var headDesc = refs.readIsHeadDetached() ? "detached HEAD" : refs.readCurrentBranchName();
+    var headDesc = refs.readIsHeadDetached() ? "detached HEAD" : refs.readHeadBranchName();
 
     if (headHash !== undefined &&
         treeHash === objects.treeHash(objects.read(headHash))) {
@@ -121,7 +121,7 @@ var gitlet = module.exports = {
 
     if (name === undefined && opts.u === undefined) {
       return Object.keys(refs.readLocalHeads()).map(function(branch) {
-        return (branch === refs.readCurrentBranchName() ? "* " : "  ") + branch;
+        return (branch === refs.readHeadBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
       throw "fatal: Not a valid object name: master.";
@@ -135,7 +135,7 @@ var gitlet = module.exports = {
         throw "error: the requested upstream branch " + opts.u + " does not exist";
       } else {
         config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
-        return "Branch " + refs.readCurrentBranchName() +
+        return "Branch " + refs.readHeadBranchName() +
           " set up to track remote branch " + rem[1] + " from " + rem[0] + ".";
       }
     } else if (refs.readExists(refs.toLocalRef(name))) {
@@ -154,7 +154,7 @@ var gitlet = module.exports = {
       throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
     } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw "fatal: reference is not a tree: " + ref;
-    } else if (ref === refs.readCurrentBranchName() ||
+    } else if (ref === refs.readHeadBranchName() ||
                ref === files.read(files.gitletPath("HEAD"))) {
       return "Already on " + ref;
     } else {
@@ -297,8 +297,8 @@ var gitlet = module.exports = {
       throw "fatal: You are not currently on a branch";
     } else if (!(remote in config.read().remote)) {
       throw "fatal: " + remote + " does not appear to be a git repository";
-    } else if (config.read().branch[refs.readCurrentBranchName()] === undefined) {
-      throw "fatal: Current branch " + refs.readCurrentBranchName() +" has no upstream branch";
+    } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
+      throw "fatal: Current branch " + refs.readHeadBranchName() +" has no upstream branch";
     }
   },
 
