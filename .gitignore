@@ -2,3 +2,4 @@
 node_modules
 spec/testData
 npm-debug.log
+.tern-port
