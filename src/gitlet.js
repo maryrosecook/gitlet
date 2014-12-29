@@ -277,22 +277,22 @@ var gitlet = module.exports = {
     }
   },
 
-  pull: function(remote, _) {
+  pull: function(remoteName, _) {
     files.assertInRepo();
     config.assertNotBare();
-    this.fetch(remote);
+    this.fetch(remoteName);
     return this.merge("FETCH_HEAD");
   },
 
-  push: function(remote, _) {
+  push: function(remoteName, _) {
     files.assertInRepo();
 
-    if (remote === undefined) {
+    if (remoteName === undefined) {
       throw "unsupported";
     } else if (refs.readIsHeadDetached()) {
       throw "fatal: You are not currently on a branch";
-    } else if (!(remote in config.read().remote)) {
-      throw "fatal: " + remote + " does not appear to be a git repository";
+    } else if (!(remoteName in config.read().remote)) {
+      throw "fatal: " + remoteName + " does not appear to be a git repository";
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
       throw "fatal: Current branch " + refs.readHeadBranchName() +" has no upstream branch";
     }
