@@ -13,6 +13,11 @@ var remote = module.exports = {
     return remote.runIn(remoteName, refs.readLocalHeads);
   },
 
+  readCanPushTo: function(remoteName, branch) {
+    return remote.runIn(remoteName, function() {
+      return config.readIsBare() || refs.readHeadBranchName() !== branch;
+    });
+  },
   runIn: function(remoteName, fn) {
     var originalDir = process.cwd();
     process.chdir(config.read().remote[remoteName].url);

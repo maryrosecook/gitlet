@@ -44,26 +44,30 @@ describe("push", function() {
       .toThrow("fatal: You are not currently on a branch");
   });
 
-  it("should not throw if current branch has an upstream branch", function() {
+  it("should throw if try push to non-bare repo where pushed branch checked out", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
     var remoteRepo = testUtil.makeRemoteRepo();
 
-    gr.init();
     testUtil.createStandardFileStructure();
+    gr.init();
     gr.add("1a/filea");
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
-    gl.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
-    gr.commit({ m: "first" }); // have to create commits to avoid "never heard of master"
+    gl.init();
+    gl.add("1a/filea");
+    gl.commit({ m: "first" });
 
-    gl.remote("add", "origin", remoteRepo);
-    gl.fetch("origin");
-    gl.branch(undefined, { u: "origin/master" });
+    process.chdir(remoteRepo);
+    gr.remote("add", "origin", localRepo);
+    gr.fetch("origin");
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" });
+    gr.branch(undefined, { u: "origin/master" });
 
-    gl.push("origin");
+    expect(function() { gr.push("origin"); })
+      .toThrow("error: refusing to update checked out branch: master");
   });
 });

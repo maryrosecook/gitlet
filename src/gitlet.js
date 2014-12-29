@@ -295,6 +295,11 @@ var gitlet = module.exports = {
       throw "fatal: " + remoteName + " does not appear to be a git repository";
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
       throw "fatal: Current branch " + refs.readHeadBranchName() +" has no upstream branch";
+    } else {
+      var branch = refs.readTerminalRef(refs.readHeadBranchName());
+      if (remote.readCanPushTo(remoteName, branch)) {
+        throw "error: refusing to update checked out branch: " + refs.readHeadBranchName();
+      }
     }
   },
 
