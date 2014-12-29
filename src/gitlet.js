@@ -10,7 +10,7 @@ var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
 var commit = require("./commit");
-var fetch = require("./fetch");
+var remote = require("./remote");
 
 var gitlet = module.exports = {
   init: function(opts) {
@@ -212,38 +212,34 @@ var gitlet = module.exports = {
     }
   },
 
-  fetch: function(remote, _) {
+  fetch: function(remoteName, _) {
     files.assertInRepo();
 
-    if (remote === undefined) {
+    if (remoteName === undefined) {
       throw "unsupported";
-    } else if (!(remote in config.read().remote)) {
-      throw "fatal: " + remote + " does not appear to be a git repository";
+    } else if (!(remoteName in config.read().remote)) {
+      throw "fatal: " + remoteName + " does not appear to be a git repository";
     } else {
-      var remoteUrl = config.read().remote[remote].url;
-      var remoteObjects = util.runIn(remoteUrl, function() {
-        return objects.readAllHashes().map(objects.read);
-      });
+      remote.readRemoteObjects(remoteName).forEach(objects.write);
 
-      remoteObjects.forEach(objects.write);
-
-      var giverRemoteRefs = util.runIn(remoteUrl, refs.readLocalHeads);
-      var receiverRemoteRefs = refs.readRemoteHeads(remote);
+      var remoteUrl = config.read().remote[remoteName].url;
+      var giverRemoteRefs = remote.readRemoteHeads(remoteName);
+      var receiverRemoteRefs = refs.readRemoteHeads(remoteName);
       var changedRefs = Object.keys(giverRemoteRefs)
           .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
 
       refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remoteUrl));
       changedRefs.forEach(function(b) {
-        gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
+        gitlet.update_ref(refs.toRemoteRef(remoteName, b), giverRemoteRefs[b])
       });
 
       var refUpdateReport = changedRefs.map(function(b) {
-        return b + " -> " + remote + "/" + b +
-          (fetch.readIsForced(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
+        return b + " -> " + remoteName + "/" + b +
+          (merge.readIsForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
       });
 
       return ["From " + remoteUrl,
-              "Count " + remoteObjects.length]
+              "Count " + remote.readRemoteObjects(remoteName).length]
         .concat(refUpdateReport)
         .join("\n") + "\n";
     }

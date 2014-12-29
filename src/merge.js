@@ -24,6 +24,10 @@ var merge = module.exports = {
     return objects.readIsAncestor(giverHash, receiverHash);
   },
 
+  readIsForce: function(receiverHash, giverHash) {
+    return receiverHash !== undefined && !objects.readIsAncestor(giverHash, receiverHash);
+  },
+
   readHasConflicts: function(receiverHash, giverHash) {
     var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
     return Object.keys(mergeDiff)

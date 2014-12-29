@@ -40,14 +40,5 @@ var util = module.exports = {
 
   intersection: function(a, b) {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
-  },
-
-  runIn: function(dir, fn) {
-    var originalDir = process.cwd();
-    process.chdir(dir);
-
-    var result = fn();
-    process.chdir(originalDir);
-    return result;
   }
 };
