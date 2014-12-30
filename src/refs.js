@@ -39,6 +39,10 @@ var refs = module.exports = {
     return files.read(files.gitletPath("HEAD")).match("refs") === null;
   },
 
+  readIsCheckedOut: function(branch) {
+    return config.readIsBare() || refs.readHeadBranchName() !== branch;
+  },
+
   toLocalRef: function(name) {
     return "refs/heads/" + name;
   },

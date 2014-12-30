@@ -13,9 +13,9 @@ var remote = module.exports = {
     return remote.runIn(remoteName, refs.readLocalHeads);
   },
 
-  readCanPushTo: function(remoteName, branch) {
+  readIsCheckedOut: function(remoteName, branchName) {
     return remote.runIn(remoteName, function() {
-      return config.readIsBare() || refs.readHeadBranchName() !== branch;
+      return refs.readIsCheckedOut(branchName);
     });
   },
   runIn: function(remoteName, fn) {
