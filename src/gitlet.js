@@ -10,7 +10,6 @@ var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
 var commit = require("./commit");
-var remote = require("./remote");
 
 var gitlet = module.exports = {
   init: function(opts) {
@@ -212,34 +211,34 @@ var gitlet = module.exports = {
     }
   },
 
-  fetch: function(remoteName, _) {
+  fetch: function(remote, _) {
     files.assertInRepo();
 
-    if (remoteName === undefined) {
+    if (remote === undefined) {
       throw "unsupported";
-    } else if (!(remoteName in config.read().remote)) {
-      throw "fatal: " + remoteName + " does not appear to be a git repository";
+    } else if (!(remote in config.read().remote)) {
+      throw "fatal: " + remote + " does not appear to be a git repository";
     } else {
-      remote.readRemoteObjects(remoteName).forEach(objects.write);
+      util.remote(remote, objects.readAllObjects)().forEach(objects.write);
 
-      var remoteUrl = config.read().remote[remoteName].url;
-      var giverRemoteRefs = remote.readRemoteHeads(remoteName);
-      var receiverRemoteRefs = refs.readRemoteHeads(remoteName);
+      var remoteUrl = config.read().remote[remote].url;
+      var giverRemoteRefs = util.remote(remote, refs.readLocalHeads)();
+      var receiverRemoteRefs = refs.readRemoteHeads(remote);
       var changedRefs = Object.keys(giverRemoteRefs)
           .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
 
       refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remoteUrl));
       changedRefs.forEach(function(b) {
-        gitlet.update_ref(refs.toRemoteRef(remoteName, b), giverRemoteRefs[b])
+        gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
       });
 
       var refUpdateReport = changedRefs.map(function(b) {
-        return b + " -> " + remoteName + "/" + b +
+        return b + " -> " + remote + "/" + b +
           (merge.readIsForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
       });
 
       return ["From " + remoteUrl,
-              "Count " + remote.readRemoteObjects(remoteName).length]
+              "Count " + util.remote(remote, objects.readAllObjects)().length]
         .concat(refUpdateReport)
         .join("\n") + "\n";
     }
@@ -277,26 +276,27 @@ var gitlet = module.exports = {
     }
   },
 
-  pull: function(remoteName, _) {
+  pull: function(remote, _) {
     files.assertInRepo();
     config.assertNotBare();
-    this.fetch(remoteName);
+    this.fetch(remote);
     return this.merge("FETCH_HEAD");
   },
 
-  push: function(remoteName, _) {
+  push: function(remote, _) {
     files.assertInRepo();
 
-    if (remoteName === undefined) {
+    var headBranch = refs.readHeadBranchName();
+    if (remote === undefined) {
       throw "unsupported";
     } else if (refs.readIsHeadDetached()) {
       throw "fatal: You are not currently on a branch";
-    } else if (!(remoteName in config.read().remote)) {
-      throw "fatal: " + remoteName + " does not appear to be a git repository";
+    } else if (!(remote in config.read().remote)) {
+      throw "fatal: " + remote + " does not appear to be a git repository";
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
       throw "fatal: Current branch " + refs.readHeadBranchName() +" has no upstream branch";
-    } else if (!remote.readIsCheckedOut(remoteName, refs.readHeadBranchName())) {
-      throw "error: refusing to update checked out branch: " + refs.readHeadBranchName();
+    } else if (util.remote(remote, refs.readIsCheckedOut)(remote, headBranch)) {
+      throw "error: refusing to update checked out branch: " + headBranch;
     }
   },
 

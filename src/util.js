@@ -40,5 +40,15 @@ var util = module.exports = {
 
   intersection: function(a, b) {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
+  },
+
+  remote: function(remoteName, fn) {
+    return function() {
+      var originalDir = process.cwd();
+      process.chdir(require("./config").read().remote[remoteName].url);
+      var result = fn.apply(null, arguments);
+      process.chdir(originalDir);
+      return result;
+    };
   }
 };

@@ -61,8 +61,8 @@ var objects = module.exports = {
     }
   },
 
-  readAllHashes: function() {
-    return fs.readdirSync(files.gitletPath("objects"));
+  readAllObjects: function() {
+    return fs.readdirSync(files.gitletPath("objects")).map(objects.read);
   },
 
   type: function(str) {
