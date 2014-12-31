@@ -297,7 +297,7 @@ var gitlet = module.exports = {
       throw new Error("error: " + remote + " does not appear to be a git repository");
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
       throw new Error("error: current branch " + headBranch + " has no upstream branch");
-    } else if (util.remote(remote, refs.readIsCheckedOut)(remote, headBranch)) {
+    } else if (util.remote(remote, refs.readIsCheckedOut)(headBranch)) {
       throw new Error("error: refusing to update checked out branch " + headBranch);
     }
   },
