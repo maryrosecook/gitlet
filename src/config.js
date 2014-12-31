@@ -8,7 +8,7 @@ var config = module.exports = {
 
   assertNotBare: function() {
     if (config.readIsBare()) {
-      throw "fatal: This operation must be run in a work tree";
+      throw new Error("fatal: This operation must be run in a work tree");
     }
   },
 

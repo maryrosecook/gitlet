@@ -36,7 +36,8 @@ var gitlet = module.exports = {
 
     var addedFiles = files.lsRecursive(path);
     if (addedFiles.length === 0) {
-      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
+      throw new Error("fatal: pathspec " + files.pathFromRepoRoot(path) +
+                      " did not match any files");
     } else {
       for (var i = 0; i < addedFiles.length; i++) {
         this.update_index(addedFiles[i], { add: true });
@@ -53,11 +54,12 @@ var gitlet = module.exports = {
     var fileList = Object.keys(index.readToc()).
         filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
     if (opts.f) {
-      throw "unsupported";
+      throw new Error("unsupported");
     } else if (fileList.length === 0) {
-      throw "fatal: pathspec " + files.pathFromRepoRoot(path) + " did not match any files";
+      throw new Error("fatal: pathspec " + files.pathFromRepoRoot(path) +
+                      " did not match any files");
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
-      throw "fatal: not removing " + path + " recursively without -r";
+      throw new Error("fatal: not removing " + path + " recursively without -r");
     } else {
       var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
       var wcDiff = diff.nameStatus(headToc, index.readWorkingCopyToc());
@@ -66,7 +68,8 @@ var gitlet = module.exports = {
       var changesToRm = util.intersection(addedModified, fileList);
 
       if (changesToRm.length > 0) {
-        throw "error: the following files have changes:\n" + changesToRm.join("\n") + "\n";
+        throw new Error("error: the following files have changes:\n" +
+                        changesToRm.join("\n") + "\n");
       } else {
         for (var i = 0; i < fileList.length; i++) {
           if (fs.existsSync(fileList[i])) {
@@ -89,7 +92,8 @@ var gitlet = module.exports = {
 
     if (headHash !== undefined &&
         treeHash === objects.treeHash(objects.read(headHash))) {
-      throw "# On " + headDesc + "\n" + "nothing to commit, working directory clean";
+      throw new Error("# On " + headDesc + "\n" +
+                      "nothing to commit, working directory clean");
     } else {
       var message = merge.readIsMergeInProgress() ?
           files.read(files.gitletPath("MERGE_MSG")) :
@@ -101,8 +105,9 @@ var gitlet = module.exports = {
       if (merge.readIsMergeInProgress()) {
         var conflictedPaths = index.readConflictedPaths();
         if (conflictedPaths.length > 0) {
-          throw conflictedPaths.map(function(p) { return "U " + p; }).join("\n") + "\n" +
-            "error: 'commit' is not possible because you have unmerged files.\n";
+          throw new Error(conflictedPaths.map(function(p) { return "U " + p; }).join("\n") +
+                          "\n" + "error: 'commit' is not possible because " +
+                          "you have unmerged files.\n");
         } else {
           fs.unlinkSync(files.gitletPath("MERGE_MSG"));
           refs.rm("MERGE_HEAD");
@@ -123,22 +128,23 @@ var gitlet = module.exports = {
         return (branch === refs.readHeadBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
     } else if (refs.readHash("HEAD") === undefined) {
-      throw "fatal: Not a valid object name: master.";
+      throw new Error("fatal: Not a valid object name: master.");
     } else if (name === undefined && opts.u !== undefined) {
       var rem = opts.u.split("/");
 
       if (refs.readIsHeadDetached()) {
-        throw "fatal: could not set upstream of HEAD to " + opts.u +
-          " when it does not point to any branch.";
+        throw new Error("fatal: could not set upstream of HEAD to " + opts.u +
+                        " when it does not point to any branch.");
       } else if (!refs.readExists(refs.toRemoteRef(rem[0], rem[1]))) {
-        throw "error: the requested upstream branch " + opts.u + " does not exist";
+        throw new Error("error: the requested upstream branch " + opts.u +
+                        " does not exist");
       } else {
         config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
         return "Branch " + refs.readHeadBranchName() +
           " set up to track remote branch " + rem[1] + " from " + rem[0] + ".";
       }
     } else if (refs.readExists(refs.toLocalRef(name))) {
-      throw "fatal: A branch named " + name + " already exists.";
+      throw new Error("fatal: A branch named " + name + " already exists.");
     } else {
       this.update_ref(refs.toLocalRef(name), refs.readHash("HEAD"));
     }
@@ -150,17 +156,18 @@ var gitlet = module.exports = {
 
     var toHash = refs.readHash(ref);
     if (!objects.readExists(toHash)) {
-      throw "error: pathspec " + ref + " did not match any file(s) known to gitlet."
+      throw new Error("error: pathspec " + ref +
+                      " did not match any file(s) known to gitlet.");
     } else if (objects.type(objects.read(toHash)) !== "commit") {
-      throw "fatal: reference is not a tree: " + ref;
+      throw new Error("fatal: reference is not a tree: " + ref);
     } else if (ref === refs.readHeadBranchName() ||
                ref === files.read(files.gitletPath("HEAD"))) {
       return "Already on " + ref;
     } else {
       var paths = diff.readChangedFilesCommitWouldOverwrite(toHash);
       if (paths.length > 0) {
-        throw "error: Aborting. Your local changes to these files would be overwritten:\n" +
-	        paths.join("\n") + "\n";
+        throw new Error("error: Aborting. Your local changes to these files would be " +
+                        "overwritten:\n" + paths.join("\n") + "\n");
       } else {
         process.chdir(files.workingCopyPath());
 
@@ -182,12 +189,12 @@ var gitlet = module.exports = {
     config.assertNotBare();
 
     if (ref1 !== undefined && refs.readHash(ref1) === undefined) {
-      throw "fatal: ambiguous argument " + ref1 + ": unknown revision";
+      throw new Error("fatal: ambiguous argument " + ref1 + ": unknown revision");
     } else if (ref2 !== undefined && refs.readHash(ref2) === undefined) {
-      throw "fatal: ambiguous argument " + ref2 + ": unknown revision";
+      throw new Error("fatal: ambiguous argument " + ref2 + ": unknown revision");
     } else {
       if (opts["name-status"] !== true) {
-        throw "unsupported"; // for now
+        throw new Error("unsupported"); // for now
       } else {
         var nameToStatus = diff.readDiff(refs.readHash(ref1),
                                          refs.readHash(ref2));
@@ -202,9 +209,9 @@ var gitlet = module.exports = {
     files.assertInRepo();
 
     if (command !== "add") {
-      throw "unsupported";
+      throw new Error("unsupported");
     } else if (name in config.read()["remote"]) {
-      throw "fatal: remote " + name + " already exists.";
+      throw new Error("fatal: remote " + name + " already exists.");
     } else if (command === "add") {
       config.write(util.assocIn(config.read(), ["remote", name, "url", path]));
       return "\n";
@@ -215,9 +222,9 @@ var gitlet = module.exports = {
     files.assertInRepo();
 
     if (remote === undefined) {
-      throw "unsupported";
+      throw new Error("unsupported");
     } else if (!(remote in config.read().remote)) {
-      throw "fatal: " + remote + " does not appear to be a git repository";
+      throw new Error("fatal: " + remote + " does not appear to be a git repository");
     } else {
       util.remote(remote, objects.readAllObjects)().forEach(objects.write);
 
@@ -250,9 +257,9 @@ var gitlet = module.exports = {
 
     var giverHash = refs.readHash(ref);
     if (refs.readIsHeadDetached()) {
-      throw "unsupported";
+      throw new Error("unsupported");
     } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
-      throw "error: " + ref + ": expected commit type";
+      throw new Error("error: " + ref + ": expected commit type");
     } else {
       var receiverHash = refs.readHash("HEAD");
       if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
@@ -260,7 +267,8 @@ var gitlet = module.exports = {
       } else {
         var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
         if (paths.length > 0) {
-          throw "Aborting. Local changes would be overwritten:\n" + paths.join("\n") + "\n";
+          throw new Error("Aborting. Local changes would be overwritten:\n" +
+                          paths.join("\n") + "\n");
         } else if (merge.readCanFastForward(receiverHash, giverHash)) {
           merge.writeFastForwardMerge(receiverHash, giverHash);
           return "Fast-forward";
@@ -293,15 +301,16 @@ var gitlet = module.exports = {
 
     var headBranch = refs.readHeadBranchName();
     if (remote === undefined) {
-      throw "unsupported";
+      throw new Error("unsupported");
     } else if (refs.readIsHeadDetached()) {
-      throw "fatal: You are not currently on a branch";
+      throw new Error("fatal: You are not currently on a branch");
     } else if (!(remote in config.read().remote)) {
-      throw "fatal: " + remote + " does not appear to be a git repository";
+      throw new Error("fatal: " + remote + " does not appear to be a git repository");
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
-      throw "fatal: Current branch " + refs.readHeadBranchName() +" has no upstream branch";
+      throw new Error("fatal: Current branch " + refs.readHeadBranchName() +
+                      " has no upstream branch");
     } else if (util.remote(remote, refs.readIsCheckedOut)(remote, headBranch)) {
-      throw "error: refusing to update checked out branch: " + headBranch;
+      throw new Error("error: refusing to update checked out branch: " + headBranch);
     }
   },
 
@@ -315,10 +324,11 @@ var gitlet = module.exports = {
     var isInIndex = index.readHasFile(path, 0);
 
     if (isOnDisk && fs.statSync(path).isDirectory()) {
-      throw "error: " + pathFromRoot + ": is a directory - add files inside instead\n";
+      throw new Error("error: " + pathFromRoot +
+                      ": is a directory - add files inside instead\n");
     } else if (opts.remove && !isOnDisk && isInIndex) {
       if (index.readFileInConflict(path)) {
-        throw "unsupported";
+        throw new Error("unsupported");
       } else {
         index.writeRm(path);
         return "\n";
@@ -326,12 +336,14 @@ var gitlet = module.exports = {
     } else if (opts.remove && !isOnDisk && !isInIndex) {
       return "\n";
     } else if (!opts.add && isOnDisk && !isInIndex) {
-      throw "error: "+ pathFromRoot +": cannot add to the index - missing --add option?\n";
+      throw new Error("error: "+ pathFromRoot +
+                      ": cannot add to the index - missing --add option?\n");
     } else if (isOnDisk && (opts.add || isInIndex)) {
       index.writeAdd(path);
       return "\n";
     } else if (!opts.remove && !isOnDisk) {
-      throw "error: " + pathFromRoot + ": does not exist and --remove not passed\n";
+      throw new Error("error: " + pathFromRoot +
+                      ": does not exist and --remove not passed\n");
     }
   },
 
@@ -345,12 +357,12 @@ var gitlet = module.exports = {
 
     var hash = refs.readHash(refToUpdateTo);
     if (!objects.readExists(hash)) {
-      throw "fatal: " + refToUpdateTo + ": not a valid SHA1";
+      throw new Error("fatal: " + refToUpdateTo + ": not a valid SHA1");
     } else if (!refs.isRef(refToUpdate)) {
-      throw "fatal: Cannot lock the ref " + refToUpdate + ".";
+      throw new Error("fatal: Cannot lock the ref " + refToUpdate + ".");
     } else if (objects.type(objects.read(hash)) !== "commit") {
-      throw "error: Trying to write non-commit object " + hash + " to branch " +
-        refs.readTerminalRef(refToUpdate) + "\n";
+      throw new Error("error: Trying to write non-commit object " + hash + " to branch " +
+                      refs.readTerminalRef(refToUpdate) + "\n");
     } else {
       refs.write(refs.readTerminalRef(refToUpdate), hash);
     }
