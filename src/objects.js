@@ -47,6 +47,10 @@ var objects = module.exports = {
     return contentHash;
   },
 
+  readIsUpToDate: function(receiverHash, giverHash) {
+    return receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash);
+  },
+
   readExists: function(objectHash) {
     return objectHash !== undefined &&
       fs.existsSync(nodePath.join(files.gitletPath(), "objects", objectHash));

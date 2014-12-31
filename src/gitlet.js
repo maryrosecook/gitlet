@@ -299,6 +299,11 @@ var gitlet = module.exports = {
       throw new Error("error: current branch " + headBranch + " has no upstream branch");
     } else if (util.remote(remote, refs.readIsCheckedOut)(headBranch)) {
       throw new Error("error: refusing to update checked out branch " + headBranch);
+    } else {
+      var receiverHash = util.remote(remote, refs.readHash)(headBranch);
+      if (objects.readIsUpToDate(receiverHash, refs.readHash(headBranch))) {
+        return "Already up-to-date.";
+      }
     }
   },
 

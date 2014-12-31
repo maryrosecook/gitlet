@@ -70,4 +70,37 @@ describe("push", function() {
     expect(function() { gr.push("origin"); })
       .toThrow("error: refusing to update checked out branch master");
   });
+
+  it("should return up to date if try push current remote hash", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    testUtil.createStandardFileStructure();
+    gr.init();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    testUtil.createStandardFileStructure();
+    gl.init();
+    gl.add("1a/filea");
+    gr.commit({ m: "first" }); // have to add init commit so no "what is master" problems
+
+    gl.remote("add", "origin", remoteRepo);
+    gl.fetch("origin");
+    gl.branch(undefined, { u: "origin/master" });
+
+    process.chdir(remoteRepo);
+    gr.init();
+    gr.add("1b/fileb");
+    gr.commit({ m: "second" });
+    gr.branch("other");
+    gr.checkout("other");
+
+    process.chdir(localRepo);
+    gl.pull("origin");
+
+    expect(gl.push("origin")).toEqual("Already up-to-date.");
+  });
 });
