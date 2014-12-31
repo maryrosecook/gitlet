@@ -98,4 +98,22 @@ describe("pull", function() {
 
     expect(gl.pull("origin")).toEqual("Already up-to-date.");
   });
+
+  it("should throw if pull without tracking branch", function() {
+    // regression
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = testUtil.makeRemoteRepo();
+
+    testUtil.createStandardFileStructure();
+    gr.init();
+    gr.add("1a/filea");
+    gr.commit({ m: "first" });
+
+    process.chdir(localRepo);
+    gl.init();
+    gl.remote("add", "origin", remoteRepo);
+
+    expect(gl.pull("origin")).toEqual("master has no tracking branch");
+  });
 });

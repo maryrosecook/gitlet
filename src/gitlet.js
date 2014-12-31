@@ -279,8 +279,13 @@ var gitlet = module.exports = {
   pull: function(remote, _) {
     files.assertInRepo();
     config.assertNotBare();
+
     this.fetch(remote);
-    return this.merge("FETCH_HEAD");
+    if (refs.readHash("FETCH_HEAD") === undefined) {
+      return refs.readHeadBranchName() + " has no tracking branch";
+    } else {
+      return this.merge("FETCH_HEAD");
+    }
   },
 
   push: function(remote, _) {
