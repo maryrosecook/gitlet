@@ -40,7 +40,7 @@ var refs = module.exports = {
   },
 
   readIsCheckedOut: function(branch) {
-    return config.readIsBare() || refs.readHeadBranchName() !== branch;
+    return !config.readIsBare() && refs.readHeadBranchName() === branch;
   },
 
   toLocalRef: function(name) {
