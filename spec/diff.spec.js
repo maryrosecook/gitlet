@@ -9,13 +9,13 @@ describe("diff", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.diff(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.diff(); })
-      .toThrow("fatal: This operation must be run in a work tree");
+      .toThrow("error: this operation must be run in a work tree");
   });
 
   it("should throw if do not pass --name-status option", function() {
@@ -26,13 +26,13 @@ describe("diff", function() {
   it("should throw unknown revision if ref1 not in objects", function() {
     g.init();
     expect(function() { g.diff("blah1", undefined, { "name-status": true }) })
-      .toThrow("fatal: ambiguous argument blah1: unknown revision");
+      .toThrow("error: ambiguous argument blah1: unknown revision");
   });
 
   it("should throw unknown revision if ref2 not in objects", function() {
     g.init();
     expect(function() { g.diff("blah2", undefined, { "name-status": true }) })
-      .toThrow("fatal: ambiguous argument blah2: unknown revision");
+      .toThrow("error: ambiguous argument blah2: unknown revision");
   });
 
   it("should include several files with changes", function() {
@@ -134,7 +134,7 @@ describe("diff", function() {
       it("should blow up for HEAD if no commits", function() {
         g.init();
         expect(function() { g.diff("HEAD", undefined, { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument HEAD: unknown revision");
+          .toThrow("error: ambiguous argument HEAD: unknown revision");
       });
 
       it("should not include unstaged files", function() {
@@ -237,7 +237,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         expect(function() { g.diff("blah", undefined, { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument blah: unknown revision");
+          .toThrow("error: ambiguous argument blah: unknown revision");
       });
     });
   });
@@ -247,13 +247,13 @@ describe("diff", function() {
       it("should blow up with two refs if no commits", function() {
         g.init();
         expect(function() { g.diff("a", "b", { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument a: unknown revision");
+          .toThrow("error: ambiguous argument a: unknown revision");
       });
 
       it("should blow up for HEAD and other ref if no commits", function() {
         g.init();
         expect(function() { g.diff("HEAD", "b", { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument HEAD: unknown revision");
+          .toThrow("error: ambiguous argument HEAD: unknown revision");
       });
 
       it("should blow up if either ref does not exist", function() {
@@ -262,10 +262,10 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         expect(function() { g.diff("blah1", "blah2", { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument blah1: unknown revision");
+          .toThrow("error: ambiguous argument blah1: unknown revision");
 
         expect(function() { g.diff("HEAD", "blah2", { "name-status": true }) })
-          .toThrow("fatal: ambiguous argument blah2: unknown revision");
+          .toThrow("error: ambiguous argument blah2: unknown revision");
       });
 
       it("should not include unstaged files", function() {

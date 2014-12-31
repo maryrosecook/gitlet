@@ -9,13 +9,13 @@ describe("branch", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.branch(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should throw if master has not been created", function() {
     g.init();
     expect(function() { g.branch("woo"); })
-      .toThrow("fatal: Not a valid object name: master.");
+      .toThrow("error: master not a valid object name");
   });
 
   it("should create new branch pointed at HEAD when call branch w branch name", function() {
@@ -54,13 +54,13 @@ describe("branch", function() {
     g.commit({ m: "first" });
     g.branch("woo");
     expect(function() { g.branch("woo") })
-      .toThrow("fatal: A branch named woo already exists.");
+      .toThrow("error: A branch named woo already exists");
   });
 
   it("should throw if -u passed but no commits", function() {
     g.init();
     expect(function() { g.branch(undefined, { u: "notthere/whatever" }) })
-      .toThrow("fatal: Not a valid object name: master.");
+      .toThrow("error: master not a valid object name");
   });
 
   it("should throw if -u passed, there are commits, but remote does not exist", function() {
@@ -81,8 +81,7 @@ describe("branch", function() {
     g.checkout("17a11ad4");
 
     expect(function() { g.branch(undefined, { u: "origin/master" }) })
-      .toThrow("fatal: could not set upstream of HEAD to origin/master" +
-               " when it does not point to any branch.");
+      .toThrow("error: HEAD is detached so could not set upstream to origin/master");
   });
 
   it("should throw if -u, there are commits, remote exists, rem branch doesn't", function() {
@@ -141,6 +140,6 @@ describe("branch", function() {
     gl.fetch("origin");
 
     expect(g.branch(undefined, { u: "origin/master" }))
-      .toEqual("Branch master set up to track remote branch master from origin.");
+      .toEqual("master tracking remote branch origin/master");
   });
 });

@@ -12,20 +12,20 @@ describe("update-index", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.update_index(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.update_index(); })
-      .toThrow("fatal: This operation must be run in a work tree");
+      .toThrow("error: this operation must be run in a work tree");
   });
 
   describe("pathspec stipulations", function() {
     it("should throw if path does not match existing working copy file", function() {
       g.init();
       expect(function() { g.update_index("blah"); })
-        .toThrow("error: blah: does not exist and --remove not passed\n");
+        .toThrow("error: blah does not exist and --remove not passed\n");
     });
 
     it("should throw rel path if not in root and pathspec does not match file", function() {
@@ -33,7 +33,7 @@ describe("update-index", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.update_index("blah"); })
-        .toThrow("error: 1/2/blah: does not exist and --remove not passed\n");
+        .toThrow("error: 1/2/blah does not exist and --remove not passed\n");
     });
 
     it("should throw rel path if not in root and path is dir", function() {
@@ -41,7 +41,7 @@ describe("update-index", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1");
       expect(function() { g.update_index("2"); })
-        .toThrow("error: 1/2: is a directory - add files inside instead\n");
+        .toThrow("error: 1/2 is a directory - add files inside\n");
     });
   });
 
@@ -89,7 +89,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", "this is a readme");
 
       expect(function() { g.update_index("README.md"); })
-        .toThrow("error: README.md: cannot add to the index - missing --add option?\n");
+        .toThrow("error: cannot add README.md to index - use --add option\n");
     });
 
     it("should still refer to staged version if file changes after stage", function() {
@@ -133,7 +133,7 @@ describe("update-index", function() {
       expect(testUtil.index().length).toEqual(0); // sanity
 
       expect(function() { g.update_index("filea", { remove: true }); })
-        .toThrow("error: filea: cannot add to the index - missing --add option?\n");
+        .toThrow("error: cannot add filea to index - use --add option\n");
     });
 
     it("shouldn't rm file from index/disk if --remove, file on disk, file in idx", function() {

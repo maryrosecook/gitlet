@@ -10,26 +10,26 @@ describe("update-ref", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.update_ref(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should throw if try to update ref that is not in refs/heads/", function() {
     g.init();
-    expect(function() { g.update_ref("/", ""); }).toThrow("fatal: Cannot lock the ref /.");
+    expect(function() { g.update_ref("/", ""); }).toThrow("error: cannot lock the ref /");
     expect(function() { g.update_ref("refs/", ""); })
-      .toThrow("fatal: Cannot lock the ref refs/.");
+      .toThrow("error: cannot lock the ref refs/");
     expect(function() { g.update_ref("refs/heads", ""); })
-      .toThrow("fatal: Cannot lock the ref refs/heads.");
+      .toThrow("error: cannot lock the ref refs/heads");
     expect(function() { g.update_ref("refs/heads/", ""); })
-      .toThrow("fatal: Cannot lock the ref refs/heads/.");
+      .toThrow("error: cannot lock the ref refs/heads/");
     expect(function() { g.update_ref("../woo", ""); })
-      .toThrow("fatal: Cannot lock the ref ../woo.");
+      .toThrow("error: cannot lock the ref ../woo");
   });
 
   it("should throw if ref2 is a hash that is not in the db", function() {
     g.init();
     expect(function() { g.update_ref("refs/heads/master", "123"); })
-      .toThrow("fatal: 123: not a valid SHA1");
+      .toThrow("error: 123 not a valid SHA1");
   });
 
   it("should throw if try to update HEAD to hash that is not a commit", function() {
@@ -37,8 +37,7 @@ describe("update-ref", function() {
     fs.writeFileSync("a", "a");
     var hash = objects.write("a");
     expect(function() { g.update_ref("HEAD", hash); })
-      .toThrow("error: Trying to write non-commit object " + hash +
-               " to branch refs/heads/master\n");
+      .toThrow("error: refs/heads/master cannot refer to non-commit object " + hash + "\n");
   });
 
   it("should throw if try to update master to hash that is not a commit", function() {
@@ -46,8 +45,7 @@ describe("update-ref", function() {
     fs.writeFileSync("a", "a");
     var hash = objects.write("a");
     expect(function() { g.update_ref("refs/heads/master", hash); })
-      .toThrow("error: Trying to write non-commit object " + hash +
-               " to branch refs/heads/master\n");
+      .toThrow("error: refs/heads/master cannot refer to non-commit object " + hash + "\n");
   });
 
   it("should allow updating HEAD to hash", function() {

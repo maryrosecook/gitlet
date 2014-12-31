@@ -10,13 +10,13 @@ describe("commit", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.commit(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.commit(); })
-      .toThrow("fatal: This operation must be run in a work tree");
+      .toThrow("error: this operation must be run in a work tree");
   });
 
   it("should throw if nothing to commit now, but there were previous commits", function() {
@@ -26,7 +26,7 @@ describe("commit", function() {
     g.commit({ m: "first" });
 
     expect(function() { g.commit(); })
-      .toThrow("# On master\n" + "nothing to commit, working directory clean");
+      .toThrow("# On master\nnothing to commit, working directory clean");
   });
 
   it("should create commit file when initially commiting", function() {

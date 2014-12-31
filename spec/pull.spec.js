@@ -12,7 +12,7 @@ describe("pull", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.pull(); })
-      .toThrow("fatal: Not a gitlet repository (or any of the parent directories): .gitlet");
+      .toThrow("error: not a Gitlet repository");
   });
 
   it("should not support git pull with no name", function() {
@@ -23,13 +23,13 @@ describe("pull", function() {
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.add(); })
-      .toThrow("fatal: This operation must be run in a work tree");
+      .toThrow("error: this operation must be run in a work tree");
   });
 
   it("should throw if remote does not exist", function() {
     g.init();
     expect(function() { g.pull("origin"); })
-      .toThrow("fatal: origin does not appear to be a git repository");
+      .toThrow("error: origin does not appear to be a git repository");
   });
 
   it("should pull and merge master if tracking branch", function() {
