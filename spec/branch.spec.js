@@ -9,13 +9,13 @@ describe("branch", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.branch(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if master has not been created", function() {
     g.init();
     expect(function() { g.branch("woo"); })
-      .toThrow("error: master not a valid object name");
+      .toThrow("master not a valid object name");
   });
 
   it("should create new branch pointed at HEAD when call branch w branch name", function() {
@@ -54,13 +54,13 @@ describe("branch", function() {
     g.commit({ m: "first" });
     g.branch("woo");
     expect(function() { g.branch("woo") })
-      .toThrow("error: A branch named woo already exists");
+      .toThrow("A branch named woo already exists");
   });
 
   it("should throw if -u passed but no commits", function() {
     g.init();
     expect(function() { g.branch(undefined, { u: "notthere/whatever" }) })
-      .toThrow("error: master not a valid object name");
+      .toThrow("master not a valid object name");
   });
 
   it("should throw if -u passed, there are commits, but remote does not exist", function() {
@@ -70,7 +70,7 @@ describe("branch", function() {
     g.commit({ m: "first" });
 
     expect(function() { g.branch(undefined, { u: "notthere/whatever" }) })
-      .toThrow("error: the requested upstream branch notthere/whatever does not exist");
+      .toThrow("the requested upstream branch notthere/whatever does not exist");
   });
 
   it("should throw if -u and detached head", function() {
@@ -81,7 +81,7 @@ describe("branch", function() {
     g.checkout("17a11ad4");
 
     expect(function() { g.branch(undefined, { u: "origin/master" }) })
-      .toThrow("error: HEAD is detached so could not set upstream to origin/master");
+      .toThrow("HEAD is detached so could not set upstream to origin/master");
   });
 
   it("should throw if -u, there are commits, remote exists, rem branch doesn't", function() {
@@ -92,7 +92,7 @@ describe("branch", function() {
     g.remote("add", "origin", "file://a/b/c/d");
 
     expect(function() { g.branch(undefined, { u: "origin/etuteuh" }) })
-      .toThrow("error: the requested upstream branch origin/etuteuh does not exist");
+      .toThrow("the requested upstream branch origin/etuteuh does not exist");
   });
 
   it("should set branch to tracking if remote exists", function() {

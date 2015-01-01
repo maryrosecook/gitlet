@@ -31,13 +31,13 @@ describe("merge", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.merge(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.merge(); })
-      .toThrow("error: this operation must be run in a work tree");
+      .toThrow("this operation must be run in a work tree");
   });
 
   describe('common ancestors', function() {
@@ -182,7 +182,7 @@ describe("merge", function() {
       it("should throw if can't resolve ref/hash passed", function() {
         g.init();
         expect(function() { g.merge("blah"); })
-          .toThrow("error: blah: expected commit type");
+          .toThrow("blah: expected commit type");
       });
 
       it("should throw if try to merge when head detached", function() {
@@ -242,7 +242,7 @@ describe("merge", function() {
         g.commit({ m: "first" });
 
         expect(function() { g.merge("5ceba65"); })
-          .toThrow("error: 5ceba65: expected commit type");
+          .toThrow("5ceba65: expected commit type");
       });
 
       describe('working copy changes', function() {
@@ -263,7 +263,7 @@ describe("merge", function() {
           fs.writeFileSync("1a/filea", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n1a/filea\n");
         });
 
         it("should throw if file has changes even if make it same as giver", function() {
@@ -283,7 +283,7 @@ describe("merge", function() {
           fs.writeFileSync("1a/filea", "fileachange1");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n1a/filea\n");
         });
 
         it("should throw if file has staged changes w/o common orig content with c/o", function() {
@@ -304,7 +304,7 @@ describe("merge", function() {
           g.add("1a/filea");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n1a/filea\n");
         });
 
         it("should list all files that would be overwritten when throwing", function() {
@@ -332,7 +332,7 @@ describe("merge", function() {
           fs.writeFileSync("1b/2b/filec", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("error: local changes would be lost\n1a/filea\n1b/fileb\n1b/2b/filec\n");
+            .toThrow("local changes would be lost\n1a/filea\n1b/fileb\n1b/2b/filec\n");
         });
       });
     });
@@ -757,7 +757,7 @@ describe("merge", function() {
             testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
 
             expect(function() { g.commit(); })
-              .toThrow("U filea\nerror: cannot commit because you have unmerged files\n");
+              .toThrow("U filea\ncannot commit because you have unmerged files\n");
           });
 
           it("should leave repo in merging stage", function() {

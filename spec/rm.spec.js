@@ -8,20 +8,20 @@ describe("rm", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.rm(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.rm(); })
-      .toThrow("error: this operation must be run in a work tree");
+      .toThrow("this operation must be run in a work tree");
   });
 
   describe("pathspec matching", function() {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.rm("blah"); })
-        .toThrow("error: blah did not match any files");
+        .toThrow("blah did not match any files");
     });
 
     it("should throw rel path if not in root and pathspec does not match files", function() {
@@ -29,7 +29,7 @@ describe("rm", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.rm("blah"); })
-        .toThrow("error: 1/2/blah did not match any files");
+        .toThrow("1/2/blah did not match any files");
     });
   });
 
@@ -40,7 +40,7 @@ describe("rm", function() {
     expect(testUtil.index().length).toEqual(0); // sanity
 
     expect(function() { g.rm("filea"); })
-      .toThrow("error: filea did not match any files");
+      .toThrow("filea did not match any files");
   });
 
   it("should rm file from index/disk if file on disk + in idx + in head", function() {
@@ -93,7 +93,7 @@ describe("rm", function() {
     testUtil.createFilesFromTree({ filea: "filea" });
     g.add("filea", { add: true });
     expect(function() { g.rm("filea"); })
-      .toThrow("error: these files have changes:\nfilea\n");
+      .toThrow("these files have changes:\nfilea\n");
   });
 
   it("should throw if file modified, then rmed", function() {
@@ -104,7 +104,7 @@ describe("rm", function() {
 
     fs.writeFileSync("filea", "fileaa");
     expect(function() { g.rm("filea"); })
-      .toThrow("error: these files have changes:\nfilea\n");
+      .toThrow("these files have changes:\nfilea\n");
   });
 
   it("should allow removals to be committed", function() {
@@ -133,7 +133,7 @@ describe("rm", function() {
     it("should throw pathspec error if try and rm dir w no indexed files", function() {
       g.init();
       expect(function() { g.rm("src") })
-        .toThrow("error: src did not match any files");
+        .toThrow("src did not match any files");
     });
 
     it("should mention staged and unstaged changes when rm multiple files", function() {
@@ -149,7 +149,7 @@ describe("rm", function() {
       g.add("src/filea");
 
       expect(function() { g.rm("src", { r: true }); })
-        .toThrow("error: these files have changes:\nsrc/filea\nsrc/fileb\n");
+        .toThrow("these files have changes:\nsrc/filea\nsrc/fileb\n");
     });
 
     it("should rm nested files", function() {

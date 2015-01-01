@@ -9,7 +9,7 @@ var files = module.exports = {
 
   assertInRepo: function() {
     if (!files.inRepo()) {
-      throw new Error("error: not a Gitlet repository");
+      throw new Error("not a Gitlet repository");
     }
   },
 

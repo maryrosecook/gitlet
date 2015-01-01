@@ -7,7 +7,7 @@ describe("remote", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.remote(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if try to remove origin", function() {
@@ -52,6 +52,6 @@ describe("remote", function() {
     g.init();
     g.remote("add", "origin", "git@origin");
     expect(function() { g.remote("add", "origin", "git@heroku"); })
-      .toThrow("error: remote origin already exists");
+      .toThrow("remote origin already exists");
   });
 });

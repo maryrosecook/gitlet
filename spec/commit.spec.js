@@ -10,13 +10,13 @@ describe("commit", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.commit(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.commit(); })
-      .toThrow("error: this operation must be run in a work tree");
+      .toThrow("this operation must be run in a work tree");
   });
 
   it("should throw if nothing to commit now, but there were previous commits", function() {

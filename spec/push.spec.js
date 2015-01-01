@@ -12,7 +12,7 @@ describe("push", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.push(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should not support git push with no remote name", function() {
@@ -23,14 +23,14 @@ describe("push", function() {
   it("should throw if remote does not exist", function() {
     g.init();
     expect(function() { g.push("origin"); })
-      .toThrow("error: origin does not appear to be a git repository");
+      .toThrow("origin does not appear to be a git repository");
   });
 
   it("should throw if current branch does not have an upstream branch", function() {
     g.init();
     g.remote("add", "origin", "whatever");
     expect(function() { g.push("origin"); })
-      .toThrow("error: current branch master has no upstream branch");
+      .toThrow("current branch master has no upstream branch");
   });
 
   it("should throw if try to push when head detached", function() {
@@ -41,7 +41,7 @@ describe("push", function() {
     g.checkout("17a11ad4");
 
     expect(function() { g.push("origin"); })
-      .toThrow("error: you are not currently on a branch");
+      .toThrow("you are not currently on a branch");
   });
 
   it("should throw if try push to non-bare repo where pushed branch checked out", function() {
@@ -68,7 +68,7 @@ describe("push", function() {
     gr.branch(undefined, { u: "origin/master" });
 
     expect(function() { gr.push("origin"); })
-      .toThrow("error: refusing to update checked out branch master");
+      .toThrow("refusing to update checked out branch master");
   });
 
   it("should return up to date if try push current remote hash", function() {

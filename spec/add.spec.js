@@ -7,20 +7,20 @@ describe("add", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.add(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.add(); })
-      .toThrow("error: this operation must be run in a work tree");
+      .toThrow("this operation must be run in a work tree");
   });
 
   describe("pathspec matching", function() {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
-        .toThrow("error: blah did not match any files");
+        .toThrow("blah did not match any files");
     });
 
     it("should throw rel path if not in root and pathspec does not match files", function() {
@@ -28,7 +28,7 @@ describe("add", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.add("blah"); })
-        .toThrow("error: 1/2/blah did not match any files");
+        .toThrow("1/2/blah did not match any files");
     });
   });
 
@@ -85,7 +85,7 @@ describe("add", function() {
       g.add("1a/filea");
       fs.unlinkSync("1a/filea");
       expect(function() { g.add("1a/filea"); })
-        .toThrow("error: 1a/filea did not match any files");
+        .toThrow("1a/filea did not match any files");
     });
   });
 });

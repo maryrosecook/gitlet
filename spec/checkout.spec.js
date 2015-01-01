@@ -9,19 +9,19 @@ describe("checkout", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.checkout(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.checkout(); })
-      .toThrow("error: this operation must be run in a work tree");
+      .toThrow("this operation must be run in a work tree");
   });
 
   it("should throw if pass ref that does not resolve to a hash", function() {
     g.init();
     expect(function() { g.checkout("woo"); })
-      .toThrow("error: woo did not match any file(s) known to Gitlet");
+      .toThrow("woo did not match any file(s) known to Gitlet");
   });
 
   it("should throw if passed ref points to blob", function() {
@@ -30,7 +30,7 @@ describe("checkout", function() {
     g.add("1a/filea");
     g.commit({ m: "first" });
     expect(function() { g.checkout("5ceba65") })
-      .toThrow("error: reference is not a tree: 5ceba65")
+      .toThrow("reference is not a tree: 5ceba65")
   });
 
   it("should throw if passed ref points to tree", function() {
@@ -39,7 +39,7 @@ describe("checkout", function() {
     g.add("1a/filea");
     g.commit({ m: "first" });
     expect(function() { g.checkout("17653b6d") })
-      .toThrow("error: reference is not a tree: 17653b6d")
+      .toThrow("reference is not a tree: 17653b6d")
   });
 
   it("should throw if file has unstaged changes w/o common orig content with c/o", function() {
@@ -58,7 +58,7 @@ describe("checkout", function() {
     fs.writeFileSync("1a/filea", "fileachange2");
 
     expect(function() { g.checkout("other"); })
-      .toThrow("error: local changes would be lost\n1a/filea\n");
+      .toThrow("local changes would be lost\n1a/filea\n");
   });
 
   it("should throw if file has unstaged changes even if they make it same as c/o", function() {
@@ -77,7 +77,7 @@ describe("checkout", function() {
     fs.writeFileSync("1a/filea", "filea");
 
     expect(function() { g.checkout("other"); })
-      .toThrow("error: local changes would be lost\n1a/filea\n");
+      .toThrow("local changes would be lost\n1a/filea\n");
   });
 
   it("should throw if file has staged changes w/o common orig content with c/o", function() {
@@ -97,7 +97,7 @@ describe("checkout", function() {
     g.add("1a/filea");
 
     expect(function() { g.checkout("other"); })
-      .toThrow("error: local changes would be lost\n1a/filea\n");
+      .toThrow("local changes would be lost\n1a/filea\n");
   });
 
   it("should list all files that would be overwritten when throwing", function() {
@@ -124,7 +124,7 @@ describe("checkout", function() {
     fs.writeFileSync("1b/2b/filec", "fileachange2");
 
     expect(function() { g.checkout("other"); })
-      .toThrow("error: local changes would be lost\n1a/filea\n1b/fileb\n1b/2b/filec\n");
+      .toThrow("local changes would be lost\n1a/filea\n1b/fileb\n1b/2b/filec\n");
   });
 
   it("should not throw if file has changes w/ common orig content w/ c/o branch", function() {

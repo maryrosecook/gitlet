@@ -7,7 +7,7 @@ describe("write-tree", function() {
 
   it("should throw if not in repo", function() {
     expect(function() { g.write_tree(); })
-      .toThrow("error: not a Gitlet repository");
+      .toThrow("not a Gitlet repository");
   });
 
   it("should be able to write largish tree when no trees written yet", function() {
