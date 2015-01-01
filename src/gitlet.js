@@ -30,6 +30,12 @@ var gitlet = module.exports = {
                              process.cwd());
   },
 
+  clone: function(remotePath, targetPath, opts) {
+    if (remotePath === undefined || targetPath === undefined) {
+      throw new Error("you must specify remote path and target path");
+    }
+  },
+
   add: function(path, _) {
     files.assertInRepo();
     config.assertNotBare();
