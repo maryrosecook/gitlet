@@ -18,16 +18,6 @@ describe("clone", function() {
       .toThrow("you must specify remote path and target path");
   });
 
-  it("should not throw if target path exists and is empty", function() {
-    var remoteRepo = testUtil.makeRemoteRepo();
-    process.chdir(remoteRepo);
-    g.init();
-    process.chdir("../");
-
-    fs.mkdirSync("exists");
-    g.clone(remoteRepo, "exists");
-  });
-
   it("should throw if target path exists and is not empty ", function() {
     var remoteRepo = testUtil.makeRemoteRepo();
     process.chdir(remoteRepo);
