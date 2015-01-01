@@ -483,6 +483,24 @@ describe("merge", function() {
         g.merge("d08448d");
         expect(refs.readHash("HEAD")).toEqual("d08448d");
       });
+
+      it("should be able to merge even if current branch has no commits", function() {
+        var gl = g, gr = g;
+        var localRepo = process.cwd();
+        var remoteRepo = testUtil.makeRemoteRepo();
+
+        gr.init();
+        testUtil.createDeeplyNestedFileStructure();
+        gr.add("filea");
+        gr.commit({ m: "first" });
+
+        process.chdir(localRepo);
+        gl.init();
+        gl.remote("add", "origin", remoteRepo);
+        gl.fetch("origin");
+        g.merge("refs/remotes/origin/master");
+        expect(refs.readHash("HEAD")).toEqual("281d2f1c");
+      });
     });
 
     describe('three way merge', function() {

@@ -21,7 +21,7 @@ var merge = module.exports = {
   },
 
   readCanFastForward: function(receiverHash, giverHash) {
-    return objects.readIsAncestor(giverHash, receiverHash);
+    return receiverHash === undefined || objects.readIsAncestor(giverHash, receiverHash);
   },
 
   readIsForce: function(receiverHash, giverHash) {
@@ -77,8 +77,8 @@ var merge = module.exports = {
 
   writeFastForwardMerge: function(receiverHash, giverHash) {
     refs.write(refs.toLocalRef(refs.readHeadBranchName()), giverHash);
-    workingCopy.write(diff.diff(objects.readCommitToc(receiverHash),
-                                objects.readCommitToc(giverHash)));
+    var receiverToc = receiverHash === undefined ? {} : objects.readCommitToc(receiverHash);
+    workingCopy.write(diff.diff(receiverToc, objects.readCommitToc(giverHash)));
     index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
   },
 

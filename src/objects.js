@@ -48,7 +48,8 @@ var objects = module.exports = {
   },
 
   readIsUpToDate: function(receiverHash, giverHash) {
-    return receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash);
+    return receiverHash !== undefined &&
+      (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash));
   },
 
   readExists: function(objectHash) {

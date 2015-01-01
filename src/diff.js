@@ -7,13 +7,9 @@ var diff = module.exports = {
   FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME", CONFLICT: "CONFLICT" },
 
   readDiff: function(hash1, hash2) {
-    if (hash1 === undefined && hash2 === undefined) {
-      return diff.nameStatus(index.readToc(), index.readWorkingCopyToc());
-    } else if (hash2 === undefined) {
-      return diff.nameStatus(objects.readCommitToc(hash1), index.readWorkingCopyToc());
-    } else {
-      return diff.nameStatus(objects.readCommitToc(hash1), objects.readCommitToc(hash2));
-    }
+    var a = hash1 === undefined ? index.readToc() : objects.readCommitToc(hash1);
+    var b = hash2 === undefined ? index.readWorkingCopyToc() : objects.readCommitToc(hash2);
+    return diff.nameStatus(a, b);
   },
 
   nameStatus: function(receiver, giver) {
