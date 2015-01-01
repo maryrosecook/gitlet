@@ -252,7 +252,7 @@ var gitlet = module.exports = {
       throw new Error("error: " + ref + ": expected commit type");
     } else {
       var receiverHash = refs.readHash("HEAD");
-      if (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash)) {
+      if (objects.readIsUpToDate(receiverHash, giverHash)) {
         return "Already up-to-date.";
       } else {
         var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
