@@ -254,7 +254,7 @@ var gitlet = module.exports = {
     } else {
       var receiverHash = refs.readHash("HEAD");
       if (objects.readIsUpToDate(receiverHash, giverHash)) {
-        return "Already up-to-date.";
+        return "Already up-to-date";
       } else {
         var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
         if (paths.length > 0) {
@@ -306,7 +306,7 @@ var gitlet = module.exports = {
         var receiverHash = util.remote(remotePath, refs.readHash)(headBranch);
         var giverHash = refs.readHash(headBranch);
         if (objects.readIsUpToDate(receiverHash, giverHash)) {
-          return "Already up-to-date.";
+          return "Already up-to-date";
         }
       }
     }

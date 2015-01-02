@@ -206,7 +206,7 @@ describe("merge", function() {
         g.add("fileb");
         g.commit({ m: "second" });
 
-        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date");
       });
 
       it("should not throw if passed hash not descendent of HEAD, but HEAD descendent of passed hash", function() {
@@ -219,11 +219,11 @@ describe("merge", function() {
         g.commit({ m: "second" });
 
         expect(refs.readHash("HEAD")).toEqual("a9b6e7e");
-        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date");
 
         g.checkout("other");
         expect(refs.readHash("HEAD")).toEqual("281d2f1c");
-        expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date.");
+        expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date");
       });
 
       it("should return up to date if pass current HEAD hash", function() {
@@ -232,7 +232,7 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
 
-        expect(g.merge("281d2f1c")).toEqual("Already up-to-date.");
+        expect(g.merge("281d2f1c")).toEqual("Already up-to-date");
       });
 
       it("should throw if item to merge resolves, but is not commit", function() {

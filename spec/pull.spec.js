@@ -96,7 +96,7 @@ describe("pull", function() {
     gl.fetch("origin"); // fetch to tell local repo about branch
     gl.branch(undefined, { u: "origin/master" }); // add branch as tracking
 
-    expect(gl.pull("origin")).toEqual("Already up-to-date.");
+    expect(gl.pull("origin")).toEqual("Already up-to-date");
   });
 
   it("should throw if pull without tracking branch", function() {

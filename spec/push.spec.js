@@ -87,6 +87,6 @@ describe("push", function() {
     g.clone(localRepo, remoteRepo)
     process.chdir(remoteRepo);
 
-    expect(gl.push("origin")).toEqual("Already up-to-date.");
+    expect(gl.push("origin")).toEqual("Already up-to-date");
   });
 });
