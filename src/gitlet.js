@@ -286,8 +286,9 @@ var gitlet = module.exports = {
     }
   },
 
-  push: function(remote, _) {
+  push: function(remote, opts) {
     files.assertInRepo();
+    opts = opts || {};
 
     var headBranch = refs.readHeadBranchName();
     if (remote === undefined) {
@@ -305,8 +306,11 @@ var gitlet = module.exports = {
       } else {
         var receiverHash = util.remote(remotePath, refs.readHash)(headBranch);
         var giverHash = refs.readHash(headBranch);
+        var needsForce = !merge.readCanFastForward(receiverHash, giverHash);
         if (objects.readIsUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date";
+        } else if (needsForce && !opts.f) {
+          throw new Error("failed to push some refs to " + remotePath);
         }
       }
     }

@@ -4,6 +4,7 @@ var g = require("../src/gitlet");
 var objects = require("../src/objects");
 var refs = require("../src/refs");
 var testUtil = require("./test-util");
+var util = require("../src/util");
 
 describe("push", function() {
   beforeEach(testUtil.initTestDataDir);
@@ -88,5 +89,36 @@ describe("push", function() {
     process.chdir(remoteRepo);
 
     expect(gl.push("origin")).toEqual("Already up-to-date");
+  });
+
+  it("should throw if must be forced and -f not passed", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = "repo2";
+
+    testUtil.createStandardFileStructure();
+    gl.init();
+    gl.add("1a/filea");
+    gl.commit({ m: "first" });
+    gl.add("1b/fileb");
+    gl.commit({ m: "second" });
+    gl.branch("other");
+    gl.checkout("other");
+
+    process.chdir("../");
+    g.clone(localRepo, remoteRepo);
+
+    process.chdir(remoteRepo);
+
+    // amend first commit on remote
+    var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
+    var amended = orig.replace("parent 17a11ad4\n", "");
+    var amendedCommitHash = util.hash(amended);
+    var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
+    fs.writeFileSync(amendedCommitPath, amended);
+    expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);
+    gr.update_ref("HEAD", amendedCommitHash);
+
+    expect(function() { gr.push("origin"); }).toThrow("failed to push some refs to ../repo1");
   });
 });
