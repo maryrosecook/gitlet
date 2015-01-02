@@ -323,6 +323,10 @@ var gitlet = module.exports = {
     }
   },
 
+  status: function(_) {
+    files.assertInRepo();
+  },
+
   clone: function(remotePath, targetPath, opts) {
     opts = opts || {};
 
