@@ -42,10 +42,10 @@ var util = module.exports = {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
   },
 
-  remote: function(remoteName, fn) {
+  remote: function(remoteUrl, fn) {
     return function() {
       var originalDir = process.cwd();
-      process.chdir(require("./config").read().remote[remoteName].url);
+      process.chdir(remoteUrl);
       var result = fn.apply(null, arguments);
       process.chdir(originalDir);
       return result;

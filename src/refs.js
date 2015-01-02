@@ -103,7 +103,7 @@ var refs = module.exports = {
   },
 
   readHeadBranchName: function() {
-    if (!refs.readIsHeadDetached() && !config.readIsBare()) {
+    if (!refs.readIsHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("refs/heads/(.+)")[1];
     }
   }

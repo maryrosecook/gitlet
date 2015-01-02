@@ -1,4 +1,5 @@
 var fs = require("fs");
+var nodePath = require("path");
 var files = require("./files");
 var index = require("./index");
 var objects = require("./objects");
@@ -28,16 +29,6 @@ var gitlet = module.exports = {
 
     files.writeFilesFromTree(opts.bare ? gitletStructure : { ".gitlet": gitletStructure },
                              process.cwd());
-  },
-
-  clone: function(remotePath, targetPath, opts) {
-    if (remotePath === undefined || targetPath === undefined) {
-      throw new Error("you must specify remote path and target path");
-    } else if (!fs.existsSync(remotePath) || !files.inRepo(remotePath)) {
-      throw new Error("repository " + remotePath + " does not exist");
-    } else if (fs.existsSync(targetPath) && fs.readdirSync(targetPath).length > 0) {
-      throw new Error(targetPath + " already exists and is not empty");
-    }
   },
 
   add: function(path, _) {
@@ -226,15 +217,15 @@ var gitlet = module.exports = {
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
     } else {
-      util.remote(remote, objects.readAllObjects)().forEach(objects.write);
+      var remotePath = config.read().remote[remote].url;
+      util.remote(remotePath, objects.readAllObjects)().forEach(objects.write);
 
-      var remoteUrl = config.read().remote[remote].url;
-      var giverRemoteRefs = util.remote(remote, refs.readLocalHeads)();
+      var giverRemoteRefs = util.remote(remotePath, refs.readLocalHeads)();
       var receiverRemoteRefs = refs.readRemoteHeads(remote);
       var changedRefs = Object.keys(giverRemoteRefs)
           .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
 
-      refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remoteUrl));
+      refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remotePath));
       changedRefs.forEach(function(b) {
         gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
       });
@@ -244,8 +235,8 @@ var gitlet = module.exports = {
           (merge.readIsForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
       });
 
-      return ["From " + remoteUrl,
-              "Count " + util.remote(remote, objects.readAllObjects)().length]
+      return ["From " + remotePath,
+              "Count " + util.remote(remotePath, objects.readAllObjects)().length]
         .concat(refUpdateReport)
         .join("\n") + "\n";
     }
@@ -307,13 +298,45 @@ var gitlet = module.exports = {
       throw new Error(remote + " does not appear to be a git repository");
     } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
       throw new Error("current branch " + headBranch + " has no upstream branch");
-    } else if (util.remote(remote, refs.readIsCheckedOut)(headBranch)) {
-      throw new Error("refusing to update checked out branch " + headBranch);
     } else {
-      var receiverHash = util.remote(remote, refs.readHash)(headBranch);
-      if (objects.readIsUpToDate(receiverHash, refs.readHash(headBranch))) {
-        return "Already up-to-date.";
+      var remotePath = config.read().remote[remote].url;
+      if (util.remote(remotePath, refs.readIsCheckedOut)(headBranch)) {
+        throw new Error("refusing to update checked out branch " + headBranch);
+      } else {
+        var receiverHash = util.remote(remotePath, refs.readHash)(headBranch);
+        if (objects.readIsUpToDate(receiverHash, refs.readHash(headBranch))) {
+          return "Already up-to-date.";
+        }
       }
+    }
+  },
+
+  clone: function(remotePath, targetPath, opts) {
+    opts = opts || {};
+
+    if (remotePath === undefined || targetPath === undefined) {
+      throw new Error("you must specify remote path and target path");
+    } else if (!fs.existsSync(remotePath) || !files.inRepo(remotePath)) {
+      throw new Error("repository " + remotePath + " does not exist");
+    } else if (fs.existsSync(targetPath) && fs.readdirSync(targetPath).length > 0) {
+      throw new Error(targetPath + " already exists and is not empty");
+    } else {
+      remotePath = nodePath.join(process.cwd(), remotePath);
+      if (!fs.existsSync(targetPath)) {
+        fs.mkdirSync(targetPath)
+      }
+
+      util.remote(targetPath, function(headHash) {
+        gitlet.init(opts);
+        gitlet.remote("add", "origin", nodePath.relative(process.cwd(), remotePath));
+        gitlet.fetch("origin");
+        config.write(util.assocIn(config.read(), ["branch", "master", "remote", "origin"]));
+        if (headHash !== undefined) {
+          merge.writeFastForwardMerge(undefined, headHash);
+        }
+      })(util.remote(remotePath, refs.readHash)("HEAD"));
+
+      return "Cloning into " + targetPath;
     }
   },
 
