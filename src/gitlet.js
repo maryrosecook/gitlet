@@ -321,7 +321,7 @@ var gitlet = module.exports = {
     } else if (fs.existsSync(targetPath) && fs.readdirSync(targetPath).length > 0) {
       throw new Error(targetPath + " already exists and is not empty");
     } else {
-      remotePath = nodePath.join(process.cwd(), remotePath);
+      remotePath = nodePath.resolve(process.cwd(), remotePath);
       if (!fs.existsSync(targetPath)) {
         fs.mkdirSync(targetPath)
       }
