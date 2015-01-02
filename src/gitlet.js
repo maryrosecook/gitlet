@@ -304,7 +304,8 @@ var gitlet = module.exports = {
         throw new Error("refusing to update checked out branch " + headBranch);
       } else {
         var receiverHash = util.remote(remotePath, refs.readHash)(headBranch);
-        if (objects.readIsUpToDate(receiverHash, refs.readHash(headBranch))) {
+        var giverHash = refs.readHash(headBranch);
+        if (objects.readIsUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date.";
         }
       }
