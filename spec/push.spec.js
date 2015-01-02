@@ -91,6 +91,53 @@ describe("push", function() {
     expect(gl.push("origin")).toEqual("Already up-to-date");
   });
 
+  describe("updating remote if push can be fast forwarded", function() {
+    beforeEach(function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = "repo2";
+
+      testUtil.createStandardFileStructure();
+      gl.init();
+      gl.add("1a/filea");
+      gl.commit({ m: "first" });
+      gl.branch("other");
+      gl.checkout("other");
+
+      process.chdir("../");
+      g.clone(localRepo, remoteRepo);
+
+      process.chdir(remoteRepo);
+      fs.mkdirSync("1b");
+      fs.writeFileSync("1b/fileb");
+      gr.add("1b/fileb");
+      gr.commit({ m: "second" });
+    });
+
+    it("should return report of what happened", function() {
+      expect(g.push("origin", { f: true }))
+        .toEqual("To ../repo1\nCount 8\nmaster -> master\n");
+    });
+
+    it("should set remote master to latest commit", function() {
+      g.push("origin", { f: true });
+      process.chdir("../repo1");
+      testUtil.expectFile(".gitlet/refs/heads/master", "352785f2");
+    });
+
+    it("should have sent commit object for newest commit", function() {
+      g.push("origin", { f: true });
+      process.chdir("../repo1");
+      expect(fs.existsSync(".gitlet/objects/352785f2")).toEqual(true);
+    });
+
+    it("should have updated remote's own refs/remotes/heads/master", function() {
+      g.push("origin", { f: true });
+      testUtil.expectFile(".gitlet/refs/remotes/origin/master", "352785f2");
+      expect(g.push("origin")).toEqual("Already up-to-date");
+    });
+  });
+
   it("should throw if must be forced and -f not passed", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
@@ -110,7 +157,7 @@ describe("push", function() {
 
     process.chdir(remoteRepo);
 
-    // amend first commit on remote
+    // amend second commit to be first (no parent) on remote
     var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
     var amended = orig.replace("parent 17a11ad4\n", "");
     var amendedCommitHash = util.hash(amended);
@@ -120,5 +167,59 @@ describe("push", function() {
     gr.update_ref("HEAD", amendedCommitHash);
 
     expect(function() { gr.push("origin"); }).toThrow("failed to push some refs to ../repo1");
+  });
+
+  describe("updating remote if push must be forced and -f passed", function() {
+    beforeEach(function() {
+      var gl = g, gr = g;
+      var localRepo = process.cwd();
+      var remoteRepo = "repo2";
+
+      testUtil.createStandardFileStructure();
+      gl.init();
+      gl.add("1a/filea");
+      gl.commit({ m: "first" });
+      gl.add("1b/fileb");
+      gl.commit({ m: "second" });
+      gl.branch("other");
+      gl.checkout("other");
+
+      process.chdir("../");
+      g.clone(localRepo, remoteRepo);
+
+      process.chdir(remoteRepo);
+
+      // amend second commit to be first (no parent) on remote
+      var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
+      var amended = orig.replace("parent 17a11ad4\n", "");
+      var amendedCommitHash = util.hash(amended);
+      var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
+      fs.writeFileSync(amendedCommitPath, amended);
+      expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);
+      gr.update_ref("HEAD", amendedCommitHash);
+    });
+
+    it("should return report of what happened", function() {
+      expect(g.push("origin", { f: true }))
+        .toEqual("To ../repo1\nCount 9\nmaster -> master\n");
+    });
+
+    it("should set remote master to latest commit", function() {
+      g.push("origin", { f: true });
+      process.chdir("../repo1");
+      testUtil.expectFile(".gitlet/refs/heads/master", "6e3bfe70");
+    });
+
+    it("should have sent commit object for newest commit", function() {
+      g.push("origin", { f: true });
+      process.chdir("../repo1");
+      expect(fs.existsSync(".gitlet/objects/6e3bfe70")).toEqual(true);
+    });
+
+    it("should have updated remote's own refs/remotes/heads/master", function() {
+      g.push("origin", { f: true });
+      testUtil.expectFile(".gitlet/refs/remotes/origin/master", "6e3bfe70");
+      expect(g.push("origin")).toEqual("Already up-to-date");
+    });
   });
 });

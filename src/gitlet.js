@@ -311,6 +311,13 @@ var gitlet = module.exports = {
           return "Already up-to-date";
         } else if (needsForce && !opts.f) {
           throw new Error("failed to push some refs to " + remotePath);
+        } else {
+          objects.readAllObjects().forEach(util.remote(remotePath, objects.write));
+          gitlet.update_ref(refs.toRemoteRef(remote, headBranch), giverHash);
+          util.remote(remotePath, gitlet.update_ref)(refs.toLocalRef(headBranch), giverHash);
+          return ["To " + remotePath,
+                  "Count " + objects.readAllObjects().length,
+                  headBranch + " -> " + headBranch].join("\n") + "\n";
         }
       }
     }
