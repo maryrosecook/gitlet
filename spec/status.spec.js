@@ -23,4 +23,11 @@ describe("status", function() {
 
     expect(g.status()).toMatch(/On branch other/);
   });
+
+  it("should mention untracked files", function() {
+    g.init();
+    fs.writeFileSync("a");
+    fs.writeFileSync("b");
+    expect(g.status()).toMatch("Untracked files:\na\nb");
+  });
 });
