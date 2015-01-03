@@ -11,6 +11,7 @@ var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
 var commit = require("./commit");
+var status = require("./status");
 
 var gitlet = module.exports = {
   init: function(opts) {
@@ -325,6 +326,7 @@ var gitlet = module.exports = {
 
   status: function(_) {
     files.assertInRepo();
+    return status.toString();
   },
 
   clone: function(remotePath, targetPath, opts) {

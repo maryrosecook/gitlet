@@ -12,4 +12,15 @@ describe("status", function() {
     expect(function() { g.push(); })
       .toThrow("not a Gitlet repository");
   });
+
+  it("should say what current branch is", function() {
+    g.init();
+    testUtil.createStandardFileStructure();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+    g.branch("other");
+    g.checkout("other");
+
+    expect(g.status()).toMatch(/On branch other/);
+  });
 });
