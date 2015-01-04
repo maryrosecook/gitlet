@@ -1,6 +1,7 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
 var objects = require("../src/objects");
+var config = require("../src/config");
 var testUtil = require("./test-util");
 
 describe("update-ref", function() {
@@ -146,5 +147,26 @@ describe("update-ref", function() {
     expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("281d2f1c");
     g.update_ref("refs/heads/other-branch", "HEAD");
     expect(fs.readFileSync(".gitlet/refs/heads/other-branch", "utf8")).toEqual("d08448d");
+  });
+
+  it("should be allowed to update ref on bare repo", function() {
+    var gl = g, gb = g;
+
+    gl.init();
+    testUtil.createStandardFileStructure();
+    gl.add("1a");
+    gl.commit({ m: "first" });
+    gl.add("1b");
+    gl.commit({ m: "second" });
+
+    process.chdir("../");
+    g.clone("repo1", "repo2", { bare: true });
+
+    process.chdir("repo2");
+    expect(config.readIsBare()).toEqual(true);
+
+    expect(fs.readFileSync("refs/heads/master", "utf8")).toEqual("5b228c59");
+    g.update_ref("refs/heads/master", "17a11ad4");
+    expect(fs.readFileSync("refs/heads/master", "utf8")).toEqual("17a11ad4");
   });
 });
