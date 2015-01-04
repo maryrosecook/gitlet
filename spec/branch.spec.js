@@ -142,4 +142,17 @@ describe("branch", function() {
     expect(g.branch(undefined, { u: "origin/master" }))
       .toEqual("master tracking remote branch origin/master");
   });
+
+  it("should be able to branch on bare repo", function() {
+    g.init();
+    testUtil.createStandardFileStructure();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+
+    process.chdir("../");
+    g.clone("repo1", "repo2");
+    process.chdir("repo2");
+    g.branch("other");
+    testUtil.expectFile(".gitlet/refs/heads/other", "17a11ad4");
+  });
 });
