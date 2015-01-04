@@ -92,7 +92,7 @@ describe("push", function() {
   });
 
   it("should be able to push to bare repo", function() {
-    var gl = g, gr = g;
+    var gl = g;
     var localRepo = process.cwd();
     var remoteRepo = "repo2";
 
@@ -112,6 +112,38 @@ describe("push", function() {
     gl.branch(undefined, { u: "origin/master" });
 
     expect(gl.push("origin")).toMatch("master -> master");
+  });
+
+  it("should be able to push from bare repo", function() {
+    var localRepo = process.cwd();
+    var bareRepo = "repo2";
+    var remoteRepo = "repo3";
+
+    testUtil.createStandardFileStructure();
+    g.init();
+    g.add("1a/filea");
+    g.commit({ m: "first" });
+    g.branch("other");
+    g.checkout("other");
+
+    process.chdir("../");
+    g.clone(localRepo, remoteRepo);
+
+    process.chdir(remoteRepo);
+    fs.mkdirSync("1b");
+    fs.writeFileSync("1b/fileb", "fileb");
+    g.add("1b/fileb");
+    g.commit({ m: "second" });
+
+    process.chdir("../");
+    g.clone(remoteRepo, bareRepo, { bare: true });
+
+    process.chdir(bareRepo);
+    g.remote("add", "local", "../repo1");
+    g.fetch("local");
+    g.branch(undefined, { u: "local/master" });
+
+    expect(g.push("local")).toMatch("master -> master");
   });
 
   describe("updating remote if push can be fast forwarded", function() {
