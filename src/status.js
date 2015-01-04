@@ -7,7 +7,8 @@ var index = require("./index");
 var status = module.exports = {
   toString: function() {
     return [readCurrentBranch(),
-            readUntracked()]
+            readUntracked(),
+            readConflicted()]
       .reduce(function(a, section) {
         return section.length > 0 ? a.concat(section, "") : a;
       }, [])
@@ -23,4 +24,9 @@ function readUntracked() {
   var paths = fs.readdirSync(files.workingCopyPath())
       .filter(function(p) { return index.readToc()[p] === undefined && p !== ".gitlet"; });
   return paths.length > 0 ? ["Untracked files:"].concat(paths) : [];
+};
+
+function readConflicted() {
+  var paths = index.readConflictedPaths();
+  return paths.length > 0 ? ["Unmerged paths:"].concat(paths) : [];
 };
