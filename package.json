@@ -1,6 +1,6 @@
 {
   "name": "gitlet",
-  "description": "A toy Git.",
+  "description": "Git implemented in JavaScript.",
   "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
   "version": "0.1.0",
   "repository": {
