@@ -6,17 +6,16 @@ var util = require("./util");
 var diff = module.exports = {
   FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME", CONFLICT: "CONFLICT" },
 
-  readDiff: function(hash1, hash2) {
+  readHashDiff: function(hash1, hash2) {
     var a = hash1 === undefined ? index.readToc() : objects.readCommitToc(hash1);
     var b = hash2 === undefined ? index.readWorkingCopyToc() : objects.readCommitToc(hash2);
-    return diff.nameStatus(a, b);
+    return diff.diff(a, b);
   },
 
-  nameStatus: function(receiver, giver) {
-    var tocDiff = diff.diff(receiver, giver);
-    return Object.keys(tocDiff)
-      .filter(function(p) { return tocDiff[p].status !== diff.FILE_STATUS.SAME; })
-      .reduce(function(ns, p) { return util.assocIn(ns, [p, tocDiff[p].status]); }, {});
+  nameStatus: function(dif) {
+    return Object.keys(dif)
+      .filter(function(p) { return dif[p].status !== diff.FILE_STATUS.SAME; })
+      .reduce(function(ns, p) { return util.assocIn(ns, [p, dif[p].status]); }, {});
   },
 
   diff: function(receiver, giver) {
@@ -37,8 +36,8 @@ var diff = module.exports = {
 
   readChangedFilesCommitWouldOverwrite: function(hash) {
     var headHash = refs.readHash("HEAD");
-    var localChanges = diff.readDiff(headHash);
-    var headToBranchChanges = diff.readDiff(headHash, hash);
+    var localChanges = diff.nameStatus(diff.readHashDiff(headHash));
+    var headToBranchChanges = diff.nameStatus(diff.readHashDiff(headHash, hash));
     return Object.keys(localChanges)
       .filter(function(path) { return path in headToBranchChanges; });
   },

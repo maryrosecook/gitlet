@@ -62,7 +62,7 @@ var gitlet = module.exports = {
       throw new Error("not removing " + path + " recursively without -r");
     } else {
       var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
-      var wcDiff = diff.nameStatus(headToc, index.readWorkingCopyToc());
+      var wcDiff = diff.nameStatus(diff.diff(headToc, index.readWorkingCopyToc()));
       var addedModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
       var changesToRm = util.intersection(addedModified, fileList);
@@ -188,8 +188,8 @@ var gitlet = module.exports = {
       if (opts["name-status"] !== true) {
         throw new Error("unsupported"); // for now
       } else {
-        var nameToStatus = diff.readDiff(refs.readHash(ref1),
-                                         refs.readHash(ref2));
+        var nameToStatus = diff.nameStatus(diff.readHashDiff(refs.readHash(ref1),
+                                                             refs.readHash(ref2)));
         return Object.keys(nameToStatus)
           .map(function(path) { return nameToStatus[path] + " " + path; })
           .join("\n") + "\n";
