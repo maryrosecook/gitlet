@@ -23,6 +23,14 @@ describe("remote", function() {
     expect(configFileLines[1]).toEqual("  url = git@origin");
   });
 
+  it("should be able to add remote to bare repo", function() {
+    g.init({ bare: true });
+    g.remote("add", "origin", "git@origin");
+    var configFileLines = fs.readFileSync("config", "utf8").split("\n");
+    expect(configFileLines[0]).toEqual("[remote \"origin\"]");
+    expect(configFileLines[1]).toEqual("  url = git@origin");
+  });
+
   it("should store remote branch ref location when add origin", function() {
     g.init();
     g.remote("add", "origin", "git@origin");
