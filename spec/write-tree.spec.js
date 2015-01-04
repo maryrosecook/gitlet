@@ -1,5 +1,6 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
+var config = require("../src/config");
 var testUtil = require("./test-util");
 
 describe("write-tree", function() {
@@ -74,5 +75,24 @@ describe("write-tree", function() {
   it("should write-tree of empty root tree if no files staged", function() {
     g.init();
     expect(g.write_tree()).toEqual("a");
+  });
+
+  it("should be able to write tree in bare repo", function() {
+    var gl = g;
+    var localRepo = process.cwd();
+    var remoteRepo = "repo2";
+
+    testUtil.createStandardFileStructure();
+    gl.init();
+    gl.add("1a/filea");
+    gl.commit({ m: "first" });
+
+    process.chdir("../");
+    g.clone(localRepo, remoteRepo, { bare: true });
+
+    process.chdir(remoteRepo);
+
+    expect(config.readIsBare()).toEqual(true);
+    expect(gl.write_tree()).toMatch("63e0627e");
   });
 });
