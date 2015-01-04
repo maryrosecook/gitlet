@@ -3,6 +3,7 @@ var refs = require("./refs");
 var files = require("./files");
 var index = require("./index");
 var diff = require("./diff");
+var objects = require("./objects");
 
 var status = module.exports = {
   toString: function() {
@@ -33,7 +34,9 @@ function readConflicted() {
 };
 
 function readToBeCommitted() {
-  var d = diff.readDiff(refs.readHash("HEAD"));
-  var paths = Object.keys(d).map(function(p) { return d[p] + " " + p; });
-  return paths.length > 0 ? ["Changes to be committed:"].concat(paths) : [];
+  if (refs.readHash("HEAD") === undefined) { return []; }
+  var ns = diff.nameStatus(diff.diff(objects.readCommitToc(refs.readHash("HEAD")),
+                                     index.readToc()));
+  var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
+  return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
 };
