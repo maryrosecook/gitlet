@@ -91,6 +91,29 @@ describe("push", function() {
     expect(gl.push("origin")).toEqual("Already up-to-date");
   });
 
+  it("should be able to push to bare repo", function() {
+    var gl = g, gr = g;
+    var localRepo = process.cwd();
+    var remoteRepo = "repo2";
+
+    testUtil.createStandardFileStructure();
+    gl.init();
+    gl.add("1a/filea");
+    gl.commit({ m: "first" });
+
+    process.chdir("../");
+    g.clone(localRepo, remoteRepo, { bare: true });
+
+    process.chdir(localRepo);
+    gl.add("1b/fileb");
+    gl.commit({ m: "second" });
+    gl.remote("add", "origin", "../repo2");
+    gl.fetch("origin");
+    gl.branch(undefined, { u: "origin/master" });
+
+    expect(gl.push("origin")).toMatch("master -> master");
+  });
+
   describe("updating remote if push can be fast forwarded", function() {
     beforeEach(function() {
       var gl = g, gr = g;
