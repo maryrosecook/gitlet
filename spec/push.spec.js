@@ -5,6 +5,7 @@ var objects = require("../src/objects");
 var refs = require("../src/refs");
 var testUtil = require("./test-util");
 var util = require("../src/util");
+var config = require("../src/config");
 
 describe("push", function() {
   beforeEach(testUtil.initTestDataDir);
@@ -143,6 +144,7 @@ describe("push", function() {
     g.fetch("local");
     g.branch(undefined, { u: "local/master" });
 
+    expect(config.readIsBare()).toEqual(true);
     expect(g.push("local")).toMatch("master -> master");
   });
 
