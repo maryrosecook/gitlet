@@ -10,7 +10,8 @@ var status = module.exports = {
     return [readCurrentBranch(),
             readUntracked(),
             readConflicted(),
-            readToBeCommitted()]
+            readToBeCommitted(),
+            readNotStagedForCommit()]
       .reduce(function(a, section) {
         return section.length > 0 ? a.concat(section, "") : a;
       }, [])
@@ -39,4 +40,10 @@ function readToBeCommitted() {
                                      index.readToc()));
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
+};
+
+function readNotStagedForCommit() {
+  var ns = diff.nameStatus(diff.readHashDiff());
+  var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
+  return entries.length > 0 ? ["Changes not staged for commit:"].concat(entries) : [];
 };

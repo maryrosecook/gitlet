@@ -105,4 +105,22 @@ describe("status", function() {
                                "D 1b/fileb\n" +
                                "A 1b/2b/filec");
   });
+
+  it("should mention unstaged changes", function() {
+    g.init();
+    testUtil.createStandardFileStructure();
+    g.add("1a/filea");
+    g.commit({ m: "a" });
+    g.add("1b/fileb");
+    g.commit({ m: "b" });
+
+    fs.writeFileSync("1a/filea", "aa");
+
+    g.rm("1b/fileb");
+
+    g.add("1b/2b/filec");
+
+    expect(g.status()).toMatch("Changes not staged for commit:\n" +
+                               "M 1a/filea");
+  });
 });
