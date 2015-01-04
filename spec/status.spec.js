@@ -13,6 +13,12 @@ describe("status", function() {
       .toThrow("not a Gitlet repository");
   });
 
+  it("should throw if in bare repo", function() {
+    g.init({ bare: true });
+    expect(function() { g.status(); })
+      .toThrow("this operation must be run in a work tree");
+  });
+
   it("should say what current branch is", function() {
     g.init();
     testUtil.createStandardFileStructure();

@@ -326,6 +326,7 @@ var gitlet = module.exports = {
 
   status: function(_) {
     files.assertInRepo();
+    config.assertNotBare();
     return status.toString();
   },
 
