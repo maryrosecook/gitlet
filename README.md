@@ -2,7 +2,7 @@
 
 Git implemented in JavaScript.
 
-Supports `init`, `add`, `rm`, `commit`, `branch`, `checkout`, `diff`, `remote`, `fetch`, `merge`, `push`, `pull` and `clone`.
+Supports `init`, `add`, `rm`, `commit`, `branch`, `checkout`, `diff`, `remote`, `fetch`, `merge`, `push`, `pull`, `status` and `clone`.
 
 I wrote Gitlet to demonstrate how Git works under the covers.  The code is about 1200 lines.  It's written to be readable.  It's not written to be fast or feature complete.
 
