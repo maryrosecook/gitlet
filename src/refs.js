@@ -25,12 +25,10 @@ var refs = module.exports = {
       return refOrHash;
     } else {
       var terminalRef = refs.readTerminalRef(refOrHash);
-      if (terminalRef === "HEAD" || terminalRef === "MERGE_HEAD") {
-        return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
-      } else if (terminalRef === "FETCH_HEAD") {
+      if (terminalRef === "FETCH_HEAD") {
         return this.readFetchHeadBranchToMerge(refs.readHeadBranchName());
       } else if (refs.readExists(terminalRef)) {
-        return files.read(files.gitletPath(refs.readTerminalRef(refOrHash)));
+        return files.read(files.gitletPath(terminalRef));
       }
     }
   },
