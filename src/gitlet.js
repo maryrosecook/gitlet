@@ -62,7 +62,9 @@ var gitlet = module.exports = {
       throw new Error("not removing " + path + " recursively without -r");
     } else {
       var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {}
-      var wcDiff = diff.nameStatus(diff.diff(headToc, index.readWorkingCopyToc()));
+      var wcDiff = diff.nameStatus(diff.diff(headToc,
+                                             headToc,
+                                             index.readWorkingCopyToc()));
       var addedModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
       var changesToRm = util.intersection(addedModified, fileList);
@@ -165,7 +167,9 @@ var gitlet = module.exports = {
 
         var fromHash = refs.readHash("HEAD");
         var isDetachingHead = objects.readExists(ref);
-        workingCopy.write(diff.diff(objects.readCommitToc(fromHash),
+        var fromHashToc = objects.readCommitToc(fromHash);
+        workingCopy.write(diff.diff(fromHashToc,
+                                    fromHashToc,
                                     objects.readCommitToc(toHash)));
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
         index.write(index.tocToIndex(objects.readCommitToc(toHash)));
