@@ -36,16 +36,14 @@ function readConflicted() {
 
 function readToBeCommitted() {
   if (refs.readHash("HEAD") === undefined) { return []; }
-  var headToc = objects.readCommitToc(refs.readHash("HEAD"));
-  var ns = diff.nameStatus(diff.diff(headToc,
-                                     headToc,
-                                     index.readToc()));
+  var ns = diff.nameStatus(diff.tocDiff(objects.readCommitToc(refs.readHash("HEAD")),
+                                        index.readToc()));
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
 };
 
 function readNotStagedForCommit() {
-  var ns = diff.nameStatus(diff.readHashDiff());
+  var ns = diff.nameStatus(diff.readDiff());
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes not staged for commit:"].concat(entries) : [];
 };

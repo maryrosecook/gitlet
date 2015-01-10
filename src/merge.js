@@ -36,10 +36,10 @@ var merge = module.exports = {
   },
 
   readMergeDiff: function(receiverHash, giverHash) {
-    var receiver = objects.readCommitToc(receiverHash);
-    var base = objects.readCommitToc(merge.readCommonAncestor(receiverHash, giverHash));
-    var giver = objects.readCommitToc(giverHash);
-    return diff.diff(receiver, base, giver);
+    var commonAncestorHash = merge.readCommonAncestor(receiverHash, giverHash);
+    return diff.tocDiff(objects.readCommitToc(receiverHash),
+                        objects.readCommitToc(giverHash),
+                        objects.readCommitToc(commonAncestorHash));
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {
@@ -78,12 +78,10 @@ var merge = module.exports = {
 
   writeFastForwardMerge: function(receiverHash, giverHash) {
     refs.write(refs.toLocalRef(refs.readHeadBranchName()), giverHash);
-    var receiverToc = receiverHash === undefined ? {} : objects.readCommitToc(receiverHash);
     index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
     if (!config.readIsBare()) {
-      workingCopy.write(diff.diff(receiverToc,
-                                  receiverToc,
-                                  objects.readCommitToc(giverHash)));
+      var receiverToc = receiverHash === undefined ? {} : objects.readCommitToc(receiverHash);
+      workingCopy.write(diff.tocDiff(receiverToc, objects.readCommitToc(giverHash)));
     }
   },
 
