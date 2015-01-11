@@ -35,9 +35,9 @@ function readConflicted() {
 };
 
 function readToBeCommitted() {
-  if (refs.readHash("HEAD") === undefined) { return []; }
-  var ns = diff.nameStatus(diff.tocDiff(objects.readCommitToc(refs.readHash("HEAD")),
-                                        index.readToc()));
+  var headHash = refs.readHash("HEAD");
+  var headToc = headHash === undefined ? {} : objects.readCommitToc(headHash);
+  var ns = diff.nameStatus(diff.tocDiff(headToc, index.readToc()));
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
 };

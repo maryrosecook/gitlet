@@ -112,6 +112,17 @@ describe("status", function() {
                                "A 1b/2b/filec");
   });
 
+  it("should mention changes to be committed when no commits yet", function() {
+    g.init();
+    testUtil.createStandardFileStructure();
+    g.add("1a/filea");
+    g.add("1b/fileb");
+
+    expect(g.status()).toMatch("Changes to be committed:\n" +
+                               "A 1a/filea\n" +
+                               "A 1b/fileb");
+  });
+
   it("should mention unstaged changes", function() {
     g.init();
     testUtil.createStandardFileStructure();
