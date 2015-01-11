@@ -51,12 +51,12 @@ var gitlet = module.exports = {
     config.assertNotBare();
     opts = opts || {};
 
-    var diskFiles = files.lsRecursive(path);
-    var fileList = Object.keys(index.readToc()).
-        filter(function(p) { return p === path || diskFiles.indexOf(p) !== -1; });
+    var matchingPaths = files.lsRecursive(path).length > 0 ? files.lsRecursive(path) : [path];
+    var filesToRm = util.intersection(Object.keys(index.readToc()), matchingPaths);
+
     if (opts.f) {
       throw new Error("unsupported");
-    } else if (fileList.length === 0) {
+    } else if (filesToRm.length === 0) {
       throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
       throw new Error("not removing " + path + " recursively without -r");
@@ -65,17 +65,17 @@ var gitlet = module.exports = {
       var wcDiff = diff.nameStatus(diff.tocDiff(headToc, index.readWorkingCopyToc()));
       var addedModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
-      var changesToRm = util.intersection(addedModified, fileList);
+      var changesToRm = util.intersection(addedModified, filesToRm);
 
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
       } else {
-        for (var i = 0; i < fileList.length; i++) {
-          if (fs.existsSync(fileList[i])) {
-            fs.unlinkSync(fileList[i]);
+        for (var i = 0; i < filesToRm.length; i++) {
+          if (fs.existsSync(filesToRm[i])) {
+            fs.unlinkSync(filesToRm[i]);
           }
 
-          this.update_index(fileList[i], { remove: true });
+          this.update_index(filesToRm[i], { remove: true });
         }
       }
     }
