@@ -1,5 +1,6 @@
 var fs = require("fs");
 var g = require("../src/gitlet");
+var refs = require("../src/refs");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -151,6 +152,47 @@ describe("commit", function() {
 
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
     testUtil.expectFile(".gitlet/refs/heads/other", "16b35712");
+  });
+
+  it('should not write commit if commit when unresolved merge in progress', function() {
+    //       a
+    //       |
+    //       aa
+    //      /  \
+    // M aaa   aaaa
+    //     \   /
+    //       m      O <<<aaaa===aaa>>>
+
+    g.init();
+    testUtil.createDeeplyNestedFileStructure();
+    g.add("filea");
+    g.commit({ m: "a" });
+
+    fs.writeFileSync("filea", "fileaa");
+    g.add("filea");
+    g.commit({ m: "aa" });
+
+    g.branch("other");
+
+    fs.writeFileSync("filea", "fileaaa");
+    g.add("filea");
+    g.commit({ m: "aaa" });
+
+    g.checkout("other");
+
+    fs.writeFileSync("filea", "fileaaaa");
+    g.add("filea");
+    g.commit({ m: "aaaa" });
+
+    expect(g.merge("master"))
+      .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
+
+    var origHeadHash = refs.hash("HEAD");
+
+    expect(function() { g.commit(); })
+      .toThrow("U filea\ncannot commit because you have unmerged files\n");
+
+    expect(refs.hash("HEAD")).toEqual(origHeadHash);
   });
 
   describe('detached HEAD commits', function() {

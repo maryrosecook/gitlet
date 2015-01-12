@@ -76,21 +76,21 @@ var gitlet = module.exports = {
     if (headHash !== undefined && treeHash === objects.treeHash(objects.read(headHash))) {
       throw new Error("# On " + headDesc + "\nnothing to commit, working directory clean");
     } else {
-      var msg = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
-      var commitHash = objects.writeCommit(treeHash, msg, refs.commitParentHashes());
-      this.update_ref("HEAD", commitHash);
-      if (merge.isMergeInProgress()) {
-        var conflictedPaths = index.conflictedPaths();
-        if (conflictedPaths.length > 0) {
-          throw new Error(conflictedPaths.map(function(p) { return "U " + p; }).join("\n") +
-                          "\ncannot commit because you have unmerged files\n");
-        } else {
+      var conflictedPaths = index.conflictedPaths();
+      if (merge.isMergeInProgress() && conflictedPaths.length > 0) {
+        throw new Error(conflictedPaths.map(function(p) { return "U " + p; }).join("\n") +
+                        "\ncannot commit because you have unmerged files\n");
+      } else {
+        var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
+        var commitHash = objects.writeCommit(treeHash, m, refs.commitParentHashes());
+        this.update_ref("HEAD", commitHash);
+        if (merge.isMergeInProgress()) {
           fs.unlinkSync(files.gitletPath("MERGE_MSG"));
           refs.rm("MERGE_HEAD");
           return "Merge made by the three-way strategy";
+        } else {
+          return "[" + headDesc + " " + commitHash + "] " + m;
         }
-      } else {
-        return "[" + headDesc + " " + commitHash + "] " + msg;
       }
     }
   },
