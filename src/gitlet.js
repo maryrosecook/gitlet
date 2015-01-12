@@ -243,29 +243,27 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
+    var receiverHash = refs.readHash("HEAD");
     var giverHash = refs.readHash(ref);
     if (refs.readIsHeadDetached()) {
       throw new Error("unsupported");
     } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
       throw new Error(ref + ": expected commit type");
+    } else if (objects.readIsUpToDate(receiverHash, giverHash)) {
+      return "Already up-to-date";
     } else {
-      var receiverHash = refs.readHash("HEAD");
-      if (objects.readIsUpToDate(receiverHash, giverHash)) {
-        return "Already up-to-date";
+      var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
+      if (paths.length > 0) {
+        throw new Error("local changes would be lost\n" + paths.join("\n") + "\n");
+      } else if (merge.readCanFastForward(receiverHash, giverHash)) {
+        merge.writeFastForwardMerge(receiverHash, giverHash);
+        return "Fast-forward";
       } else {
-        var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
-        if (paths.length > 0) {
-          throw new Error("local changes would be lost\n" + paths.join("\n") + "\n");
-        } else if (merge.readCanFastForward(receiverHash, giverHash)) {
-          merge.writeFastForwardMerge(receiverHash, giverHash);
-          return "Fast-forward";
+        merge.writeNonFastForwardMerge(receiverHash, giverHash, ref);
+        if (merge.readHasConflicts(receiverHash, giverHash)) {
+          return "Automatic merge failed. Fix conflicts and commit the result.";
         } else {
-          merge.writeNonFastForwardMerge(receiverHash, giverHash, ref);
-          if (merge.readHasConflicts(receiverHash, giverHash)) {
-            return "Automatic merge failed. Fix conflicts and commit the result.";
-          } else {
-            return this.commit();
-          }
+          return this.commit();
         }
       }
     }
