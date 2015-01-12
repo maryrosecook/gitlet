@@ -19,7 +19,7 @@ var gitlet = module.exports = {
 
     var gitletStructure = {
       HEAD: "ref: refs/heads/master\n",
-      config: config.objToStr({ core: { "": { bare: (opts.bare === true).toString() }}}),
+      config: config.objToStr({ core: { "": { bare: opts.bare === true }}}),
       objects: {},
       refs: {
         heads: {},
