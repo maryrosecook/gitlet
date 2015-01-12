@@ -275,10 +275,9 @@ var gitlet = module.exports = {
       } else {
         var receiverHash = remoteCall(refs.hash, branch);
         var giverHash = refs.hash(branch);
-        var needsForce = !merge.canFastForward(receiverHash, giverHash);
         if (objects.isUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date";
-        } else if (needsForce && !opts.f) {
+        } else if (!opts.f && !merge.canFastForward(receiverHash, giverHash)) {
           throw new Error("failed to push some refs to " + remotePath);
         } else {
           objects.allObjects().forEach(function(o) { remoteCall(objects.write, o); });
