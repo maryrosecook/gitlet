@@ -38,6 +38,12 @@ var diff = module.exports = {
     return Object.keys(localChanges)
       .filter(function(path) { return path in headToBranchChanges; });
   },
+
+  addedOrModifiedFiles: function() {
+    var headToc = refs.hash("HEAD") ? objects.commitToc(refs.hash("HEAD")) : {};
+    var wc = diff.nameStatus(diff.tocDiff(headToc, index.workingCopyToc()));
+    return Object.keys(wc).filter(function(p) { return wc[p] !== diff.FILE_STATUS.DELETE; });
+  }
 };
 
 function fileStatus(receiver, base, giver) {

@@ -55,12 +55,7 @@ var gitlet = module.exports = {
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
       throw new Error("not removing " + path + " recursively without -r");
     } else {
-      var headToc = refs.hash("HEAD") ? objects.commitToc(refs.hash("HEAD")) : {};
-      var wcDiff = diff.nameStatus(diff.tocDiff(headToc, index.workingCopyToc()));
-      var addedOrModified = Object.keys(wcDiff)
-          .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
-      var changesToRm = util.intersection(addedOrModified, filesToRm);
-
+      var changesToRm = util.intersection(diff.addedOrModifiedFiles(), filesToRm);
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
       } else {
