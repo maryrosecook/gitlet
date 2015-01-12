@@ -67,13 +67,13 @@ var gitlet = module.exports = {
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
       } else {
-        for (var i = 0; i < filesToRm.length; i++) {
-          if (fs.existsSync(filesToRm[i])) {
-            fs.unlinkSync(filesToRm[i]);
+        filesToRm.forEach(function(p) {
+          if (fs.existsSync(p)) {
+            fs.unlinkSync(p);
           }
 
-          this.update_index(filesToRm[i], { remove: true });
-        }
+          gitlet.update_index(p, { remove: true });
+        });
       }
     }
   },
