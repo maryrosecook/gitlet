@@ -181,7 +181,7 @@ var gitlet = module.exports = {
       throw new Error("ambiguous argument " + ref2 + ": unknown revision");
     } else {
       if (opts["name-status"] !== true) {
-        throw new Error("unsupported"); // for now
+        throw new Error("unsupported");
       } else {
         var nameToStatus = diff.nameStatus(diff.diff(refs.hash(ref1), refs.hash(ref2)));
         return Object.keys(nameToStatus)
