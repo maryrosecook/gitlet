@@ -1,4 +1,5 @@
 var fs = require("fs");
+var nodePath = require("path");
 var files = require("./files");
 var objects = require("./objects");
 var util = require("./util");
@@ -90,5 +91,12 @@ var index = module.exports = {
   tocToIndex: function(toc) {
     return Object.keys(toc)
       .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 0), toc[p]]); }, {});
+  },
+
+  readMatchingFiles: function(pathSpec) {
+    var prefix = nodePath.relative(files.workingCopyPath(), process.cwd());
+    var searchPath = nodePath.join(prefix, pathSpec);
+    return Object.keys(index.readToc())
+      .filter(function(p) { return p.match("^" + searchPath); });
   }
 };

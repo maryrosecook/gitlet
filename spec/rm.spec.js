@@ -162,5 +162,18 @@ describe("rm", function() {
       g.rm("src1", { r: true });
       expect(testUtil.index().length).toEqual(0);
     });
+
+    it("should rm indexed files that have already been removed from disk (when not in root)", function() {
+      g.init();
+      testUtil.createFilesFromTree({ a: { b: { filea: "filea", fileb: "fileb" }}});
+
+      g.add("a", { add: true });
+      g.commit({ m: "first" });
+
+      fs.unlinkSync("a/b/filea");
+      process.chdir("a");
+      g.rm("b", { r: true });
+      expect(testUtil.index().length).toEqual(0);
+    });
   });
 });

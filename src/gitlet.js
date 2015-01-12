@@ -50,9 +50,7 @@ var gitlet = module.exports = {
     config.assertNotBare();
     opts = opts || {};
 
-    var matchingPaths = files.lsRecursive(path).length > 0 ? files.lsRecursive(path) : [path];
-    var filesToRm = util.intersection(Object.keys(index.readToc()), matchingPaths);
-
+    var filesToRm = index.readMatchingFiles(path);
     if (opts.f) {
       throw new Error("unsupported");
     } else if (filesToRm.length === 0) {
@@ -62,9 +60,9 @@ var gitlet = module.exports = {
     } else {
       var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {};
       var wcDiff = diff.nameStatus(diff.tocDiff(headToc, index.readWorkingCopyToc()));
-      var addedModified = Object.keys(wcDiff)
+      var addedOrModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
-      var changesToRm = util.intersection(addedModified, filesToRm);
+      var changesToRm = util.intersection(addedOrModified, filesToRm);
 
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
