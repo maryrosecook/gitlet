@@ -59,13 +59,8 @@ var gitlet = module.exports = {
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
       } else {
-        filesToRm.forEach(function(p) {
-          if (fs.existsSync(p)) {
-            fs.unlinkSync(p);
-          }
-
-          gitlet.update_index(p, { remove: true });
-        });
+        filesToRm.filter(fs.existsSync).forEach(fs.unlinkSync);
+        filesToRm.forEach(function(p) { gitlet.update_index(p, { remove: true }); });
       }
     }
   },
