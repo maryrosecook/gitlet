@@ -17,22 +17,16 @@ describe("push", function() {
       .toThrow("not a Gitlet repository");
   });
 
-  it("should not support git push with no remote name", function() {
+  it("should not support git push with no remote name or branch name", function() {
     g.init();
     expect(function() { g.push(); }).toThrow("unsupported");
+    expect(function() { g.push("origin"); }).toThrow("unsupported");
   });
 
   it("should throw if remote does not exist", function() {
     g.init();
-    expect(function() { g.push("origin"); })
+    expect(function() { g.push("origin", "master"); })
       .toThrow("origin does not appear to be a git repository");
-  });
-
-  it("should throw if current branch does not have an upstream branch", function() {
-    g.init();
-    g.remote("add", "origin", "whatever");
-    expect(function() { g.push("origin"); })
-      .toThrow("current branch master has no upstream branch");
   });
 
   it("should throw if try to push when head detached", function() {
@@ -42,7 +36,7 @@ describe("push", function() {
     g.commit({ m: "first" });
     g.checkout("17a11ad4");
 
-    expect(function() { g.push("origin"); })
+    expect(function() { g.push("origin", "master"); })
       .toThrow("you are not currently on a branch");
   });
 
@@ -64,12 +58,11 @@ describe("push", function() {
 
     process.chdir(remoteRepo);
     gr.remote("add", "origin", localRepo);
-    gr.fetch("origin");
+    gr.fetch("origin", "master");
     gr.add("1b/fileb");
     gr.commit({ m: "second" });
-    gr.branch(undefined, { u: "origin/master" });
 
-    expect(function() { gr.push("origin"); })
+    expect(function() { gr.push("origin", "master"); })
       .toThrow("refusing to update checked out branch master");
   });
 
@@ -89,7 +82,7 @@ describe("push", function() {
     g.clone(localRepo, remoteRepo)
     process.chdir(remoteRepo);
 
-    expect(gl.push("origin")).toEqual("Already up-to-date");
+    expect(gl.push("origin", "master")).toEqual("Already up-to-date");
   });
 
   it("should be able to push to bare repo", function() {
@@ -109,10 +102,8 @@ describe("push", function() {
     gl.add("1b/fileb");
     gl.commit({ m: "second" });
     gl.remote("add", "origin", "../repo2");
-    gl.fetch("origin");
-    gl.branch(undefined, { u: "origin/master" });
 
-    expect(gl.push("origin")).toMatch("master -> master");
+    expect(gl.push("origin", "master")).toMatch("master -> master");
   });
 
   it("should be able to push from bare repo", function() {
@@ -141,11 +132,9 @@ describe("push", function() {
 
     process.chdir(bareRepo);
     g.remote("add", "local", "../repo1");
-    g.fetch("local");
-    g.branch(undefined, { u: "local/master" });
 
     expect(config.isBare()).toEqual(true);
-    expect(g.push("local")).toMatch("master -> master");
+    expect(g.push("local", "master")).toMatch("master -> master");
   });
 
   describe("updating remote if push can be fast forwarded", function() {
@@ -172,26 +161,26 @@ describe("push", function() {
     });
 
     it("should return report of what happened", function() {
-      expect(g.push("origin", { f: true }))
+      expect(g.push("origin", "master", { f: true }))
         .toEqual("To ../repo1\nCount 8\nmaster -> master\n");
     });
 
     it("should set remote master to latest commit", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       process.chdir("../repo1");
       testUtil.expectFile(".gitlet/refs/heads/master", "352785f2");
     });
 
     it("should have sent commit object for newest commit", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       process.chdir("../repo1");
       expect(fs.existsSync(".gitlet/objects/352785f2")).toEqual(true);
     });
 
     it("should have updated remote's own refs/remotes/heads/master", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       testUtil.expectFile(".gitlet/refs/remotes/origin/master", "352785f2");
-      expect(g.push("origin")).toEqual("Already up-to-date");
+      expect(g.push("origin", "master")).toEqual("Already up-to-date");
     });
   });
 
@@ -223,7 +212,8 @@ describe("push", function() {
     expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);
     gr.update_ref("HEAD", amendedCommitHash);
 
-    expect(function() { gr.push("origin"); }).toThrow("failed to push some refs to ../repo1");
+    expect(function() { gr.push("origin", "master"); })
+      .toThrow("failed to push some refs to ../repo1");
   });
 
   describe("updating remote if push must be forced and -f passed", function() {
@@ -257,26 +247,26 @@ describe("push", function() {
     });
 
     it("should return report of what happened", function() {
-      expect(g.push("origin", { f: true }))
+      expect(g.push("origin", "master", { f: true }))
         .toEqual("To ../repo1\nCount 9\nmaster -> master\n");
     });
 
     it("should set remote master to latest commit", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       process.chdir("../repo1");
       testUtil.expectFile(".gitlet/refs/heads/master", "6e3bfe70");
     });
 
     it("should have sent commit object for newest commit", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       process.chdir("../repo1");
       expect(fs.existsSync(".gitlet/objects/6e3bfe70")).toEqual(true);
     });
 
     it("should have updated remote's own refs/remotes/heads/master", function() {
-      g.push("origin", { f: true });
+      g.push("origin", "master", { f: true });
       testUtil.expectFile(".gitlet/refs/remotes/origin/master", "6e3bfe70");
-      expect(g.push("origin")).toEqual("Already up-to-date");
+      expect(g.push("origin", "master")).toEqual("Already up-to-date");
     });
   });
 });

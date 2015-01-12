@@ -117,23 +117,12 @@ var gitlet = module.exports = {
     files.assertInRepo();
     opts = opts || {};
 
-    if (name === undefined && opts.u === undefined) {
+    if (name === undefined) {
       return Object.keys(refs.localHeads()).map(function(branch) {
         return (branch === refs.headBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
     } else if (refs.hash("HEAD") === undefined) {
       throw new Error(refs.headBranchName() + " not a valid object name");
-    } else if (name === undefined && opts.u !== undefined) {
-      var rem = opts.u.split("/");
-
-      if (refs.isHeadDetached()) {
-        throw new Error("HEAD is detached so could not set upstream to " + opts.u);
-      } else if (!refs.exists(refs.toRemoteRef(rem[0], rem[1]))) {
-        throw new Error("the requested upstream branch " + opts.u + " does not exist");
-      } else {
-        config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
-        return refs.headBranchName() + " tracking remote branch " + rem[0] + "/" + rem[1];
-      }
     } else if (refs.exists(refs.toLocalRef(name))) {
       throw new Error("A branch named " + name + " already exists");
     } else {
@@ -204,37 +193,31 @@ var gitlet = module.exports = {
     }
   },
 
-  fetch: function(remote, _) {
+  fetch: function(remote, branch, _) {
     files.assertInRepo();
 
-    if (remote === undefined) {
+    if (remote === undefined || branch === undefined) {
       throw new Error("unsupported");
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
     } else {
-      var remotePath = config.read().remote[remote].url;
-      var remoteCall = util.remote(remotePath);
-      remoteCall(objects.allObjects).forEach(objects.write);
+      var remoteUrl = config.read().remote[remote].url;
+      var remoteRef =  refs.toRemoteRef(remote, branch);
+      var oldHash = refs.hash(remoteRef);
+      var newHash = util.remote(remoteUrl)(refs.hash, branch);
+      if (newHash === undefined) {
+        throw new Error("couldn't find remote ref " + branch);
+      } else {
+        var remoteObjects = util.remote(remoteUrl)(objects.allObjects);
+        remoteObjects.forEach(objects.write);
+        gitlet.update_ref(remoteRef, newHash);
+        refs.write("FETCH_HEAD", newHash + " branch " + branch + " of " + remoteUrl);
 
-      var giverRemoteRefs = remoteCall(refs.localHeads);
-      var receiverRemoteRefs = refs.remoteHeads(remote);
-      var changedRefs = Object.keys(giverRemoteRefs)
-          .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
-
-      refs.write("FETCH_HEAD", refs.composeFetchHead(giverRemoteRefs, remotePath));
-      changedRefs.forEach(function(b) {
-        gitlet.update_ref(refs.toRemoteRef(remote, b), giverRemoteRefs[b])
-      });
-
-      var refUpdateReport = changedRefs.map(function(b) {
-        return b + " -> " + remote + "/" + b +
-          (merge.isForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
-      });
-
-      return ["From " + remotePath,
-              "Count " + remoteCall(objects.allObjects).length]
-        .concat(refUpdateReport)
-        .join("\n") + "\n";
+        return ["From " + remoteUrl,
+                "Count " + remoteObjects.length,
+                branch + " -> " + remote + "/" + branch +
+                (merge.isForce(oldHash, newHash) ? " (forced)" : "")].join("\n") + "\n";
+      }
     }
   },
 
@@ -268,52 +251,43 @@ var gitlet = module.exports = {
     }
   },
 
-  pull: function(remote, _) {
+  pull: function(remote, branch, _) {
     files.assertInRepo();
     config.assertNotBare();
-
-    this.fetch(remote);
-    if (refs.hash("FETCH_HEAD") === undefined) {
-      return refs.headBranchName() + " has no tracking branch";
-    } else {
-      return this.merge("FETCH_HEAD");
-    }
+    this.fetch(remote, branch);
+    return this.merge("FETCH_HEAD");
   },
 
-  push: function(remote, opts) {
+  push: function(remote, branch, opts) {
     files.assertInRepo();
     opts = opts || {};
 
-    var headBranch = refs.headBranchName();
-    if (remote === undefined) {
+    if (remote === undefined || branch === undefined) {
       throw new Error("unsupported");
     } else if (refs.isHeadDetached()) {
       throw new Error("you are not currently on a branch");
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
-    } else if (config.read().branch[refs.headBranchName()] === undefined) {
-      throw new Error("current branch " + headBranch + " has no upstream branch");
     } else {
       var remotePath = config.read().remote[remote].url;
       var remoteCall = util.remote(remotePath);
-      if (remoteCall(refs.isCheckedOut, headBranch)) {
-        throw new Error("refusing to update checked out branch " + headBranch);
+      if (remoteCall(refs.isCheckedOut, branch)) {
+        throw new Error("refusing to update checked out branch " + branch);
       } else {
-        var receiverHash = remoteCall(refs.hash, headBranch);
-        var giverHash = refs.hash(headBranch);
+        var receiverHash = remoteCall(refs.hash, branch);
+        var giverHash = refs.hash(branch);
         var needsForce = !merge.canFastForward(receiverHash, giverHash);
         if (objects.isUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date";
         } else if (needsForce && !opts.f) {
           throw new Error("failed to push some refs to " + remotePath);
         } else {
-          objects.allObjects()
-            .forEach(function(o) { remoteCall(objects.write, o); });
-          gitlet.update_ref(refs.toRemoteRef(remote, headBranch), giverHash);
-          remoteCall(gitlet.update_ref, refs.toLocalRef(headBranch), giverHash);
+          objects.allObjects().forEach(function(o) { remoteCall(objects.write, o); });
+          gitlet.update_ref(refs.toRemoteRef(remote, branch), giverHash);
+          remoteCall(gitlet.update_ref, refs.toLocalRef(branch), giverHash);
           return ["To " + remotePath,
                   "Count " + objects.allObjects().length,
-                  headBranch + " -> " + headBranch].join("\n") + "\n";
+                  branch + " -> " + branch].join("\n") + "\n";
         }
       }
     }
@@ -341,12 +315,11 @@ var gitlet = module.exports = {
       }
 
       util.remote(targetPath)(function() {
-        var remoteHeadHash = util.remote(remotePath)(refs.hash, "HEAD");
         gitlet.init(opts);
         gitlet.remote("add", "origin", nodePath.relative(process.cwd(), remotePath));
-        gitlet.fetch("origin");
-        config.write(util.assocIn(config.read(), ["branch", "master", "remote", "origin"]));
+        var remoteHeadHash = util.remote(remotePath)(refs.hash, "HEAD");
         if (remoteHeadHash !== undefined) {
+          gitlet.fetch("origin", "master");
           merge.writeFastForwardMerge(undefined, remoteHeadHash);
         }
       });

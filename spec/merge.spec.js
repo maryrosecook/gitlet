@@ -497,7 +497,7 @@ describe("merge", function() {
         process.chdir(localRepo);
         gl.init();
         gl.remote("add", "origin", remoteRepo);
-        gl.fetch("origin");
+        gl.fetch("origin", "master");
         g.merge("refs/remotes/origin/master");
         expect(refs.hash("HEAD")).toEqual("281d2f1c");
       });

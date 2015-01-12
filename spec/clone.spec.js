@@ -63,18 +63,6 @@ describe("clone", function() {
       expect(config.read().remote.origin.url).toEqual("../repo1");
     });
 
-    it("should set master to track remote", function() {
-      testUtil.createStandardFileStructure();
-      g.init();
-      g.add("1a/filea");
-      g.commit({ m: "first" });
-      process.chdir("../");
-
-      g.clone(remoteRepo, "local");
-      process.chdir("local");
-      expect(config.read().branch.master.remote).toEqual("origin");
-    });
-
     it("should return repo cloned when finished", function() {
       testUtil.createStandardFileStructure();
       g.init();

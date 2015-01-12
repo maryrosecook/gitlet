@@ -28,7 +28,7 @@ var config = module.exports = {
         var lines = item.split("\n");
         var entry = [];
 
-        // section eg "branch" or "core"
+        // section eg "core"
         entry.push(lines[0].match(/([^ \]]+)( |\])/)[1]);
 
         // eg "master"
@@ -43,7 +43,7 @@ var config = module.exports = {
         }, {}));
 
         return util.assocIn(c, entry);
-      }, { "remote": {}, "branch": {} });
+      }, { "remote": {} });
   },
 
   objToStr: function(configObj) {

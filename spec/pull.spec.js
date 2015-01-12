@@ -15,9 +15,10 @@ describe("pull", function() {
       .toThrow("not a Gitlet repository");
   });
 
-  it("should not support git pull with no name", function() {
+  it("should not support git pull with no name or no branch", function() {
     g.init();
     expect(function() { g.pull(); }).toThrow("unsupported");
+    expect(function() { g.pull("origin"); }).toThrow("unsupported");
   });
 
   it("should throw if in bare repo", function() {
@@ -26,13 +27,13 @@ describe("pull", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  it("should throw if remote does not exist", function() {
+  it("should throw if remote branch does not exist", function() {
     g.init();
-    expect(function() { g.pull("origin"); })
+    expect(function() { g.pull("origin", "master"); })
       .toThrow("origin does not appear to be a git repository");
   });
 
-  it("should pull and merge master if tracking branch", function() {
+  it("should pull and merge master", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
     var remoteRepo = testUtil.makeRemoteRepo();
@@ -54,9 +55,7 @@ describe("pull", function() {
     gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
 
     gl.remote("add", "origin", remoteRepo);
-    gl.fetch("origin"); // fetch to tell local repo about branch
-    gl.branch(undefined, { u: "origin/master" }); // add branch as tracking
-    gl.pull("origin");
+    gl.pull("origin", "master");
 
     // check index
     expect(testUtil.index().length).toEqual(2);
@@ -93,27 +92,7 @@ describe("pull", function() {
     gr.commit({ m: "first" }); // add identical commits
 
     gl.remote("add", "origin", remoteRepo);
-    gl.fetch("origin"); // fetch to tell local repo about branch
-    gl.branch(undefined, { u: "origin/master" }); // add branch as tracking
 
-    expect(gl.pull("origin")).toEqual("Already up-to-date");
-  });
-
-  it("should throw if pull without tracking branch", function() {
-    // regression
-    var gl = g, gr = g;
-    var localRepo = process.cwd();
-    var remoteRepo = testUtil.makeRemoteRepo();
-
-    testUtil.createStandardFileStructure();
-    gr.init();
-    gr.add("1a/filea");
-    gr.commit({ m: "first" });
-
-    process.chdir(localRepo);
-    gl.init();
-    gl.remote("add", "origin", remoteRepo);
-
-    expect(gl.pull("origin")).toEqual("master has no tracking branch");
+    expect(gl.pull("origin", "master")).toEqual("Already up-to-date");
   });
 });
