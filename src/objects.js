@@ -99,9 +99,8 @@ var objects = module.exports = {
     }
   },
 
-  commitToc: function(commitHash) {
-    return files.flattenNestedTree(objects.fileTree(objects.treeHash(
-      objects.read(commitHash))));
+  commitToc: function(hash) {
+    return files.flattenNestedTree(objects.fileTree(objects.treeHash(objects.read(hash))));
   }
 };
 
