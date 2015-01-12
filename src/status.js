@@ -7,11 +7,11 @@ var objects = require("./objects");
 
 var status = module.exports = {
   toString: function() {
-    return [readCurrentBranch(),
-            readUntracked(),
-            readConflicted(),
-            readToBeCommitted(),
-            readNotStagedForCommit()]
+    return [currentBranch(),
+            untracked(),
+            conflicted(),
+            toBeCommitted(),
+            notStagedForCommit()]
       .reduce(function(a, section) {
         return section.length > 0 ? a.concat(section, "") : a;
       }, [])
@@ -19,31 +19,31 @@ var status = module.exports = {
   }
 };
 
-function readCurrentBranch() {
-  return ["On branch " + refs.readHeadBranchName()];
+function currentBranch() {
+  return ["On branch " + refs.headBranchName()];
 };
 
-function readUntracked() {
+function untracked() {
   var paths = fs.readdirSync(files.workingCopyPath())
-      .filter(function(p) { return index.readToc()[p] === undefined && p !== ".gitlet"; });
+      .filter(function(p) { return index.toc()[p] === undefined && p !== ".gitlet"; });
   return paths.length > 0 ? ["Untracked files:"].concat(paths) : [];
 };
 
-function readConflicted() {
-  var paths = index.readConflictedPaths();
+function conflicted() {
+  var paths = index.conflictedPaths();
   return paths.length > 0 ? ["Unmerged paths:"].concat(paths) : [];
 };
 
-function readToBeCommitted() {
-  var headHash = refs.readHash("HEAD");
-  var headToc = headHash === undefined ? {} : objects.readCommitToc(headHash);
-  var ns = diff.nameStatus(diff.tocDiff(headToc, index.readToc()));
+function toBeCommitted() {
+  var headHash = refs.hash("HEAD");
+  var headToc = headHash === undefined ? {} : objects.commitToc(headHash);
+  var ns = diff.nameStatus(diff.tocDiff(headToc, index.toc()));
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
 };
 
-function readNotStagedForCommit() {
-  var ns = diff.nameStatus(diff.readDiff());
+function notStagedForCommit() {
+  var ns = diff.nameStatus(diff.diff());
   var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
   return entries.length > 0 ? ["Changes not staged for commit:"].concat(entries) : [];
 };

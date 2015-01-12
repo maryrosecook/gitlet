@@ -144,7 +144,7 @@ describe("push", function() {
     g.fetch("local");
     g.branch(undefined, { u: "local/master" });
 
-    expect(config.readIsBare()).toEqual(true);
+    expect(config.isBare()).toEqual(true);
     expect(g.push("local")).toMatch("master -> master");
   });
 

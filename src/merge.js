@@ -8,44 +8,43 @@ var util = require("./util");
 var config = require("./config");
 
 var merge = module.exports = {
-  readCommonAncestor: function(aHash, bHash) {
+  commonAncestor: function(aHash, bHash) {
     var sorted = [aHash, bHash].sort();
     aHash = sorted[0];
     bHash = sorted[1];
-    var aAncestors = [aHash].concat(objects.readAncestors(aHash));
-    var bAncestors = [bHash].concat(objects.readAncestors(bHash));
+    var aAncestors = [aHash].concat(objects.ancestors(aHash));
+    var bAncestors = [bHash].concat(objects.ancestors(bHash));
     return util.intersection(aAncestors, bAncestors)[0];
   },
 
-  readIsMergeInProgress: function() {
-    return refs.readHash("MERGE_HEAD");
+  isMergeInProgress: function() {
+    return refs.hash("MERGE_HEAD");
   },
 
-  readCanFastForward: function(receiverHash, giverHash) {
-    return receiverHash === undefined || objects.readIsAncestor(giverHash, receiverHash);
+  canFastForward: function(receiverHash, giverHash) {
+    return receiverHash === undefined || objects.isAncestor(giverHash, receiverHash);
   },
 
-  readIsForce: function(receiverHash, giverHash) {
-    return receiverHash !== undefined && !objects.readIsAncestor(giverHash, receiverHash);
+  isForce: function(receiverHash, giverHash) {
+    return receiverHash !== undefined && !objects.isAncestor(giverHash, receiverHash);
   },
 
-  readHasConflicts: function(receiverHash, giverHash) {
-    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
+  hasConflicts: function(receiverHash, giverHash) {
+    var mergeDiff = merge.mergeDiff(receiverHash, giverHash);
     return Object.keys(mergeDiff)
       .filter(function(p) {return mergeDiff[p].status===diff.FILE_STATUS.CONFLICT }).length > 0
   },
 
-  readMergeDiff: function(receiverHash, giverHash) {
-    var commonAncestorHash = merge.readCommonAncestor(receiverHash, giverHash);
-    return diff.tocDiff(objects.readCommitToc(receiverHash),
-                        objects.readCommitToc(giverHash),
-                        objects.readCommitToc(commonAncestorHash));
+  mergeDiff: function(receiverHash, giverHash) {
+    return diff.tocDiff(objects.commitToc(receiverHash),
+                        objects.commitToc(giverHash),
+                        objects.commitToc(merge.commonAncestor(receiverHash, giverHash)));
   },
 
   writeMergeMsg: function(receiverHash, giverHash, ref) {
-    var msg = "Merge " + ref + " into " + refs.readHeadBranchName();
+    var msg = "Merge " + ref + " into " + refs.headBranchName();
 
-    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
+    var mergeDiff = merge.mergeDiff(receiverHash, giverHash);
     var conflicts = Object.keys(mergeDiff)
         .filter(function(p) { return mergeDiff[p].status === diff.FILE_STATUS.CONFLICT });
     if (conflicts.length > 0) {
@@ -56,7 +55,7 @@ var merge = module.exports = {
   },
 
   writeIndex: function(receiverHash, giverHash) {
-    var mergeDiff = merge.readMergeDiff(receiverHash, giverHash);
+    var mergeDiff = merge.mergeDiff(receiverHash, giverHash);
     index.write({});
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
@@ -77,11 +76,11 @@ var merge = module.exports = {
   },
 
   writeFastForwardMerge: function(receiverHash, giverHash) {
-    refs.write(refs.toLocalRef(refs.readHeadBranchName()), giverHash);
-    index.write(index.tocToIndex(objects.readCommitToc(giverHash)));
-    if (!config.readIsBare()) {
-      var receiverToc = receiverHash === undefined ? {} : objects.readCommitToc(receiverHash);
-      workingCopy.write(diff.tocDiff(receiverToc, objects.readCommitToc(giverHash)));
+    refs.write(refs.toLocalRef(refs.headBranchName()), giverHash);
+    index.write(index.tocToIndex(objects.commitToc(giverHash)));
+    if (!config.isBare()) {
+      var receiverToc = receiverHash === undefined ? {} : objects.commitToc(receiverHash);
+      workingCopy.write(diff.tocDiff(receiverToc, objects.commitToc(giverHash)));
     }
   },
 
@@ -89,8 +88,8 @@ var merge = module.exports = {
     refs.write("MERGE_HEAD", giverHash);
     merge.writeMergeMsg(receiverHash, giverHash, giverRef);
     merge.writeIndex(receiverHash, giverHash);
-    if (!config.readIsBare()) {
-      workingCopy.write(merge.readMergeDiff(receiverHash, giverHash));
+    if (!config.isBare()) {
+      workingCopy.write(merge.mergeDiff(receiverHash, giverHash));
     }
   }
 };

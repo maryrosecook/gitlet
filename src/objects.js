@@ -16,13 +16,13 @@ var objects = module.exports = {
     return objects.write(treeObject);
   },
 
-  readFileTree: function(treeHash, tree) {
-    if (tree === undefined) { return objects.readFileTree(treeHash, {}); }
+  fileTree: function(treeHash, tree) {
+    if (tree === undefined) { return objects.fileTree(treeHash, {}); }
 
     util.lines(objects.read(treeHash)).forEach(function(line) {
       var lineTokens = line.split(/ /);
       tree[lineTokens[2]] = lineTokens[0] === "tree" ?
-        objects.readFileTree(lineTokens[1], {}) :
+        objects.fileTree(lineTokens[1], {}) :
         lineTokens[1];
     });
 
@@ -39,7 +39,7 @@ var objects = module.exports = {
 
   write: function(str) {
     var contentHash = util.hash(str);
-    if (!objects.readExists(contentHash)) {
+    if (!objects.exists(contentHash)) {
       var filePath = nodePath.join(files.gitletPath(), "objects", contentHash);
       files.write(filePath, str);
     }
@@ -47,12 +47,12 @@ var objects = module.exports = {
     return contentHash;
   },
 
-  readIsUpToDate: function(receiverHash, giverHash) {
+  isUpToDate: function(receiverHash, giverHash) {
     return receiverHash !== undefined &&
-      (receiverHash === giverHash || objects.readIsAncestor(receiverHash, giverHash));
+      (receiverHash === giverHash || objects.isAncestor(receiverHash, giverHash));
   },
 
-  readExists: function(objectHash) {
+  exists: function(objectHash) {
     return objectHash !== undefined &&
       fs.existsSync(nodePath.join(files.gitletPath(), "objects", objectHash));
   },
@@ -66,7 +66,7 @@ var objects = module.exports = {
     }
   },
 
-  readAllObjects: function() {
+  allObjects: function() {
     return fs.readdirSync(files.gitletPath("objects")).map(objects.read);
   },
 
@@ -81,13 +81,13 @@ var objects = module.exports = {
     }
   },
 
-  readIsAncestor: function(descendentHash, ancestorHash) {
-    return objects.readAncestors(descendentHash).indexOf(ancestorHash) !== -1;
+  isAncestor: function(descendentHash, ancestorHash) {
+    return objects.ancestors(descendentHash).indexOf(ancestorHash) !== -1;
   },
 
-  readAncestors: function(commitHash) {
+  ancestors: function(commitHash) {
     var parents = objects.parentHashes(objects.read(commitHash));
-    return util.flatten(parents.concat(parents.map(objects.readAncestors)));
+    return util.flatten(parents.concat(parents.map(objects.ancestors)));
   },
 
   parentHashes: function(str) {
@@ -104,8 +104,8 @@ var objects = module.exports = {
     }
   },
 
-  readCommitToc: function(commitHash) {
-    return files.flattenNestedTree(objects.readFileTree(objects.treeHash(
+  commitToc: function(commitHash) {
+    return files.flattenNestedTree(objects.fileTree(objects.treeHash(
       objects.read(commitHash))));
   }
 };

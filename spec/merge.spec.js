@@ -46,7 +46,7 @@ describe("merge", function() {
       createFlatFileStructure();
       g.add("filea");
       g.commit({ m: "first" });
-      expect(merge.readCommonAncestor("281d2f1c", "281d2f1c")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("281d2f1c", "281d2f1c")).toEqual("281d2f1c");
     });
 
     it("should return ancestor if one is descendent of other", function() {
@@ -56,7 +56,7 @@ describe("merge", function() {
       g.commit({ m: "first" });
       g.add("fileb");
       g.commit({ m: "second" });
-      expect(merge.readCommonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
     });
 
     it("should return branch point for master and branch both w one extra commit", function() {
@@ -73,8 +73,8 @@ describe("merge", function() {
       g.add("filec");
       g.commit({ m: "third" });
 
-      expect(merge.readCommonAncestor("a9b6e7e", "281d2f1c")).toEqual("281d2f1c");
-      expect(merge.readCommonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("a9b6e7e", "281d2f1c")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
     });
 
     it("should return branch point for master and branch both w two extra commits", function() {
@@ -95,8 +95,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("7ece7757", "47cf8efe")).toEqual("281d2f1c");
-      expect(merge.readCommonAncestor("47cf8efe", "7ece7757")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("7ece7757", "47cf8efe")).toEqual("281d2f1c");
+      expect(merge.commonAncestor("47cf8efe", "7ece7757")).toEqual("281d2f1c");
     });
 
     it("should return most recent ancestor if there is a shared hist of several commits", function() {
@@ -117,8 +117,8 @@ describe("merge", function() {
       g.add("filee");
       g.commit({ m: "fifth" });
 
-      expect(merge.readCommonAncestor("34503151", "1c67dfcf")).toEqual("7ece7757");
-      expect(merge.readCommonAncestor("1c67dfcf", "34503151")).toEqual("7ece7757");
+      expect(merge.commonAncestor("34503151", "1c67dfcf")).toEqual("7ece7757");
+      expect(merge.commonAncestor("1c67dfcf", "34503151")).toEqual("7ece7757");
     });
 
     it("should return a single ancestor if merge commits have multiple common ancestors", function() {
@@ -172,8 +172,8 @@ describe("merge", function() {
       addParent("2f31bde1", "571effba"); // 16 has another parent: 11
       addParent("7f7be135", "16b70b64"); // 15 has another parent: 12
 
-      expect(merge.readCommonAncestor("2f31bde1", "7f7be135")).toEqual("571effba");
-      expect(merge.readCommonAncestor("7f7be135", "2f31bde1")).toEqual("571effba");
+      expect(merge.commonAncestor("2f31bde1", "7f7be135")).toEqual("571effba");
+      expect(merge.commonAncestor("7f7be135", "2f31bde1")).toEqual("571effba");
     });
   });
 
@@ -218,11 +218,11 @@ describe("merge", function() {
         g.add("fileb");
         g.commit({ m: "second" });
 
-        expect(refs.readHash("HEAD")).toEqual("a9b6e7e");
+        expect(refs.hash("HEAD")).toEqual("a9b6e7e");
         expect(g.merge("281d2f1c")).toEqual("Already up-to-date");
 
         g.checkout("other");
-        expect(refs.readHash("HEAD")).toEqual("281d2f1c");
+        expect(refs.hash("HEAD")).toEqual("281d2f1c");
         expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date");
       });
 
@@ -358,16 +358,16 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.readHash("other")).toEqual("281d2f1c");
+        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.readHash("master");
+        var masterHash = refs.hash("master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
         g.merge("master");
-        var otherHash = refs.readHash("other");
+        var otherHash = refs.hash("other");
 
         expect(masterHash).toEqual(otherHash);
       });
@@ -378,14 +378,14 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.readHash("other")).toEqual("281d2f1c");
+        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
         g.checkout("other");
 
         expect(g.merge("master")).toEqual("Fast-forward");
-        expect(refs.readHeadBranchName()).toEqual("other");
+        expect(refs.headBranchName()).toEqual("other");
       });
 
       it("should update working copy after merge", function() {
@@ -394,11 +394,11 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.readHash("other")).toEqual("281d2f1c");
+        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.readHash("master");
+        var masterHash = refs.hash("master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
@@ -414,11 +414,11 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.readHash("other")).toEqual("281d2f1c");
+        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.readHash("master");
+        var masterHash = refs.hash("master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
@@ -433,7 +433,7 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.readHash("other")).toEqual("281d2f1c");
+        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
@@ -444,12 +444,12 @@ describe("merge", function() {
         g.add("e1/e2/filee");
         g.commit({ m: "fifth" });
 
-        var masterHash = refs.readHash("master");
+        var masterHash = refs.hash("master");
         expect(masterHash).toEqual("4b3c6333");
 
         g.checkout("other");
         g.merge("master");
-        var otherHash = refs.readHash("other");
+        var otherHash = refs.hash("other");
 
         expect(masterHash).toEqual(otherHash);
       });
@@ -466,7 +466,7 @@ describe("merge", function() {
 
         g.checkout("other");
         g.merge("master");
-        expect(objects.parentHashes(objects.read(refs.readHash("HEAD"))).length).toEqual(1);
+        expect(objects.parentHashes(objects.read(refs.hash("HEAD"))).length).toEqual(1);
       });
 
       it("should be able to pass hash when fast-forwarding", function() {
@@ -481,7 +481,7 @@ describe("merge", function() {
 
         g.checkout("other");
         g.merge("d08448d");
-        expect(refs.readHash("HEAD")).toEqual("d08448d");
+        expect(refs.hash("HEAD")).toEqual("d08448d");
       });
 
       it("should be able to merge even if current branch has no commits", function() {
@@ -499,7 +499,7 @@ describe("merge", function() {
         gl.remote("add", "origin", remoteRepo);
         gl.fetch("origin");
         g.merge("refs/remotes/origin/master");
-        expect(refs.readHash("HEAD")).toEqual("281d2f1c");
+        expect(refs.hash("HEAD")).toEqual("281d2f1c");
       });
     });
 
@@ -529,24 +529,24 @@ describe("merge", function() {
         it("should give merge commit parents: head of cur branch, merged branch", function() {
           g.merge("master");
 
-          var parentHashes = objects.parentHashes(objects.read(refs.readHash("HEAD")));
+          var parentHashes = objects.parentHashes(objects.read(refs.hash("HEAD")));
           expect(parentHashes[0]).toEqual("4c37d74c");
           expect(parentHashes[1]).toEqual("505952f0");
         });
 
         it("should point HEAD at merge commit", function() {
           g.merge("master");
-          expect(refs.readHash("HEAD")).toEqual("3cc84b4c");
+          expect(refs.hash("HEAD")).toEqual("3cc84b4c");
         });
 
         it("should point branch at merge commit", function() {
           g.merge("master");
-          expect(refs.readHash("other")).toEqual("3cc84b4c");
+          expect(refs.hash("other")).toEqual("3cc84b4c");
         });
 
         it("should stay on branch after merge", function() {
           g.merge("master");
-          expect(refs.readHeadBranchName()).toEqual("other");
+          expect(refs.headBranchName()).toEqual("other");
         });
 
         it("should return string describing merge strategy", function() {
@@ -555,13 +555,13 @@ describe("merge", function() {
 
         it("should allow merging of hash", function() {
           g.merge("505952f0");
-          expect(refs.readHash("HEAD")).toEqual("7b1641d0");
+          expect(refs.hash("HEAD")).toEqual("7b1641d0");
         });
 
         it("should say hash was merged in commit message", function() {
           g.merge("505952f0");
 
-          var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+          var commitStrLines = objects.read(refs.hash("HEAD")).split("\n");
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge 505952f0 into other");
         });
@@ -569,7 +569,7 @@ describe("merge", function() {
         it("should say branch was merged in commit message", function() {
           g.merge("master");
 
-          var commitStrLines = objects.read(refs.readHash("HEAD")).split("\n");
+          var commitStrLines = objects.read(refs.hash("HEAD")).split("\n");
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge master into other");
         });
@@ -615,7 +615,7 @@ describe("merge", function() {
           expect(fs.existsSync("c1/filec")).toEqual(true); // sanity
           testUtil.expectFile("fileb", "fileb");
 
-          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          var toc = objects.commitToc(refs.hash("HEAD"));
           expect(Object.keys(toc).length).toEqual(1);
           expect(toc["fileb"]).toBeDefined();
         });
@@ -653,7 +653,7 @@ describe("merge", function() {
           testUtil.expectFile("fileb", "fileb");
           testUtil.expectFile("c1/filec", "filec");
 
-          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          var toc = objects.commitToc(refs.hash("HEAD"));
           expect(Object.keys(toc).length).toEqual(3);
           expect(toc["filea"]).toBeDefined();
           expect(toc["fileb"]).toBeDefined();
@@ -693,7 +693,7 @@ describe("merge", function() {
           testUtil.expectFile("filea", "fileaa");
           testUtil.expectFile("fileb", "fileb");
 
-          var toc = objects.readCommitToc(refs.readHash("HEAD"));
+          var toc = objects.commitToc(refs.hash("HEAD"));
           expect(Object.keys(toc).length).toEqual(2);
           expect(toc["filea"]).toBeDefined();
           expect(toc["fileb"]).toBeDefined();
@@ -856,7 +856,7 @@ describe("merge", function() {
             g.add("filea"); // resolve conflict
             g.commit();
 
-            var toc = objects.readCommitToc(refs.readHash("HEAD"));
+            var toc = objects.commitToc(refs.hash("HEAD"));
             expect(Object.keys(toc).length).toEqual(1);
             expect(toc["filea"]).toEqual(util.hash("fileaaa"));
           });
@@ -869,7 +869,7 @@ describe("merge", function() {
             g.add("filea"); // resolve conflict
             g.commit();
 
-            expect(refs.readTerminalRef("HEAD")).toEqual("refs/heads/other");
+            expect(refs.terminalRef("HEAD")).toEqual("refs/heads/other");
           });
         });
       });

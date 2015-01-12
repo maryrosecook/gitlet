@@ -2,12 +2,12 @@ var files = require("./files");
 var util = require("./util");
 
 var config = module.exports = {
-  readIsBare: function() {
+  isBare: function() {
     return config.read().core[""].bare === "true";
   },
 
   assertNotBare: function() {
-    if (config.readIsBare()) {
+    if (config.isBare()) {
       throw new Error("this operation must be run in a work tree");
     }
   },

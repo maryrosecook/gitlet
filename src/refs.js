@@ -10,8 +10,8 @@ var refs = module.exports = {
     return isSymbolicRef(ref) || isLocalHeadRef(ref) || isRemoteHeadRef(ref);
   },
 
-  readTerminalRef: function(ref) {
-    if (ref === "HEAD" && !this.readIsHeadDetached()) {
+  terminalRef: function(ref) {
+    if (ref === "HEAD" && !this.isHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("ref: (refs/heads/.+)")[1];
     } else if (refs.isRef(ref)) {
       return ref;
@@ -20,25 +20,25 @@ var refs = module.exports = {
     }
   },
 
-  readHash: function(refOrHash) {
-    if (objects.readExists(refOrHash)) {
+  hash: function(refOrHash) {
+    if (objects.exists(refOrHash)) {
       return refOrHash;
     } else {
-      var terminalRef = refs.readTerminalRef(refOrHash);
+      var terminalRef = refs.terminalRef(refOrHash);
       if (terminalRef === "FETCH_HEAD") {
-        return this.readFetchHeadBranchToMerge(refs.readHeadBranchName());
-      } else if (refs.readExists(terminalRef)) {
+        return refs.fetchHeadBranchToMerge(refs.headBranchName());
+      } else if (refs.exists(terminalRef)) {
         return files.read(files.gitletPath(terminalRef));
       }
     }
   },
 
-  readIsHeadDetached: function() {
+  isHeadDetached: function() {
     return files.read(files.gitletPath("HEAD")).match("refs") === null;
   },
 
-  readIsCheckedOut: function(branch) {
-    return !config.readIsBare() && refs.readHeadBranchName() === branch;
+  isCheckedOut: function(branch) {
+    return !config.isBare() && refs.headBranchName() === branch;
   },
 
   toLocalRef: function(name) {
@@ -64,7 +64,7 @@ var refs = module.exports = {
 
   composeFetchHead: function(remoteRefs, remoteUrl) {
     return Object.keys(remoteRefs).map(function(name) {
-      var forMerge =  name === refs.readHeadBranchName() &&
+      var forMerge =  name === refs.headBranchName() &&
           config.read().branch[name] !== undefined;
 
       return remoteRefs[name] + (forMerge ? "" : " not-for-merge") +
@@ -72,44 +72,44 @@ var refs = module.exports = {
     }).join("\n") + "\n";
   },
 
-  readFetchHeadBranchToMerge: function(branchName) {
+  fetchHeadBranchToMerge: function(branchName) {
     return util.lines(files.read(files.gitletPath("FETCH_HEAD")))
       .filter(function(l) { return l.match("not-for-merge") === null; })
       .filter(function(l) { return l.match("^.+ branch " + branchName + " of"); })
       .map(function(l) { return l.match("^([^ ]+) ")[1]; })[0];
   },
 
-  readLocalHeads: function() {
+  localHeads: function() {
     return fs.readdirSync(nodePath.join(files.gitletPath(), "refs", "heads"))
-      .reduce(function(o, n) { return util.assocIn(o, [n, refs.readHash(n)]); }, {});
+      .reduce(function(o, n) { return util.assocIn(o, [n, refs.hash(n)]); }, {});
   },
 
-  readRemoteHeads: function(remote) {
+  remoteHeads: function(remote) {
     var remoteHeadPath = nodePath.join(files.gitletPath(), "refs", "remotes", remote);
     if (fs.existsSync(remoteHeadPath)) {
       return fs.readdirSync(remoteHeadPath)
         .reduce(function(o, n) {
-          return util.assocIn(o, [n, refs.readHash(refs.toRemoteRef(remote, n))]);
+          return util.assocIn(o, [n, refs.hash(refs.toRemoteRef(remote, n))]);
         }, {});
     } else {
       return [];
     }
   },
 
-  readExists: function(ref) {
+  exists: function(ref) {
     return refs.isRef(ref) && fs.existsSync(files.gitletPath(ref));
   },
 
-  readHeadBranchName: function() {
-    if (!refs.readIsHeadDetached()) {
+  headBranchName: function() {
+    if (!refs.isHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("refs/heads/(.+)")[1];
     }
   },
 
-  readCommitParentHashes: function() {
-    var headHash = refs.readHash("HEAD");
-    if (require("./merge").readIsMergeInProgress()) {
-      return [headHash, refs.readHash("MERGE_HEAD")];
+  commitParentHashes: function() {
+    var headHash = refs.hash("HEAD");
+    if (require("./merge").isMergeInProgress()) {
+      return [headHash, refs.hash("MERGE_HEAD")];
     } else if (headHash === undefined) {
       return [];
     } else {

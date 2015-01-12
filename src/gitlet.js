@@ -50,7 +50,7 @@ var gitlet = module.exports = {
     config.assertNotBare();
     opts = opts || {};
 
-    var filesToRm = index.readMatchingFiles(path);
+    var filesToRm = index.matchingFiles(path);
     if (opts.f) {
       throw new Error("unsupported");
     } else if (filesToRm.length === 0) {
@@ -58,8 +58,8 @@ var gitlet = module.exports = {
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
       throw new Error("not removing " + path + " recursively without -r");
     } else {
-      var headToc = refs.readHash("HEAD") ? objects.readCommitToc(refs.readHash("HEAD")) : {};
-      var wcDiff = diff.nameStatus(diff.tocDiff(headToc, index.readWorkingCopyToc()));
+      var headToc = refs.hash("HEAD") ? objects.commitToc(refs.hash("HEAD")) : {};
+      var wcDiff = diff.nameStatus(diff.tocDiff(headToc, index.workingCopyToc()));
       var addedOrModified = Object.keys(wcDiff)
           .filter(function(p) { return wcDiff[p] !== diff.FILE_STATUS.DELETE; });
       var changesToRm = util.intersection(addedOrModified, filesToRm);
@@ -82,23 +82,23 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    var headHash = refs.readHash("HEAD");
+    var headHash = refs.hash("HEAD");
     var treeHash = this.write_tree();
-    var headDesc = refs.readIsHeadDetached() ? "detached HEAD" : refs.readHeadBranchName();
+    var headDesc = refs.isHeadDetached() ? "detached HEAD" : refs.headBranchName();
 
     if (headHash !== undefined &&
         treeHash === objects.treeHash(objects.read(headHash))) {
       throw new Error("# On " + headDesc + "\nnothing to commit, working directory clean");
     } else {
-      var message = merge.readIsMergeInProgress() ?
+      var message = merge.isMergeInProgress() ?
           files.read(files.gitletPath("MERGE_MSG")) :
           opts.m;
       var commmitHash = objects.write(objects.composeCommit(treeHash,
                                                             message,
-                                                            refs.readCommitParentHashes()));
+                                                            refs.commitParentHashes()));
       this.update_ref("HEAD", commmitHash);
-      if (merge.readIsMergeInProgress()) {
-        var conflictedPaths = index.readConflictedPaths();
+      if (merge.isMergeInProgress()) {
+        var conflictedPaths = index.conflictedPaths();
         if (conflictedPaths.length > 0) {
           throw new Error(conflictedPaths.map(function(p) { return "U " + p; }).join("\n") +
                           "\ncannot commit because you have unmerged files\n");
@@ -118,26 +118,26 @@ var gitlet = module.exports = {
     opts = opts || {};
 
     if (name === undefined && opts.u === undefined) {
-      return Object.keys(refs.readLocalHeads()).map(function(branch) {
-        return (branch === refs.readHeadBranchName() ? "* " : "  ") + branch;
+      return Object.keys(refs.localHeads()).map(function(branch) {
+        return (branch === refs.headBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
-    } else if (refs.readHash("HEAD") === undefined) {
-      throw new Error(refs.readHeadBranchName() + " not a valid object name");
+    } else if (refs.hash("HEAD") === undefined) {
+      throw new Error(refs.headBranchName() + " not a valid object name");
     } else if (name === undefined && opts.u !== undefined) {
       var rem = opts.u.split("/");
 
-      if (refs.readIsHeadDetached()) {
+      if (refs.isHeadDetached()) {
         throw new Error("HEAD is detached so could not set upstream to " + opts.u);
-      } else if (!refs.readExists(refs.toRemoteRef(rem[0], rem[1]))) {
+      } else if (!refs.exists(refs.toRemoteRef(rem[0], rem[1]))) {
         throw new Error("the requested upstream branch " + opts.u + " does not exist");
       } else {
         config.write(util.assocIn(config.read(), ["branch", rem[1], "remote", rem[0]]));
-        return refs.readHeadBranchName() + " tracking remote branch " + rem[0] + "/" + rem[1];
+        return refs.headBranchName() + " tracking remote branch " + rem[0] + "/" + rem[1];
       }
-    } else if (refs.readExists(refs.toLocalRef(name))) {
+    } else if (refs.exists(refs.toLocalRef(name))) {
       throw new Error("A branch named " + name + " already exists");
     } else {
-      this.update_ref(refs.toLocalRef(name), refs.readHash("HEAD"));
+      this.update_ref(refs.toLocalRef(name), refs.hash("HEAD"));
     }
   },
 
@@ -145,25 +145,25 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    var toHash = refs.readHash(ref);
-    if (!objects.readExists(toHash)) {
+    var toHash = refs.hash(ref);
+    if (!objects.exists(toHash)) {
       throw new Error(ref + " did not match any file(s) known to Gitlet");
     } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw new Error("reference is not a tree: " + ref);
-    } else if (ref === refs.readHeadBranchName() ||
+    } else if (ref === refs.headBranchName() ||
                ref === files.read(files.gitletPath("HEAD"))) {
       return "Already on " + ref;
     } else {
-      var paths = diff.readChangedFilesCommitWouldOverwrite(toHash);
+      var paths = diff.changedFilesCommitWouldOverwrite(toHash);
       if (paths.length > 0) {
         throw new Error("local changes would be lost\n" + paths.join("\n") + "\n")
       } else {
         process.chdir(files.workingCopyPath());
 
-        var isDetachingHead = objects.readExists(ref);
-        workingCopy.write(diff.readDiff(refs.readHash("HEAD"), toHash));
+        var isDetachingHead = objects.exists(ref);
+        workingCopy.write(diff.diff(refs.hash("HEAD"), toHash));
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
-        index.write(index.tocToIndex(objects.readCommitToc(toHash)));
+        index.write(index.tocToIndex(objects.commitToc(toHash)));
         return isDetachingHead ?
           "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
           "Switched to branch " + ref;
@@ -175,16 +175,15 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    if (ref1 !== undefined && refs.readHash(ref1) === undefined) {
+    if (ref1 !== undefined && refs.hash(ref1) === undefined) {
       throw new Error("ambiguous argument " + ref1 + ": unknown revision");
-    } else if (ref2 !== undefined && refs.readHash(ref2) === undefined) {
+    } else if (ref2 !== undefined && refs.hash(ref2) === undefined) {
       throw new Error("ambiguous argument " + ref2 + ": unknown revision");
     } else {
       if (opts["name-status"] !== true) {
         throw new Error("unsupported"); // for now
       } else {
-        var nameToStatus = diff.nameStatus(diff.readDiff(refs.readHash(ref1),
-                                                         refs.readHash(ref2)));
+        var nameToStatus = diff.nameStatus(diff.diff(refs.hash(ref1), refs.hash(ref2)));
         return Object.keys(nameToStatus)
           .map(function(path) { return nameToStatus[path] + " " + path; })
           .join("\n") + "\n";
@@ -215,10 +214,10 @@ var gitlet = module.exports = {
     } else {
       var remotePath = config.read().remote[remote].url;
       var remoteCall = util.remote(remotePath);
-      remoteCall(objects.readAllObjects).forEach(objects.write);
+      remoteCall(objects.allObjects).forEach(objects.write);
 
-      var giverRemoteRefs = remoteCall(refs.readLocalHeads);
-      var receiverRemoteRefs = refs.readRemoteHeads(remote);
+      var giverRemoteRefs = remoteCall(refs.localHeads);
+      var receiverRemoteRefs = refs.remoteHeads(remote);
       var changedRefs = Object.keys(giverRemoteRefs)
           .filter(function(b) { return giverRemoteRefs[b] !== receiverRemoteRefs[b]; });
 
@@ -229,11 +228,11 @@ var gitlet = module.exports = {
 
       var refUpdateReport = changedRefs.map(function(b) {
         return b + " -> " + remote + "/" + b +
-          (merge.readIsForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
+          (merge.isForce(receiverRemoteRefs[b], giverRemoteRefs[b]) ? " (forced)" : "");
       });
 
       return ["From " + remotePath,
-              "Count " + remoteCall(objects.readAllObjects).length]
+              "Count " + remoteCall(objects.allObjects).length]
         .concat(refUpdateReport)
         .join("\n") + "\n";
     }
@@ -243,24 +242,24 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    var receiverHash = refs.readHash("HEAD");
-    var giverHash = refs.readHash(ref);
-    if (refs.readIsHeadDetached()) {
+    var receiverHash = refs.hash("HEAD");
+    var giverHash = refs.hash(ref);
+    if (refs.isHeadDetached()) {
       throw new Error("unsupported");
     } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
       throw new Error(ref + ": expected commit type");
-    } else if (objects.readIsUpToDate(receiverHash, giverHash)) {
+    } else if (objects.isUpToDate(receiverHash, giverHash)) {
       return "Already up-to-date";
     } else {
-      var paths = diff.readChangedFilesCommitWouldOverwrite(giverHash);
+      var paths = diff.changedFilesCommitWouldOverwrite(giverHash);
       if (paths.length > 0) {
         throw new Error("local changes would be lost\n" + paths.join("\n") + "\n");
-      } else if (merge.readCanFastForward(receiverHash, giverHash)) {
+      } else if (merge.canFastForward(receiverHash, giverHash)) {
         merge.writeFastForwardMerge(receiverHash, giverHash);
         return "Fast-forward";
       } else {
         merge.writeNonFastForwardMerge(receiverHash, giverHash, ref);
-        if (merge.readHasConflicts(receiverHash, giverHash)) {
+        if (merge.hasConflicts(receiverHash, giverHash)) {
           return "Automatic merge failed. Fix conflicts and commit the result.";
         } else {
           return this.commit();
@@ -274,8 +273,8 @@ var gitlet = module.exports = {
     config.assertNotBare();
 
     this.fetch(remote);
-    if (refs.readHash("FETCH_HEAD") === undefined) {
-      return refs.readHeadBranchName() + " has no tracking branch";
+    if (refs.hash("FETCH_HEAD") === undefined) {
+      return refs.headBranchName() + " has no tracking branch";
     } else {
       return this.merge("FETCH_HEAD");
     }
@@ -285,35 +284,35 @@ var gitlet = module.exports = {
     files.assertInRepo();
     opts = opts || {};
 
-    var headBranch = refs.readHeadBranchName();
+    var headBranch = refs.headBranchName();
     if (remote === undefined) {
       throw new Error("unsupported");
-    } else if (refs.readIsHeadDetached()) {
+    } else if (refs.isHeadDetached()) {
       throw new Error("you are not currently on a branch");
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
-    } else if (config.read().branch[refs.readHeadBranchName()] === undefined) {
+    } else if (config.read().branch[refs.headBranchName()] === undefined) {
       throw new Error("current branch " + headBranch + " has no upstream branch");
     } else {
       var remotePath = config.read().remote[remote].url;
       var remoteCall = util.remote(remotePath);
-      if (remoteCall(refs.readIsCheckedOut, headBranch)) {
+      if (remoteCall(refs.isCheckedOut, headBranch)) {
         throw new Error("refusing to update checked out branch " + headBranch);
       } else {
-        var receiverHash = remoteCall(refs.readHash, headBranch);
-        var giverHash = refs.readHash(headBranch);
-        var needsForce = !merge.readCanFastForward(receiverHash, giverHash);
-        if (objects.readIsUpToDate(receiverHash, giverHash)) {
+        var receiverHash = remoteCall(refs.hash, headBranch);
+        var giverHash = refs.hash(headBranch);
+        var needsForce = !merge.canFastForward(receiverHash, giverHash);
+        if (objects.isUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date";
         } else if (needsForce && !opts.f) {
           throw new Error("failed to push some refs to " + remotePath);
         } else {
-          objects.readAllObjects()
+          objects.allObjects()
             .forEach(function(o) { remoteCall(objects.write, o); });
           gitlet.update_ref(refs.toRemoteRef(remote, headBranch), giverHash);
           remoteCall(gitlet.update_ref, refs.toLocalRef(headBranch), giverHash);
           return ["To " + remotePath,
-                  "Count " + objects.readAllObjects().length,
+                  "Count " + objects.allObjects().length,
                   headBranch + " -> " + headBranch].join("\n") + "\n";
         }
       }
@@ -342,7 +341,7 @@ var gitlet = module.exports = {
       }
 
       util.remote(targetPath)(function() {
-        var remoteHeadHash = util.remote(remotePath)(refs.readHash, "HEAD");
+        var remoteHeadHash = util.remote(remotePath)(refs.hash, "HEAD");
         gitlet.init(opts);
         gitlet.remote("add", "origin", nodePath.relative(process.cwd(), remotePath));
         gitlet.fetch("origin");
@@ -363,12 +362,12 @@ var gitlet = module.exports = {
 
     var pathFromRoot = files.pathFromRepoRoot(path);
     var isOnDisk = fs.existsSync(path);
-    var isInIndex = index.readHasFile(path, 0);
+    var isInIndex = index.hasFile(path, 0);
 
     if (isOnDisk && fs.statSync(path).isDirectory()) {
       throw new Error(pathFromRoot + " is a directory - add files inside\n");
     } else if (opts.remove && !isOnDisk && isInIndex) {
-      if (index.readFileInConflict(path)) {
+      if (index.isFileInConflict(path)) {
         throw new Error("unsupported");
       } else {
         index.writeRm(path);
@@ -388,22 +387,22 @@ var gitlet = module.exports = {
 
   write_tree: function(_) {
     files.assertInRepo();
-    return objects.writeTree(files.nestFlatTree(index.readToc()));
+    return objects.writeTree(files.nestFlatTree(index.toc()));
   },
 
   update_ref: function(refToUpdate, refToUpdateTo, _) {
     files.assertInRepo();
 
-    var hash = refs.readHash(refToUpdateTo);
-    if (!objects.readExists(hash)) {
+    var hash = refs.hash(refToUpdateTo);
+    if (!objects.exists(hash)) {
       throw new Error(refToUpdateTo + " not a valid SHA1");
     } else if (!refs.isRef(refToUpdate)) {
       throw new Error("cannot lock the ref " + refToUpdate);
     } else if (objects.type(objects.read(hash)) !== "commit") {
-      var branch = refs.readTerminalRef(refToUpdate);
+      var branch = refs.terminalRef(refToUpdate);
       throw new Error(branch + " cannot refer to non-commit object " + hash + "\n")
     } else {
-      refs.write(refs.readTerminalRef(refToUpdate), hash);
+      refs.write(refs.terminalRef(refToUpdate), hash);
     }
   }
 };

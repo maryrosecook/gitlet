@@ -5,7 +5,7 @@ var objects = require("./objects");
 var util = require("./util");
 
 var index = module.exports = {
-  readHasFile: function(path, stage) {
+  hasFile: function(path, stage) {
     return index.read()[index.key(path, stage)] !== undefined;
   },
 
@@ -28,17 +28,17 @@ var index = module.exports = {
     return { path: pieces[0], stage: parseInt(pieces[1]) };
   },
 
-  readToc: function() {
+  toc: function() {
     var idx = index.read();
     return Object.keys(idx)
       .reduce(function(obj, k) { return util.assocIn(obj, [k.split(",")[0], idx[k]]); }, {});
   },
 
-  readFileInConflict: function(path) {
-    return index.readHasFile(path, 2);
+  isFileInConflict: function(path) {
+    return index.hasFile(path, 2);
   },
 
-  readConflictedPaths: function() {
+  conflictedPaths: function() {
     var idx = index.read();
     return Object.keys(idx)
       .filter(function(k) { return index.keyPieces(k).stage === 2; })
@@ -46,7 +46,7 @@ var index = module.exports = {
   },
 
   writeAdd: function(path) {
-    if (index.readFileInConflict(path)) {
+    if (index.isFileInConflict(path)) {
       index.rmEntry(path, 1);
       index.rmEntry(path, 2);
       index.rmEntry(path, 3);
@@ -78,7 +78,7 @@ var index = module.exports = {
     files.write(files.gitletPath("index"), indexStr);
   },
 
-  readWorkingCopyToc: function() {
+  workingCopyToc: function() {
     return Object.keys(index.read())
       .map(function(k) { return k.split(",")[0]; })
       .filter(function(p) { return fs.existsSync(files.workingCopyPath(p)); })
@@ -93,10 +93,10 @@ var index = module.exports = {
       .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 0), toc[p]]); }, {});
   },
 
-  readMatchingFiles: function(pathSpec) {
+  matchingFiles: function(pathSpec) {
     var prefix = nodePath.relative(files.workingCopyPath(), process.cwd());
     var searchPath = nodePath.join(prefix, pathSpec);
-    return Object.keys(index.readToc())
+    return Object.keys(index.toc())
       .filter(function(p) { return p.match("^" + searchPath); });
   }
 };

@@ -68,7 +68,7 @@ describe("pull", function() {
     testUtil.expectFile("1b/fileb", "fileb");
 
     // check commit file tree
-    var toc = objects.readCommitToc(refs.readHash("HEAD"));
+    var toc = objects.commitToc(refs.hash("HEAD"));
     expect(Object.keys(toc).length).toEqual(2);
     expect(toc["1a/filea"]).toBeDefined();
     expect(toc["1b/fileb"]).toBeDefined();

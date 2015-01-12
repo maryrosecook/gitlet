@@ -92,7 +92,7 @@ describe("write-tree", function() {
 
     process.chdir(remoteRepo);
 
-    expect(config.readIsBare()).toEqual(true);
+    expect(config.isBare()).toEqual(true);
     expect(gl.write_tree()).toMatch("63e0627e");
   });
 });

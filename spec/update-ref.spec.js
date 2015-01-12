@@ -163,7 +163,7 @@ describe("update-ref", function() {
     g.clone("repo1", "repo2", { bare: true });
 
     process.chdir("repo2");
-    expect(config.readIsBare()).toEqual(true);
+    expect(config.isBare()).toEqual(true);
 
     expect(fs.readFileSync("refs/heads/master", "utf8")).toEqual("5b228c59");
     g.update_ref("refs/heads/master", "17a11ad4");

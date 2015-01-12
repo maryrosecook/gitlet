@@ -129,7 +129,7 @@ describe("clone", function() {
 
       g.clone(remoteRepo, "local", { bare: true });
       process.chdir("local");
-      expect(config.readIsBare()).toEqual(true);
+      expect(config.isBare()).toEqual(true);
     });
 
     it("should be able to clone a bare repo", function() {
