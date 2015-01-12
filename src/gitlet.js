@@ -38,9 +38,7 @@ var gitlet = module.exports = {
     if (addedFiles.length === 0) {
       throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
     } else {
-      for (var i = 0; i < addedFiles.length; i++) {
-        this.update_index(addedFiles[i], { add: true });
-      }
+      addedFiles.forEach(function(p) { gitlet.update_index(p, { add: true }); });
     }
   },
 
