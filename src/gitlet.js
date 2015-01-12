@@ -10,7 +10,6 @@ var util = require("./util");
 var parseOptions = require("./parse-options");
 var config = require("./config");
 var merge = require("./merge");
-var commit = require("./commit");
 var status = require("./status");
 
 var gitlet = module.exports = {
@@ -98,7 +97,7 @@ var gitlet = module.exports = {
           opts.m;
       var commmitHash = objects.write(objects.composeCommit(treeHash,
                                                             message,
-                                                            commit.readParentHashes()));
+                                                            refs.readCommitParentHashes()));
       this.update_ref("HEAD", commmitHash);
       if (merge.readIsMergeInProgress()) {
         var conflictedPaths = index.readConflictedPaths();

@@ -104,6 +104,17 @@ var refs = module.exports = {
     if (!refs.readIsHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("refs/heads/(.+)")[1];
     }
+  },
+
+  readCommitParentHashes: function() {
+    var headHash = refs.readHash("HEAD");
+    if (require("./merge").readIsMergeInProgress()) {
+      return [headHash, refs.readHash("MERGE_HEAD")];
+    } else if (headHash === undefined) {
+      return [];
+    } else {
+      return [headHash];
+    }
   }
 };
 
