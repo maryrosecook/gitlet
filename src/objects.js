@@ -96,11 +96,3 @@ var objects = module.exports = {
     return files.flattenNestedTree(objects.fileTree(objects.treeHash(objects.read(hash))));
   }
 };
-
-function treeHashes(hash) {
-  return util.lines(objects.read(hash)).reduce(function(keys, line) {
-    var lineTokens = line.split(/ /);
-    return keys.concat(lineTokens[1])
-      .concat(lineTokens[0] === "tree" ? treeHashes(lineTokens[1]) : []);
-  }, [hash]);
-};
