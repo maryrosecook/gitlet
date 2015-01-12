@@ -66,14 +66,7 @@ var objects = module.exports = {
   },
 
   type: function(str) {
-    var firstToken = str.split(" ")[0];
-    if (firstToken === "commit") {
-      return "commit";
-    } else if (firstToken === "tree" || firstToken === "blob") {
-      return "tree";
-    } else {
-      return "blob";
-    }
+    return { commit: "commit", tree: "tree", blob: "tree" }[str.split(" ")[0]] || "blob";
   },
 
   isAncestor: function(descendentHash, ancestorHash) {
