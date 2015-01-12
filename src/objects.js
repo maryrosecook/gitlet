@@ -38,13 +38,8 @@ var objects = module.exports = {
   },
 
   write: function(str) {
-    var contentHash = util.hash(str);
-    if (!objects.exists(contentHash)) {
-      var filePath = nodePath.join(files.gitletPath(), "objects", contentHash);
-      files.write(filePath, str);
-    }
-
-    return contentHash;
+    files.write(nodePath.join(files.gitletPath(), "objects", util.hash(str)), str);
+    return util.hash(str);
   },
 
   isUpToDate: function(receiverHash, giverHash) {
