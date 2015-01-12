@@ -29,12 +29,12 @@ var objects = module.exports = {
     return tree;
   },
 
-  composeCommit: function(treeHash, message, parentHashes) {
-    return "commit " + treeHash + "\n" +
-      parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
-      "Date:  " + new Date().toString() + "\n" +
-      "\n" +
-      "    " + message + "\n";
+  writeCommit: function(treeHash, message, parentHashes) {
+    return this.write("commit " + treeHash + "\n" +
+                      parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("") +
+                      "Date:  " + new Date().toString() + "\n" +
+                      "\n" +
+                      "    " + message + "\n");
   },
 
   write: function(str) {

@@ -73,17 +73,12 @@ var gitlet = module.exports = {
     var treeHash = this.write_tree();
     var headDesc = refs.isHeadDetached() ? "detached HEAD" : refs.headBranchName();
 
-    if (headHash !== undefined &&
-        treeHash === objects.treeHash(objects.read(headHash))) {
+    if (headHash !== undefined && treeHash === objects.treeHash(objects.read(headHash))) {
       throw new Error("# On " + headDesc + "\nnothing to commit, working directory clean");
     } else {
-      var message = merge.isMergeInProgress() ?
-          files.read(files.gitletPath("MERGE_MSG")) :
-          opts.m;
-      var commmitHash = objects.write(objects.composeCommit(treeHash,
-                                                            message,
-                                                            refs.commitParentHashes()));
-      this.update_ref("HEAD", commmitHash);
+      var msg = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
+      var commitHash = objects.writeCommit(treeHash, msg, refs.commitParentHashes());
+      this.update_ref("HEAD", commitHash);
       if (merge.isMergeInProgress()) {
         var conflictedPaths = index.conflictedPaths();
         if (conflictedPaths.length > 0) {
@@ -95,7 +90,7 @@ var gitlet = module.exports = {
           return "Merge made by the three-way strategy";
         }
       } else {
-        return "[" + headDesc + " " + commmitHash + "] " + message;
+        return "[" + headDesc + " " + commitHash + "] " + msg;
       }
     }
   },
