@@ -73,12 +73,9 @@ var files = module.exports = {
   },
 
   nestFlatTree: function(obj) {
-    var tree = {};
-    Object.keys(obj).forEach(function(wholePath) {
-      util.assocIn(tree, wholePath.split(nodePath.sep).concat(obj[wholePath]));
-    });
-
-    return tree;
+    return Object.keys(obj).reduce(function(tree, wholePath) {
+      return util.assocIn(tree, wholePath.split(nodePath.sep).concat(obj[wholePath]));
+    }, {});
   },
 
   flattenNestedTree: function(tree, obj, prefix) {
