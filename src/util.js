@@ -42,11 +42,11 @@ var util = module.exports = {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
   },
 
-  remote: function(remoteUrl, fn) {
-    return function() {
+  remote: function(remoteUrl) {
+    return function(fn) {
       var originalDir = process.cwd();
       process.chdir(remoteUrl);
-      var result = fn.apply(null, arguments);
+      var result = fn.apply(null, Array.prototype.slice.call(arguments, 1));
       process.chdir(originalDir);
       return result;
     };
