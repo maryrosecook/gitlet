@@ -56,7 +56,7 @@ var files = module.exports = {
   },
 
   workingCopyPath: function(path) {
-    return nodePath.join(workingCopyDir(), path || "");
+    return nodePath.join(nodePath.join(gitletDir(), ".."), path || "");
   },
 
   lsRecursive: function(path) {
@@ -108,11 +108,5 @@ function gitletDir(dir) {
     } else if (dir !== "/") {
       return gitletDir(nodePath.join(dir, ".."));
     }
-  }
-};
-
-function workingCopyDir() {
-  if (gitletDir() !== undefined) {
-    return nodePath.join(gitletDir(), "..")
   }
 };
