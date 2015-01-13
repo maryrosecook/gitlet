@@ -1,7 +1,6 @@
 var fs = require("fs");
 var nodePath = require("path");
-var g = require("../src/gitlet");
-var util = require("../src/util");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 describe("fetch", function() {
@@ -260,7 +259,7 @@ describe("fetch", function() {
 
     var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
     var amended = orig.replace("parent 17a11ad4\n", "");
-    var amendedCommitHash = util.hash(amended);
+    var amendedCommitHash = "6e3bfe70";
     var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
     fs.writeFileSync(amendedCommitPath, amended);
     expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);

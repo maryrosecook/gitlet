@@ -1,6 +1,5 @@
 var fs = require("fs");
-var g = require("../src/gitlet");
-var config = require("../src/config");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 describe("write-tree", function() {
@@ -92,7 +91,8 @@ describe("write-tree", function() {
 
     process.chdir(remoteRepo);
 
-    expect(config.isBare()).toEqual(true);
+    expect(fs.readFileSync("config", "utf8").split("\n")[3])
+      .toEqual("  bare = true");
     expect(gl.write_tree()).toMatch("63e0627e");
   });
 });

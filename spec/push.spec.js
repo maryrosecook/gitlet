@@ -1,11 +1,7 @@
 var fs = require("fs");
 var nodePath = require("path");
-var g = require("../src/gitlet");
-var objects = require("../src/objects");
-var refs = require("../src/refs");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
-var util = require("../src/util");
-var config = require("../src/config");
 
 describe("push", function() {
   beforeEach(testUtil.initTestDataDir);
@@ -133,7 +129,7 @@ describe("push", function() {
     process.chdir(bareRepo);
     g.remote("add", "local", "../repo1");
 
-    expect(config.isBare()).toEqual(true);
+    expect(fs.readFileSync("config", "utf8").split("\n")[5]).toEqual("  bare = true");
     expect(g.push("local", "master")).toMatch("master -> master");
   });
 
@@ -206,7 +202,7 @@ describe("push", function() {
     // amend second commit to be first (no parent) on remote
     var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
     var amended = orig.replace("parent 17a11ad4\n", "");
-    var amendedCommitHash = util.hash(amended);
+    var amendedCommitHash = testUtil.hash(amended);
     var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
     fs.writeFileSync(amendedCommitPath, amended);
     expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);
@@ -239,7 +235,7 @@ describe("push", function() {
       // amend second commit to be first (no parent) on remote
       var orig = fs.readFileSync(".gitlet/objects/16b35712", "utf8");
       var amended = orig.replace("parent 17a11ad4\n", "");
-      var amendedCommitHash = util.hash(amended);
+      var amendedCommitHash = testUtil.hash(amended);
       var amendedCommitPath = ".gitlet/objects/" + amendedCommitHash;
       fs.writeFileSync(amendedCommitPath, amended);
       expect(orig.length > fs.readFileSync(amendedCommitPath, "utf8").length).toEqual(true);

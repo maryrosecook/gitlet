@@ -1,12 +1,6 @@
 var fs = require("fs");
 var nodePath = require("path");
-var merge = require("../src/merge");
-var refs = require("../src/refs");
-var objects = require("../src/objects");
-var files = require("../src/files");
-var index = require("../src/index");
-var g = require("../src/gitlet");
-var util = require("../src/util");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 function spToUnd(charr) {
@@ -38,143 +32,6 @@ describe("merge", function() {
     g.init({ bare: true });
     expect(function() { g.merge(); })
       .toThrow("this operation must be run in a work tree");
-  });
-
-  describe("common ancestors", function() {
-    it("should return hash if same hash passed", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      expect(merge.commonAncestor("281d2f1c", "281d2f1c")).toEqual("281d2f1c");
-    });
-
-    it("should return ancestor if one is descendent of other", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.add("fileb");
-      g.commit({ m: "second" });
-      expect(merge.commonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
-    });
-
-    it("should return branch point for master and branch both w one extra commit", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.branch("other");
-
-      g.add("fileb");
-      g.commit({ m: "second" });
-
-      g.checkout("other");
-      g.add("filec");
-      g.commit({ m: "third" });
-
-      expect(merge.commonAncestor("a9b6e7e", "281d2f1c")).toEqual("281d2f1c");
-      expect(merge.commonAncestor("281d2f1c", "a9b6e7e")).toEqual("281d2f1c");
-    });
-
-    it("should return branch point for master and branch both w two extra commits", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.branch("other");
-
-      g.add("fileb");
-      g.commit({ m: "second" });
-      g.add("filec");
-      g.commit({ m: "third" });
-
-      g.checkout("other");
-      g.add("filed");
-      g.commit({ m: "fourth" });
-      g.add("filee");
-      g.commit({ m: "fifth" });
-
-      expect(merge.commonAncestor("7ece7757", "47cf8efe")).toEqual("281d2f1c");
-      expect(merge.commonAncestor("47cf8efe", "7ece7757")).toEqual("281d2f1c");
-    });
-
-    it("should return most recent ancestor if there is a shared hist of several commits", function() {
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "first" });
-      g.add("fileb");
-      g.commit({ m: "second" });
-      g.add("filec");
-      g.commit({ m: "third" });
-      g.branch("other");
-
-      g.add("filed");
-      g.commit({ m: "fourth" });
-
-      g.checkout("other");
-      g.add("filee");
-      g.commit({ m: "fifth" });
-
-      expect(merge.commonAncestor("34503151", "1c67dfcf")).toEqual("7ece7757");
-      expect(merge.commonAncestor("1c67dfcf", "34503151")).toEqual("7ece7757");
-    });
-
-    it("should return a single ancestor if merge commits have multiple common ancestors", function() {
-      // (it's basically arbitrary which of the possible ancestors is returned)
-
-      // example here: http://codicesoftware.blogspot.com/2011/09/merge-recursive-strategy.html
-      // real git uses recursive strategy to merge multiple ancestors into a final common ancestor.
-      // I am not going to implement this for now
-
-      g.init();
-      createFlatFileStructure();
-      g.add("filea");
-      g.commit({ m: "10" });
-      g.branch("task001");
-
-      g.add("fileb");
-      g.commit({ m: "11" });
-
-      g.checkout("task001");
-      g.add("filec");
-      g.commit({ m: "12" });
-
-      g.checkout("master");
-      g.add("filed");
-      g.commit({ m: "13" });
-
-      g.checkout("task001");
-      g.add("filee");
-      g.commit({ m: "14" });
-
-      g.checkout("master");
-      g.add("filef");
-      g.commit({ m: "15" });
-
-      g.checkout("task001");
-      g.add("fileg");
-      g.commit({ m: "16" });
-
-      // TODO: once merge implemented change these fake merges into calls to merge()
-
-      function addParent(commitHash, parentHash) {
-        var path = ".gitlet/objects/" + commitHash;
-        var lines = fs.readFileSync(path, "utf8").split("\n");
-        var out = lines.slice(0, 2)
-            .concat("parent " + parentHash)
-            .concat(lines.slice(2))
-            .join("\n") + "\n";
-        fs.writeFileSync(path, out);
-      };
-
-      addParent("2f31bde1", "571effba"); // 16 has another parent: 11
-      addParent("7f7be135", "16b70b64"); // 15 has another parent: 12
-
-      expect(merge.commonAncestor("2f31bde1", "7f7be135")).toEqual("571effba");
-      expect(merge.commonAncestor("7f7be135", "2f31bde1")).toEqual("571effba");
-    });
   });
 
   describe("merge", function() {
@@ -218,11 +75,11 @@ describe("merge", function() {
         g.add("fileb");
         g.commit({ m: "second" });
 
-        expect(refs.hash("HEAD")).toEqual("a9b6e7e");
+        expect(testUtil.headHash()).toEqual("a9b6e7e");
         expect(g.merge("281d2f1c")).toEqual("Already up-to-date");
 
         g.checkout("other");
-        expect(refs.hash("HEAD")).toEqual("281d2f1c");
+        expect(testUtil.headHash()).toEqual("281d2f1c");
         expect(g.merge("a9b6e7e")).toNotEqual("Already up-to-date");
       });
 
@@ -358,16 +215,15 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.hash("other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.hash("master");
+        var masterHash = testUtil.refHash("refs/heads/master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
         g.merge("master");
-        var otherHash = refs.hash("other");
+        var otherHash = testUtil.refHash("refs/heads/other");
 
         expect(masterHash).toEqual(otherHash);
       });
@@ -378,14 +234,14 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.hash("other")).toEqual("281d2f1c");
+        expect(testUtil.refHash("refs/heads/other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
         g.checkout("other");
 
         expect(g.merge("master")).toEqual("Fast-forward");
-        expect(refs.headBranchName()).toEqual("other");
+        testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
       });
 
       it("should update working copy after merge", function() {
@@ -394,11 +250,11 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.hash("other")).toEqual("281d2f1c");
+        expect(testUtil.refHash("refs/heads/other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.hash("master");
+        var masterHash = testUtil.refHash("refs/heads/master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
@@ -414,11 +270,11 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.hash("other")).toEqual("281d2f1c");
+        expect(testUtil.refHash("refs/heads/other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
-        var masterHash = refs.hash("master");
+        var masterHash = testUtil.refHash("refs/heads/master");
         expect(masterHash).toEqual("d08448d");
 
         g.checkout("other");
@@ -433,7 +289,7 @@ describe("merge", function() {
         g.add("filea");
         g.commit({ m: "first" });
         g.branch("other");
-        expect(refs.hash("other")).toEqual("281d2f1c");
+        expect(testUtil.refHash("refs/heads/other")).toEqual("281d2f1c");
 
         g.add("fileb");
         g.commit({ m: "second" });
@@ -444,12 +300,12 @@ describe("merge", function() {
         g.add("e1/e2/filee");
         g.commit({ m: "fifth" });
 
-        var masterHash = refs.hash("master");
+        var masterHash = testUtil.refHash("refs/heads/master");
         expect(masterHash).toEqual("4b3c6333");
 
         g.checkout("other");
         g.merge("master");
-        var otherHash = refs.hash("other");
+        var otherHash = testUtil.refHash("refs/heads/other");
 
         expect(masterHash).toEqual(otherHash);
       });
@@ -466,7 +322,12 @@ describe("merge", function() {
 
         g.checkout("other");
         g.merge("master");
-        expect(objects.parentHashes(objects.read(refs.hash("HEAD"))).length).toEqual(1);
+
+        var commitStr = testUtil.readFile(".gitlet/objects/" + testUtil.headHash());
+        expect(commitStr
+               .split("\n")
+               .filter(function(line) { return line.match(/^parent/); }).length)
+          .toEqual(1);
       });
 
       it("should be able to pass hash when fast-forwarding", function() {
@@ -481,7 +342,7 @@ describe("merge", function() {
 
         g.checkout("other");
         g.merge("d08448d");
-        expect(refs.hash("HEAD")).toEqual("d08448d");
+        expect(testUtil.headHash()).toEqual("d08448d");
       });
 
       it("should be able to merge even if current branch has no commits", function() {
@@ -499,7 +360,7 @@ describe("merge", function() {
         gl.remote("add", "origin", remoteRepo);
         gl.fetch("origin", "master");
         g.merge("refs/remotes/origin/master");
-        expect(refs.hash("HEAD")).toEqual("281d2f1c");
+        expect(testUtil.headHash()).toEqual("281d2f1c");
       });
     });
 
@@ -529,24 +390,28 @@ describe("merge", function() {
         it("should give merge commit parents: head of cur branch, merged branch", function() {
           g.merge("master");
 
-          var parentHashes = objects.parentHashes(objects.read(refs.hash("HEAD")));
-          expect(parentHashes[0]).toEqual("4c37d74c");
-          expect(parentHashes[1]).toEqual("505952f0");
+          var commitStr = testUtil.readFile(".gitlet/objects/" + testUtil.headHash());
+          var parentLines = commitStr
+              .split("\n")
+              .filter(function(line) { return line.match(/^parent/); });
+
+          expect(parentLines[0]).toEqual("parent 4c37d74c");
+          expect(parentLines[1]).toEqual("parent 505952f0");
         });
 
         it("should point HEAD at merge commit", function() {
           g.merge("master");
-          expect(refs.hash("HEAD")).toEqual("3cc84b4c");
+          expect(testUtil.headHash()).toEqual("3cc84b4c");
         });
 
         it("should point branch at merge commit", function() {
           g.merge("master");
-          expect(refs.hash("other")).toEqual("3cc84b4c");
+          expect(testUtil.refHash("refs/heads/other")).toEqual("3cc84b4c");
         });
 
         it("should stay on branch after merge", function() {
           g.merge("master");
-          expect(refs.headBranchName()).toEqual("other");
+          testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
         });
 
         it("should return string describing merge strategy", function() {
@@ -555,13 +420,14 @@ describe("merge", function() {
 
         it("should allow merging of hash", function() {
           g.merge("505952f0");
-          expect(refs.hash("HEAD")).toEqual("7b1641d0");
+          expect(testUtil.headHash()).toEqual("7b1641d0");
         });
 
         it("should say hash was merged in commit message", function() {
           g.merge("505952f0");
 
-          var commitStrLines = objects.read(refs.hash("HEAD")).split("\n");
+          var commitStrLines = testUtil.readFile(".gitlet/objects/" + testUtil.headHash())
+              .split("\n");
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge 505952f0 into other");
         });
@@ -569,19 +435,20 @@ describe("merge", function() {
         it("should say branch was merged in commit message", function() {
           g.merge("master");
 
-          var commitStrLines = objects.read(refs.hash("HEAD")).split("\n");
+          var commitStrLines = testUtil.readFile(".gitlet/objects/" + testUtil.headHash())
+              .split("\n");
           expect(commitStrLines[commitStrLines.length - 2])
             .toEqual("    Merge master into other");
         });
 
         it("should remove MERGE_MSG after committing merge", function() {
           g.merge("master");
-          expect(fs.existsSync(files.gitletPath("MERGE_MSG"))).toEqual(false);
+          expect(fs.existsSync(".gitlet/MERGE_MSG")).toEqual(false);
         });
 
         it("should remove MERGE_HEAD after committing merge", function() {
           g.merge("master");
-          expect(fs.existsSync(files.gitletPath("MERGE_HEAD"))).toEqual(false);
+          expect(fs.existsSync(".gitlet/MERGE_HEAD")).toEqual(false);
         });
       });
 
@@ -615,9 +482,8 @@ describe("merge", function() {
           expect(fs.existsSync("c1/filec")).toEqual(true); // sanity
           testUtil.expectFile("fileb", "fileb");
 
-          var toc = objects.commitToc(refs.hash("HEAD"));
-          expect(Object.keys(toc).length).toEqual(1);
-          expect(toc["fileb"]).toBeDefined();
+          expect(Object.keys(testUtil.index()).length).toEqual(1);
+          expect(testUtil.index()[0].path).toEqual("fileb");
         });
       });
 
@@ -653,11 +519,11 @@ describe("merge", function() {
           testUtil.expectFile("fileb", "fileb");
           testUtil.expectFile("c1/filec", "filec");
 
-          var toc = objects.commitToc(refs.hash("HEAD"));
-          expect(Object.keys(toc).length).toEqual(3);
-          expect(toc["filea"]).toBeDefined();
-          expect(toc["fileb"]).toBeDefined();
-          expect(toc["c1/filec"]).toBeDefined();
+          var index = testUtil.index();
+          expect(Object.keys(index).length).toEqual(3);
+          expect(index[0].path).toEqual("filea");
+          expect(index[1].path).toEqual("c1/filec");
+          expect(index[2].path).toEqual("fileb");
         });
       });
 
@@ -693,10 +559,10 @@ describe("merge", function() {
           testUtil.expectFile("filea", "fileaa");
           testUtil.expectFile("fileb", "fileb");
 
-          var toc = objects.commitToc(refs.hash("HEAD"));
-          expect(Object.keys(toc).length).toEqual(2);
-          expect(toc["filea"]).toBeDefined();
-          expect(toc["fileb"]).toBeDefined();
+          var index = testUtil.index();
+          expect(Object.keys(index).length).toEqual(2);
+          expect(index[0].path).toEqual("filea");
+          expect(index[1].path).toEqual("fileb");
         });
       });
 
@@ -745,15 +611,15 @@ describe("merge", function() {
 
             expect(testUtil.index()[0].path).toEqual("filea");
             expect(testUtil.index()[0].stage).toEqual(1);
-            expect(objects.read(testUtil.index()[0].hash)).toEqual("fileaa");
+            testUtil.expectFile(".gitlet/objects/" + testUtil.index()[0].hash, "fileaa");
 
             expect(testUtil.index()[1].path).toEqual("filea");
             expect(testUtil.index()[1].stage).toEqual(2);
-            expect(objects.read(testUtil.index()[1].hash)).toEqual("fileaaaa");
+            testUtil.expectFile(".gitlet/objects/" + testUtil.index()[1].hash, "fileaaaa");
 
             expect(testUtil.index()[2].path).toEqual("filea");
             expect(testUtil.index()[2].stage).toEqual(3);
-            expect(objects.read(testUtil.index()[2].hash)).toEqual("fileaaa");
+            testUtil.expectFile(".gitlet/objects/" + testUtil.index()[2].hash, "fileaaa");
           });
 
           it("should write conflict to working copy", function() {
@@ -765,14 +631,14 @@ describe("merge", function() {
           it("should still have merge head when conflict happens", function() {
             g.merge("master");
 
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea");
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea");
           });
         });
 
         describe("committing with unresolved conflict", function() {
           it("should mention conflicted file", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             expect(function() { g.commit(); })
               .toThrow("U filea\ncannot commit because you have unmerged files\n");
@@ -780,17 +646,17 @@ describe("merge", function() {
 
           it("should leave repo in merging stage", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             expect(function() { g.commit(); }).toThrow();
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea");
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea");
           });
         });
 
         describe("committing a resolved conflict", function() {
           it("should say that merge happened", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
@@ -800,34 +666,30 @@ describe("merge", function() {
           it("should not be merging after commit", function() {
             g.merge("master");
 
-            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_HEAD")))
-              .toEqual(true);
+            expect(fs.existsSync(".gitlet/MERGE_HEAD")).toEqual(true);
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
             g.commit();
 
-            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_HEAD")))
-              .toEqual(false);
+            expect(fs.existsSync(".gitlet/MERGE_HEAD")).toEqual(false);
           });
 
           it("should remove MERGE_MSG after commit", function() {
             g.merge("master");
 
-            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_MSG")))
-              .toEqual(true);
+            expect(fs.existsSync(".gitlet/MERGE_HEAD")).toEqual(true);
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
             g.commit();
 
-            expect(fs.existsSync(nodePath.join(files.gitletPath(), "MERGE_MSG")))
-              .toEqual(false);
+            expect(fs.existsSync(".gitlet/MERGE_MSG")).toEqual(false);
           });
 
           it("should update index with merge", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
@@ -839,7 +701,7 @@ describe("merge", function() {
 
           it("should leave WC file as it was committed", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
@@ -850,26 +712,25 @@ describe("merge", function() {
 
           it("should commit merge commit with merged content", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
             g.commit();
 
-            var toc = objects.commitToc(refs.hash("HEAD"));
-            expect(Object.keys(toc).length).toEqual(1);
-            expect(toc["filea"]).toEqual(util.hash("fileaaa"));
+            expect(Object.keys(testUtil.index()).length).toEqual(1);
+            expect(testUtil.index()[0].path).toEqual("filea");
           });
 
           it("should leave head pointed at current branch", function() {
             g.merge("master");
-            testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+            testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
             fs.writeFileSync("filea", "fileaaa");
             g.add("filea"); // resolve conflict
             g.commit();
 
-            expect(refs.terminalRef("HEAD")).toEqual("refs/heads/other");
+            testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
           });
         });
       });

@@ -1,7 +1,5 @@
 var fs = require("fs");
-var g = require("../src/gitlet");
-var files = require("../src/files");
-var util = require("../src/util");
+var g = require("../gitlet");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -53,7 +51,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", content);
       g.update_index("README.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash(content)), content);
+      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash(content)), content);
 
       expect(testUtil.index()[0].path).toEqual("README.md");
     });
@@ -64,9 +62,9 @@ describe("update-index", function() {
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("this is a readme1")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("this is a readme1")),
                           "this is a readme1");
-      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("this is a readme2")),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("this is a readme2")),
                           "this is a readme2");
 
       expect(testUtil.index()[0].path).toEqual("README1.md");
@@ -80,7 +78,7 @@ describe("update-index", function() {
       g.update_index("filea");
       g.update_index("filea");
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash("filea")), "filea");
+      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("filea")), "filea");
       expect(testUtil.index()[0].path).toEqual("filea");
     });
 
@@ -99,7 +97,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", "this is a readme1");
 
       testUtil.expectFile("README.md", "this is a readme1");
-      expect(testUtil.index()[0].hash).toEqual(util.hash("this is a readme"));
+      expect(testUtil.index()[0].hash).toEqual(testUtil.hash("this is a readme"));
     });
 
     it("should update file hash in index and add new obj if update file", function() {
@@ -107,7 +105,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", "this is a readme");
       g.update_index("README.md", { add: true });
       expect(testUtil.index()[0].hash)
-        .toEqual(util.hash("this is a readme")); // sanity check hash added for first version
+        .toEqual(testUtil.hash("this is a readme")); // sanity check hash added for first version
 
       // update file and update index again
       fs.writeFileSync("README.md", "this is a readme1");
@@ -116,7 +114,7 @@ describe("update-index", function() {
       var newVersionHash = testUtil.index()[0].hash;
 
       testUtil.expectFile(nodePath.join(".gitlet/objects", newVersionHash), "this is a readme1");
-      expect(newVersionHash).toEqual(util.hash("this is a readme1"));
+      expect(newVersionHash).toEqual(testUtil.hash("this is a readme1"));
     });
   });
 
@@ -197,7 +195,8 @@ describe("update-index", function() {
     });
 
     it("should resolve conflict in index", function() {
-      testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+      // sanity: merging
+      testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea");
 
       // sanity check file was conflicted
       expect(testUtil.index()[1].stage).toEqual(2);
@@ -210,7 +209,7 @@ describe("update-index", function() {
     });
 
     it("should add file to objects", function() {
-      testUtil.expectFile(files.gitletPath("MERGE_HEAD"), "1dd535ea"); // sanity: merging
+      testUtil.expectFile(".gitlet/MERGE_HEAD", "1dd535ea"); // sanity: merging
 
       // sanity check file was conflicted
       expect(testUtil.index()[1].stage).toEqual(2);
@@ -219,7 +218,7 @@ describe("update-index", function() {
       fs.writeFileSync("filea", resolvedContent);
       g.add("filea"); // resolve conflict
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", util.hash(resolvedContent)),
+      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash(resolvedContent)),
                           resolvedContent);
     });
   });

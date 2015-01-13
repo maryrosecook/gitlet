@@ -1,8 +1,6 @@
 var fs = require("fs");
 var nodePath = require("path");
-var g = require("../src/gitlet");
-var objects = require("../src/objects");
-var refs = require("../src/refs");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 describe("pull", function() {
@@ -67,10 +65,10 @@ describe("pull", function() {
     testUtil.expectFile("1b/fileb", "fileb");
 
     // check commit file tree
-    var toc = objects.commitToc(refs.hash("HEAD"));
-    expect(Object.keys(toc).length).toEqual(2);
-    expect(toc["1a/filea"]).toBeDefined();
-    expect(toc["1b/fileb"]).toBeDefined();
+    var index = testUtil.index();
+    expect(Object.keys(index).length).toEqual(2);
+    expect(index[0].path).toEqual("1a/filea");
+    expect(index[1].path).toEqual("1b/fileb");
   });
 
   it("should say up to date if already up to date", function() {

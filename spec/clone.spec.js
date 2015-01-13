@@ -1,6 +1,5 @@
 var fs = require("fs");
-var g = require("../src/gitlet");
-var config = require("../src/config");
+var g = require("../gitlet");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -60,7 +59,8 @@ describe("clone", function() {
 
       g.clone(remoteRepo, "local");
       process.chdir("local");
-      expect(config.read().remote.origin.url).toEqual("../repo1");
+      expect(fs.readFileSync(".gitlet/config", "utf8").split("\n")[1])
+        .toEqual("  url = ../repo1");
     });
 
     it("should return repo cloned when finished", function() {
@@ -117,7 +117,8 @@ describe("clone", function() {
 
       g.clone(remoteRepo, "local", { bare: true });
       process.chdir("local");
-      expect(config.isBare()).toEqual(true);
+      expect(fs.readFileSync("config", "utf8").split("\n")[3])
+        .toEqual("  bare = true");
     });
 
     it("should be able to clone a bare repo", function() {

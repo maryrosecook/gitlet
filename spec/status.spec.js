@@ -1,6 +1,6 @@
 var fs = require("fs");
 var nodePath = require("path");
-var g = require("../src/gitlet");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 describe("status", function() {

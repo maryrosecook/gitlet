@@ -1,6 +1,5 @@
 var fs = require("fs");
-var g = require("../src/gitlet");
-var refs = require("../src/refs");
+var g = require("../gitlet");
 var nodePath = require("path");
 var testUtil = require("./test-util");
 
@@ -187,12 +186,12 @@ describe("commit", function() {
     expect(g.merge("master"))
       .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
 
-    var origHeadHash = refs.hash("HEAD");
+    var origHeadHash = testUtil.headHash();
 
     expect(function() { g.commit(); })
       .toThrow("U filea\ncannot commit because you have unmerged files\n");
 
-    expect(refs.hash("HEAD")).toEqual(origHeadHash);
+    expect(testUtil.headHash()).toEqual(origHeadHash);
   });
 
   describe("detached HEAD commits", function() {

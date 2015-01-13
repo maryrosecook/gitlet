@@ -95,5 +95,28 @@ var testUtil = module.exports = {
 
   unpinDate: function() {
     global.Date.prototype.toString = originalDateToString;
+  },
+
+  readFile: function(path) {
+    return fs.readFileSync(path, "utf8");
+  },
+
+  hash: function(string) {
+    var hashInt = 0;
+    for (var i = 0; i < string.length; i++) {
+      hashInt = hashInt * 31 + string.charCodeAt(i);
+      hashInt = hashInt | 0;
+    }
+
+    return Math.abs(hashInt).toString(16);
+  },
+
+  refHash: function(ref) {
+    return testUtil.readFile(nodePath.join(".gitlet", ref));
+  },
+
+  headHash: function() {
+    var ref = testUtil.readFile(".gitlet/HEAD").match("ref: (refs/heads/.+)")[1];
+    return testUtil.readFile(nodePath.join(".gitlet", ref));
   }
 };

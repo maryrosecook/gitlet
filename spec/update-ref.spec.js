@@ -1,7 +1,5 @@
 var fs = require("fs");
-var g = require("../src/gitlet");
-var objects = require("../src/objects");
-var config = require("../src/config");
+var g = require("../gitlet");
 var testUtil = require("./test-util");
 
 describe("update-ref", function() {
@@ -35,16 +33,16 @@ describe("update-ref", function() {
 
   it("should throw if try to update HEAD to hash that is not a commit", function() {
     g.init();
-    fs.writeFileSync("a", "a");
-    var hash = objects.write("a");
+    var hash = "a";
+    fs.writeFileSync(".gitlet/objects/" + hash, "a");
     expect(function() { g.update_ref("HEAD", hash); })
       .toThrow("refs/heads/master cannot refer to non-commit object " + hash + "\n");
   });
 
   it("should throw if try to update master to hash that is not a commit", function() {
     g.init();
-    fs.writeFileSync("a", "a");
-    var hash = objects.write("a");
+    var hash = "a";
+    fs.writeFileSync(".gitlet/objects/" + hash, "a");
     expect(function() { g.update_ref("refs/heads/master", hash); })
       .toThrow("refs/heads/master cannot refer to non-commit object " + hash + "\n");
   });
@@ -163,7 +161,7 @@ describe("update-ref", function() {
     g.clone("repo1", "repo2", { bare: true });
 
     process.chdir("repo2");
-    expect(config.isBare()).toEqual(true);
+    expect(fs.readFileSync("config", "utf8").split("\n")[3]).toEqual("  bare = true");
 
     expect(fs.readFileSync("refs/heads/master", "utf8")).toEqual("5b228c59");
     g.update_ref("refs/heads/master", "17a11ad4");
