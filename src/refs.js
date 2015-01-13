@@ -7,7 +7,10 @@ var util = require("./util");
 
 var refs = module.exports = {
   isRef: function(ref) {
-    return isSymbolicRef(ref) || isLocalHeadRef(ref) || isRemoteHeadRef(ref);
+    return ref !== undefined &&
+      (ref.match("refs/heads/[A-Za-z-]+") ||
+       ref.match("refs/remotes/[A-Za-z-]+/[A-Za-z-]+") ||
+       ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1);
   },
 
   terminalRef: function(ref) {
@@ -93,16 +96,4 @@ var refs = module.exports = {
       return [headHash];
     }
   }
-};
-
-function isLocalHeadRef(ref) {
-  return ref !== undefined && ref.match("refs/heads/[A-Za-z-]+");
-};
-
-function isRemoteHeadRef(ref) {
-  return ref !== undefined && ref.match("refs/remotes/[A-Za-z-]+/[A-Za-z-]+");
-};
-
-function isSymbolicRef(ref) {
-  return ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1;
 };
