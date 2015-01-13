@@ -685,10 +685,9 @@ var diff = {
 
   changedFilesCommitWouldOverwrite: function(hash) {
     var headHash = refs.hash("HEAD");
-    var localChanges = diff.nameStatus(diff.diff(headHash));
-    var headToBranchChanges = diff.nameStatus(diff.diff(headHash, hash));
-    return Object.keys(localChanges)
-      .filter(function(path) { return path in headToBranchChanges; });
+    var hashToWcDiff = diff.nameStatus(diff.diff(headHash));
+    var headToHashDiff = diff.nameStatus(diff.diff(headHash, hash));
+    return Object.keys(hashToWcDiff).filter(function(p) { return p in headToHashDiff; });
   },
 
   addedOrModifiedFiles: function() {
