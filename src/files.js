@@ -3,8 +3,8 @@ var nodePath = require("path");
 var util = require("./util");
 
 var files = module.exports = {
-  inRepo: function(cwd) {
-    return gitletDir(cwd) !== undefined;
+  inRepo: function() {
+    return files.gitletPath() !== undefined;
   },
 
   assertInRepo: function() {
@@ -52,11 +52,29 @@ var files = module.exports = {
   },
 
   gitletPath: function(path) {
-    return nodePath.join(gitletDir(), path || "");
+    function gitletDir(dir) {
+      if (fs.existsSync(dir)) {
+        var potentialConfigFile = nodePath.join(dir, "config");
+        var potentialGitletPath = nodePath.join(dir, ".gitlet");
+        if (fs.existsSync(potentialConfigFile) &&
+            files.read(potentialConfigFile).match(/\[core\]/)) {
+          return dir;
+        } else if (fs.existsSync(potentialGitletPath)) {
+          return potentialGitletPath;
+        } else if (dir !== "/") {
+          return gitletDir(nodePath.join(dir, ".."));
+        }
+      }
+    };
+
+    var gDir = gitletDir(process.cwd());
+    if (gDir !== undefined) {
+      return nodePath.join(gDir, path || "");
+    }
   },
 
   workingCopyPath: function(path) {
-    return nodePath.join(nodePath.join(gitletDir(), ".."), path || "");
+    return nodePath.join(nodePath.join(this.gitletPath(), ".."), path || "");
   },
 
   lsRecursive: function(path) {
@@ -91,22 +109,5 @@ var files = module.exports = {
     });
 
     return obj;
-  }
-};
-
-function gitletDir(dir) {
-  if (dir === undefined) { return gitletDir(process.cwd()); }
-
-  if (fs.existsSync(dir)) {
-    var potentialConfigFile = nodePath.join(dir, "config");
-    var potentialGitletPath = nodePath.join(dir, ".gitlet");
-    if (fs.existsSync(potentialConfigFile) &&
-        files.read(potentialConfigFile).match(/\[core\]/)) {
-      return dir;
-    } else if (fs.existsSync(potentialGitletPath)) {
-      return potentialGitletPath;
-    } else if (dir !== "/") {
-      return gitletDir(nodePath.join(dir, ".."));
-    }
   }
 };

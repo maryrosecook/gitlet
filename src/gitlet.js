@@ -285,7 +285,7 @@ var gitlet = module.exports = {
 
     if (remotePath === undefined || targetPath === undefined) {
       throw new Error("you must specify remote path and target path");
-    } else if (!fs.existsSync(remotePath) || !files.inRepo(remotePath)) {
+    } else if (!fs.existsSync(remotePath) || !util.remote(remotePath)(files.inRepo)) {
       throw new Error("repository " + remotePath + " does not exist");
     } else if (fs.existsSync(targetPath) && fs.readdirSync(targetPath).length > 0) {
       throw new Error(targetPath + " already exists and is not empty");
