@@ -242,7 +242,7 @@ describe("checkout", function() {
         .toEqual("Note: checking out 17a11ad4\nYou are in detached HEAD state.");
     });
 
-    describe('index writing', function() {
+    describe("index writing", function() {
       it("should remove files from index that are not in checked out branch", function() {
         testUtil.createStandardFileStructure();
         g.init();

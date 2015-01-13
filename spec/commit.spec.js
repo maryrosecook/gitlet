@@ -154,7 +154,7 @@ describe("commit", function() {
     testUtil.expectFile(".gitlet/refs/heads/other", "16b35712");
   });
 
-  it('should not write commit if commit when unresolved merge in progress', function() {
+  it("should not write commit if commit when unresolved merge in progress", function() {
     //       a
     //       |
     //       aa
@@ -195,7 +195,7 @@ describe("commit", function() {
     expect(refs.hash("HEAD")).toEqual(origHeadHash);
   });
 
-  describe('detached HEAD commits', function() {
+  describe("detached HEAD commits", function() {
     it("should report in det head when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
       g.init();

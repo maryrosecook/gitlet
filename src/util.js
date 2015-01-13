@@ -25,7 +25,7 @@ var util = module.exports = {
   },
 
   lines: function(str) {
-    return str.split("\n").filter(function(l) { return l !== ''; });
+    return str.split("\n").filter(function(l) { return l !== ""; });
   },
 
   flatten: function(arr) {

@@ -40,7 +40,7 @@ describe("merge", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  describe('common ancestors', function() {
+  describe("common ancestors", function() {
     it("should return hash if same hash passed", function() {
       g.init();
       createFlatFileStructure();
@@ -177,8 +177,8 @@ describe("merge", function() {
     });
   });
 
-  describe('merge', function() {
-    describe('aborts', function() {
+  describe("merge", function() {
+    describe("aborts", function() {
       it("should throw if can't resolve ref/hash passed", function() {
         g.init();
         expect(function() { g.merge("blah"); })
@@ -245,7 +245,7 @@ describe("merge", function() {
           .toThrow("5ceba65: expected commit type");
       });
 
-      describe('working copy changes', function() {
+      describe("working copy changes", function() {
         it("should throw if has unstaged changes wo common orig content w/ giver", function() {
           testUtil.createStandardFileStructure();
           g.init();
@@ -337,7 +337,7 @@ describe("merge", function() {
       });
     });
 
-    describe('fast forward', function() {
+    describe("fast forward", function() {
       it("should report that ancestor has been fast forwarded", function() {
         g.init();
         testUtil.createDeeplyNestedFileStructure();
@@ -503,8 +503,8 @@ describe("merge", function() {
       });
     });
 
-    describe('three way merge', function() {
-      describe('basic results', function() {
+    describe("three way merge", function() {
+      describe("basic results", function() {
         beforeEach(function() {
           //      a
           //     / \
@@ -585,7 +585,7 @@ describe("merge", function() {
         });
       });
 
-      describe('rm', function() {
+      describe("rm", function() {
         it("should merge in rm of file", function() {
           //      a
           //     / \
@@ -621,7 +621,7 @@ describe("merge", function() {
         });
       });
 
-      describe('add', function() {
+      describe("add", function() {
         it("should merge in addition of file", function() {
           //      a
           //     / \
@@ -661,7 +661,7 @@ describe("merge", function() {
         });
       });
 
-      describe('non-conflicting modify', function() {
+      describe("non-conflicting modify", function() {
         it("should merge in file change", function() {
           //       a
           //     /    \
@@ -700,7 +700,7 @@ describe("merge", function() {
         });
       });
 
-      describe('conflict', function() {
+      describe("conflict", function() {
         beforeEach(function() {
           //       a
           //       |
@@ -732,7 +732,7 @@ describe("merge", function() {
           g.commit({ m: "aaaa" });
         });
 
-        describe('writing conflict', function() {
+        describe("writing conflict", function() {
           it("should report there is a conflict when merging", function() {
             expect(g.merge("master"))
               .toEqual("Automatic merge failed. Fix conflicts and commit the result.");
