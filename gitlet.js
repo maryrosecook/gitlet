@@ -1,52 +1,92 @@
 var fs = require("fs");
 var nodePath = require("path");
 
+// Main Git API functions
+// ----------------------
+
 var gitlet = module.exports = {
+
+  // **init()** initializes the current directory as a new repo.
   init: function(opts) {
+
+    // Abort if already a repo.
     if (files.inRepo()) { return; }
+
     opts = opts || {};
 
+    // Create a JS object that mirrors the Git basic directory structure.
     var gitletStructure = {
       HEAD: "ref: refs/heads/master\n",
+
+      // If `--bare` was passed, write to the Git config indicating
+      // that the repo is bare.  If `--bare` was not passed, write to
+      // the Git config saying the repo is not bare.
       config: config.objToStr({ core: { "": { bare: opts.bare === true }}}),
+
       objects: {},
       refs: {
         heads: {},
       }
     };
 
+    // Write the standard Git directory structure using the
+    // `gitletStructure` JS object.  If the repo is not bare, put the
+    // directories inside the `.gitlet` directory.  If the repo is
+    // bare, put them in the top level of the repo.
     files.writeFilesFromTree(opts.bare ? gitletStructure : { ".gitlet": gitletStructure },
                              process.cwd());
   },
 
+  // **add()** adds files that match `path` to the index.
   add: function(path, _) {
     files.assertInRepo();
     config.assertNotBare();
 
+    // Get the paths of all the files matching `path`.
     var addedFiles = files.lsRecursive(path);
+
+    // Abort if no files matched `path`.
     if (addedFiles.length === 0) {
       throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
+
+    // Otherwise, use the `update_index()` Git command to actually add
+    // the files.
     } else {
       addedFiles.forEach(function(p) { gitlet.update_index(p, { add: true }); });
     }
   },
 
+  // **rm()** removes files that match `path` from the index.
   rm: function(path, opts) {
     files.assertInRepo();
     config.assertNotBare();
     opts = opts || {};
 
+    // Get the paths of all files in the index that match `path`.
     var filesToRm = index.matchingFiles(path);
+
+    // Abort if `-f` was passed. The removal of files with changes is not supported.
     if (opts.f) {
       throw new Error("unsupported");
+
+    // Abort if no files matched `path`.
     } else if (filesToRm.length === 0) {
       throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
+
+    // Abort if `path` is a directory and `-r` was not passed.
     } else if (fs.existsSync(path) && fs.statSync(path).isDirectory() && !opts.r) {
       throw new Error("not removing " + path + " recursively without -r");
+
     } else {
+
+      // Get a list of all files that are to be removed and have also
+      // been changed on disk.  If this list is not empty then abort.
       var changesToRm = util.intersection(diff.addedOrModifiedFiles(), filesToRm);
       if (changesToRm.length > 0) {
         throw new Error("these files have changes:\n" + changesToRm.join("\n") + "\n");
+
+      // Otherwise, remove the files that match `path`. Delete them
+      // from disk and remove from the index.
       } else {
         filesToRm.filter(fs.existsSync).forEach(fs.unlinkSync);
         filesToRm.forEach(function(p) { gitlet.update_index(p, { remove: true }); });
@@ -54,29 +94,59 @@ var gitlet = module.exports = {
     }
   },
 
+  // **commit()** creates a commit object that represents the current
+  // state of the index, writes the commit to the database and points
+  // `HEAD` at the commit.
   commit: function(opts) {
     files.assertInRepo();
     config.assertNotBare();
 
-    var headHash = refs.hash("HEAD");
+    // Write a tree object that represents the current state of the
+    // index.
     var treeHash = this.write_tree();
+
     var headDesc = refs.isHeadDetached() ? "detached HEAD" : refs.headBranchName();
 
-    if (headHash !== undefined && treeHash === objects.treeHash(objects.read(headHash))) {
+    // If the hash of the new tree is the same as the hash of the tree
+    // that the `HEAD` commit points at, abort because there is
+    // nothing new to commit.
+    if (refs.hash("HEAD") !== undefined &&
+        treeHash === objects.treeHash(objects.read(refs.hash("HEAD")))) {
       throw new Error("# On " + headDesc + "\nnothing to commit, working directory clean");
+
     } else {
+
+      // Abort if the repo is in the merge state and there are
+      // unresolved merge conflicts.
       var conflictedPaths = index.conflictedPaths();
       if (merge.isMergeInProgress() && conflictedPaths.length > 0) {
         throw new Error(conflictedPaths.map(function(p) { return "U " + p; }).join("\n") +
                         "\ncannot commit because you have unmerged files\n");
+
+      // Otherwise, do the commit.
       } else {
+
+        // If the repo is in the merge state, use a pre-written merge
+        // commit message.  If the repo is not in the merge state, use
+        // the message passed with `-m`.
         var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
+
+        // Write the new commit to the database.
         var commitHash = objects.writeCommit(treeHash, m, refs.commitParentHashes());
+
+        // Point `HEAD` at new commit.
         this.update_ref("HEAD", commitHash);
+
+        // If `MERGE_HEAD` exists, the repo was in the merge
+        // state. Remove `MERGE_HEAD` and `MERGE_MSG`to exit the merge
+        // state.  Report that the merge is complete.
         if (merge.isMergeInProgress()) {
           fs.unlinkSync(files.gitletPath("MERGE_MSG"));
           refs.rm("MERGE_HEAD");
           return "Merge made by the three-way strategy";
+
+        // Repo was not in the merge state, so just report that the
+        // commit is complete.
         } else {
           return "[" + headDesc + " " + commitHash + "] " + m;
         }
@@ -84,46 +154,94 @@ var gitlet = module.exports = {
     }
   },
 
+  // **branch()** creates a new branch that points at the commit that
+  // `HEAD` points at.
   branch: function(name, opts) {
     files.assertInRepo();
     opts = opts || {};
 
+    // If no branch `name` was passed, list the local branches.
     if (name === undefined) {
       return Object.keys(refs.localHeads()).map(function(branch) {
         return (branch === refs.headBranchName() ? "* " : "  ") + branch;
       }).join("\n") + "\n";
+
+    // `HEAD` is not pointing at a commit, so there is no commit for
+    // the new branch to point at.  Abort.  This is most likely to
+    // happen if the repo has no commits.
     } else if (refs.hash("HEAD") === undefined) {
       throw new Error(refs.headBranchName() + " not a valid object name");
+
+    // Abort because a branch called `name` already exists.
     } else if (refs.exists(refs.toLocalRef(name))) {
       throw new Error("A branch named " + name + " already exists");
+
+    // Otherwise, create a new branch by creating a new file called
+    // `name` that contains the hash of the commit that `HEAD` points
+    // at.
     } else {
       this.update_ref(refs.toLocalRef(name), refs.hash("HEAD"));
     }
   },
 
+  // **checkout()** changes the index, working copy and `HEAD` to
+  // reflect the content of the passed `ref`.  `ref` might be a branch
+  // name or a commit hash.
   checkout: function(ref, _) {
     files.assertInRepo();
     config.assertNotBare();
 
+    // Get the hash of the commit to check out.
     var toHash = refs.hash(ref);
+
+    // Abort if `ref` cannot be found.
     if (!objects.exists(toHash)) {
       throw new Error(ref + " did not match any file(s) known to Gitlet");
+
+    // Abort if the hash to check out points to an object that is a
+    // not a commit.
     } else if (objects.type(objects.read(toHash)) !== "commit") {
       throw new Error("reference is not a tree: " + ref);
+
+    // Abort if `ref` is the name of the branch currently checked
+    // out.  Abort if head is detached, `ref` is a commit hash and
+    // `HEAD` is pointing at that hash.
     } else if (ref === refs.headBranchName() ||
                ref === files.read(files.gitletPath("HEAD"))) {
       return "Already on " + ref;
     } else {
+
+      // Get a list of files changed in the working copy.  Get a list
+      // of the files that are different in the head commit and the
+      // commit to check out.  If any files appear in both lists then
+      // abort.
       var paths = diff.changedFilesCommitWouldOverwrite(toHash);
       if (paths.length > 0) {
         throw new Error("local changes would be lost\n" + paths.join("\n") + "\n")
+
+      // Otherwise, perform the checkout.
       } else {
         process.chdir(files.workingCopyPath());
 
+        // If the ref is in the object database, it must be a hash and
+        // so this checkout is detaching the head.
         var isDetachingHead = objects.exists(ref);
+
+        // Get the list of differences between the current commit and
+        // the commit to check out.  Write them to the working copy.
         workingCopy.write(diff.diff(refs.hash("HEAD"), toHash));
+
+        // Write the commit being checked out to `HEAD`. If the head is
+        // being detached, the commit hash is written directly to the
+        // `HEAD` file.  If the head is not being detached,
+        // the branch being checked out is written to `HEAD`.
         refs.write("HEAD", isDetachingHead ? toHash : "ref: " + refs.toLocalRef(ref));
+
+        // Set the index to the contents of the commit being checked
+        // out.
         index.write(index.tocToIndex(objects.commitToc(toHash)));
+
+        // Report what happened.
         return isDetachingHead ?
           "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
           "Switched to branch " + ref;
