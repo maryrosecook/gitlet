@@ -18,20 +18,15 @@ describe("diff", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  it("should throw if do not pass --name-status option", function() {
-    g.init();
-    expect(function() { g.diff(undefined, undefined, {}); }).toThrow("unsupported");
-  });
-
   it("should throw unknown revision if ref1 not in objects", function() {
     g.init();
-    expect(function() { g.diff("blah1", undefined, { "name-status": true }) })
+    expect(function() { g.diff("blah1") })
       .toThrow("ambiguous argument blah1: unknown revision");
   });
 
   it("should throw unknown revision if ref2 not in objects", function() {
     g.init();
-    expect(function() { g.diff("blah2", undefined, { "name-status": true }) })
+    expect(function() { g.diff("blah2") })
       .toThrow("ambiguous argument blah2: unknown revision");
   });
 
@@ -45,14 +40,14 @@ describe("diff", function() {
     fs.writeFileSync("1a/filea", "somethingelsea");
     fs.writeFileSync("1b/fileb", "somethingelseb");
     fs.writeFileSync("1b/2b/filec", "somethingelsec");
-    expect(g.diff(undefined, undefined, { "name-status": true }))
+    expect(g.diff())
       .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2b/filec\n");
   });
 
   describe("no refs passed (index and WC)", function() {
     it("should show nothing for repo w no commits", function() {
       g.init();
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should not include unstaged files", function() {
@@ -61,7 +56,7 @@ describe("diff", function() {
 
       testUtil.createStandardFileStructure();
       g.init();
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should not include new file that is staged", function() {
@@ -72,7 +67,7 @@ describe("diff", function() {
       g.init();
       g.add("1a/filea");
       expect(testUtil.index()[0].path).toEqual("1a/filea");
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should not include committed file w no changes", function() {
@@ -80,7 +75,7 @@ describe("diff", function() {
       g.init();
       g.add("1a/filea");
       g.commit({ m: "first" });
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should include committed file w unstaged changes", function() {
@@ -89,7 +84,7 @@ describe("diff", function() {
       g.add("1a/filea");
       g.commit({ m: "first" });
       fs.writeFileSync("1a/filea", "somethingelse");
-      expect(g.diff(undefined, undefined, { "name-status": true }))
+      expect(g.diff())
         .toEqual("M 1a/filea\n");
     });
 
@@ -100,7 +95,7 @@ describe("diff", function() {
       g.commit({ m: "first" });
       fs.writeFileSync("1a/filea", "somethingelse");
       g.add("1a/filea");
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should say file that was created, staged, deleted was deleted", function() {
@@ -108,7 +103,7 @@ describe("diff", function() {
       g.init();
       g.add("1a/filea");
       fs.unlinkSync("1a/filea");
-      expect(g.diff(undefined, undefined, { "name-status": true }))
+      expect(g.diff())
         .toEqual("D 1a/filea\n");
     });
 
@@ -116,7 +111,7 @@ describe("diff", function() {
       testUtil.createStandardFileStructure();
       g.init();
       fs.unlinkSync("1a/filea");
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("\n");
+      expect(g.diff()).toEqual("\n");
     });
 
     it("should say committed file that has now been deleted has been deleted", function() {
@@ -125,7 +120,7 @@ describe("diff", function() {
       g.add("1a/filea");
       g.commit({ m: "first" });
       fs.unlinkSync("1a/filea");
-      expect(g.diff(undefined, undefined, { "name-status": true })).toEqual("D 1a/filea\n");
+      expect(g.diff()).toEqual("D 1a/filea\n");
     });
   });
 
@@ -133,7 +128,7 @@ describe("diff", function() {
     describe("HEAD passed (compared with WC)", function() {
       it("should blow up for HEAD if no commits", function() {
         g.init();
-        expect(function() { g.diff("HEAD", undefined, { "name-status": true }) })
+        expect(function() { g.diff("HEAD") })
           .toThrow("ambiguous argument HEAD: unknown revision");
       });
 
@@ -142,7 +137,7 @@ describe("diff", function() {
         g.init();
         g.add("1a/filea");
         g.commit({ m: "first" });
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+        expect(g.diff("HEAD")).toEqual("\n");
       });
 
       it("should include new file that is staged", function() {
@@ -151,7 +146,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         g.add("1b/fileb");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("A 1b/fileb\n");
+        expect(g.diff("HEAD")).toEqual("A 1b/fileb\n");
       });
 
       it("should not include committed file w no changes", function() {
@@ -159,7 +154,7 @@ describe("diff", function() {
         g.init();
         g.add("1a/filea");
         g.commit({ m: "first" });
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+        expect(g.diff("HEAD")).toEqual("\n");
       });
 
       it("should include committed file w unstaged changes", function() {
@@ -168,7 +163,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         fs.writeFileSync("1a/filea", "somethingelse");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(g.diff("HEAD")).toEqual("M 1a/filea\n");
       });
 
       it("should include committed file w staged changes", function() {
@@ -178,7 +173,7 @@ describe("diff", function() {
         g.commit({ m: "first" });
         fs.writeFileSync("1a/filea", "somethingelse");
         g.add("1a/filea");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(g.diff("HEAD")).toEqual("M 1a/filea\n");
       });
 
       it("should not include file that was created, staged, deleted", function() {
@@ -188,7 +183,7 @@ describe("diff", function() {
         g.commit({ m: "first" });
         g.add("1b/fileb");
         fs.unlinkSync("1b/fileb");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+        expect(g.diff("HEAD")).toEqual("\n");
       });
 
       it("should not include file that was created, deleted but never staged", function() {
@@ -197,7 +192,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         fs.unlinkSync("1b/fileb");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("\n");
+        expect(g.diff("HEAD")).toEqual("\n");
       });
 
       it("should say committed file that has now been deleted has been deleted", function() {
@@ -206,7 +201,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         fs.unlinkSync("1a/filea");
-        expect(g.diff("HEAD", undefined, { "name-status": true })).toEqual("D 1a/filea\n");
+        expect(g.diff("HEAD")).toEqual("D 1a/filea\n");
       });
     });
 
@@ -217,7 +212,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "first" });
         fs.writeFileSync("1a/filea", "somethingelse");
-        expect(g.diff("17a11ad4", undefined, { "name-status": true }))
+        expect(g.diff("17a11ad4"))
           .toEqual("M 1a/filea\n");
       });
 
@@ -228,7 +223,7 @@ describe("diff", function() {
         g.commit({ m: "first" });
         g.branch("other");
         fs.writeFileSync("1a/filea", "somethingelse");
-        expect(g.diff("other", undefined, { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(g.diff("other")).toEqual("M 1a/filea\n");
       });
 
       it("should blow up if non existent ref passed", function() {
@@ -236,7 +231,7 @@ describe("diff", function() {
         g.init();
         g.add("1a/filea");
         g.commit({ m: "first" });
-        expect(function() { g.diff("blah", undefined, { "name-status": true }) })
+        expect(function() { g.diff("blah") })
           .toThrow("ambiguous argument blah: unknown revision");
       });
     });
@@ -246,13 +241,13 @@ describe("diff", function() {
     describe("basic changes", function() {
       it("should blow up with two refs if no commits", function() {
         g.init();
-        expect(function() { g.diff("a", "b", { "name-status": true }) })
+        expect(function() { g.diff("a", "b") })
           .toThrow("ambiguous argument a: unknown revision");
       });
 
       it("should blow up for HEAD and other ref if no commits", function() {
         g.init();
-        expect(function() { g.diff("HEAD", "b", { "name-status": true }) })
+        expect(function() { g.diff("HEAD", "b") })
           .toThrow("ambiguous argument HEAD: unknown revision");
       });
 
@@ -261,10 +256,10 @@ describe("diff", function() {
         g.init();
         g.add("1a/filea");
         g.commit({ m: "first" });
-        expect(function() { g.diff("blah1", "blah2", { "name-status": true }) })
+        expect(function() { g.diff("blah1", "blah2") })
           .toThrow("ambiguous argument blah1: unknown revision");
 
-        expect(function() { g.diff("HEAD", "blah2", { "name-status": true }) })
+        expect(function() { g.diff("HEAD", "blah2") })
           .toThrow("ambiguous argument blah2: unknown revision");
       });
 
@@ -275,7 +270,7 @@ describe("diff", function() {
         g.commit({ m: "first" });
         g.branch("a");
         g.branch("b");
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("\n");
+        expect(g.diff("a", "b")).toEqual("\n");
       });
 
       it("should not include committed file w no changes", function() {
@@ -285,7 +280,7 @@ describe("diff", function() {
         g.commit({ m: "first" });
         g.branch("a");
         g.branch("b");
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("\n");
+        expect(g.diff("a", "b")).toEqual("\n");
       });
 
       it("should include added file", function() {
@@ -297,7 +292,7 @@ describe("diff", function() {
         g.add("1b/fileb");
         g.commit({ m: "second" });
         g.branch("b");
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("A 1b/fileb\n");
+        expect(g.diff("a", "b")).toEqual("A 1b/fileb\n");
       });
 
       it("should include changed file", function() {
@@ -310,7 +305,7 @@ describe("diff", function() {
         g.add("1a/filea");
         g.commit({ m: "second" });
         g.branch("b");
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(g.diff("a", "b")).toEqual("M 1a/filea\n");
       });
 
       it("should not include staged changes", function() {
@@ -321,7 +316,7 @@ describe("diff", function() {
         g.branch("a");
         g.branch("b");
         g.add("1b/fileb");
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("\n");
+        expect(g.diff("a", "b")).toEqual("\n");
       });
     });
 
@@ -336,8 +331,8 @@ describe("diff", function() {
         g.commit({ m: "second" });
         g.branch("b");
 
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("A 1b/fileb\n");
-        expect(g.diff("b", "a", { "name-status": true })).toEqual("D 1b/fileb\n");
+        expect(g.diff("a", "b")).toEqual("A 1b/fileb\n");
+        expect(g.diff("b", "a")).toEqual("D 1b/fileb\n");
       });
 
       it("should see modification in both directions", function() {
@@ -351,8 +346,8 @@ describe("diff", function() {
         g.commit({ m: "second" });
         g.branch("b");
 
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\n");
-        expect(g.diff("b", "a", { "name-status": true })).toEqual("M 1a/filea\n");
+        expect(g.diff("a", "b")).toEqual("M 1a/filea\n");
+        expect(g.diff("b", "a")).toEqual("M 1a/filea\n");
       });
     });
 
@@ -375,7 +370,7 @@ describe("diff", function() {
         g.commit({ m: "fourth" });
         g.branch("b");
 
-        expect(g.diff("a", "b", { "name-status": true }))
+        expect(g.diff("a", "b"))
           .toEqual("A 1b/fileb\nA 1b/2b/filec\nA 1b/2b/3b/4b/filed\n");
       });
 
@@ -397,7 +392,7 @@ describe("diff", function() {
         g.commit({ m: "fourth" });
         g.branch("b");
 
-        expect(g.diff("b", "a", { "name-status": true }))
+        expect(g.diff("b", "a"))
           .toEqual("D 1b/fileb\nD 1b/2b/filec\nD 1b/2b/3b/4b/filed\n");
       });
 
@@ -424,7 +419,7 @@ describe("diff", function() {
         g.commit({ m: "fourth" });
         g.branch("b");
 
-        expect(g.diff("a", "b", { "name-status": true }))
+        expect(g.diff("a", "b"))
           .toEqual("M 1a/filea\nM 1b/fileb\nM 1b/2b/filec\n");
       });
     });
@@ -443,7 +438,7 @@ describe("diff", function() {
         g.commit({ m: "second" });
         g.branch("b");
 
-        expect(g.diff("a", "b", { "name-status": true })).toEqual("M 1a/filea\nA 1b/fileb\n");
+        expect(g.diff("a", "b")).toEqual("M 1a/filea\nA 1b/fileb\n");
       });
 
       it("should record deletions and modifications", function() {
@@ -459,7 +454,7 @@ describe("diff", function() {
         g.commit({ m: "second" });
         g.branch("b");
 
-        expect(g.diff("b", "a", { "name-status": true })).toEqual("M 1a/filea\nD 1b/fileb\n");
+        expect(g.diff("b", "a")).toEqual("M 1a/filea\nD 1b/fileb\n");
       });
     });
   });

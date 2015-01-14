@@ -8,7 +8,7 @@ describe("gitlet cli", function() {
   describe("missing args", function() {
     it("should allow two missing args (ref1 and ref2)", function() {
       g.init();
-      expect(g.runCli(["node", "gitlet", "diff", "--name-status"])).toEqual("\n");
+      expect(g.runCli(["node", "gitlet", "diff"])).toEqual("\n");
     });
   });
 

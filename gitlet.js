@@ -258,14 +258,10 @@ var gitlet = module.exports = {
     } else if (ref2 !== undefined && refs.hash(ref2) === undefined) {
       throw new Error("ambiguous argument " + ref2 + ": unknown revision");
     } else {
-      if (opts["name-status"] !== true) {
-        throw new Error("unsupported");
-      } else {
-        var nameToStatus = diff.nameStatus(diff.diff(refs.hash(ref1), refs.hash(ref2)));
-        return Object.keys(nameToStatus)
-          .map(function(path) { return nameToStatus[path] + " " + path; })
-          .join("\n") + "\n";
-      }
+      var nameToStatus = diff.nameStatus(diff.diff(refs.hash(ref1), refs.hash(ref2)));
+      return Object.keys(nameToStatus)
+        .map(function(path) { return nameToStatus[path] + " " + path; })
+        .join("\n") + "\n";
     }
   },
 
