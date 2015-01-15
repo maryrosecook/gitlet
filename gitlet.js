@@ -241,7 +241,7 @@ var gitlet = module.exports = {
         // out.
         index.write(index.tocToIndex(objects.commitToc(toHash)));
 
-        // Report what happened.
+        // Report the result of the checkout.
         return isDetachingHead ?
           "Note: checking out " + toHash + "\nYou are in detached HEAD state." :
           "Switched to branch " + ref;
@@ -249,55 +249,118 @@ var gitlet = module.exports = {
     }
   },
 
+  // **diff()** returns the differences between two versions of the repo.
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
     config.assertNotBare();
 
+    // Abort if `ref1` was supplied, but it does not resolve to a hash.
     if (ref1 !== undefined && refs.hash(ref1) === undefined) {
       throw new Error("ambiguous argument " + ref1 + ": unknown revision");
+
+    // Abort if `ref2` was supplied, but it does not resolve to a hash.
     } else if (ref2 !== undefined && refs.hash(ref2) === undefined) {
       throw new Error("ambiguous argument " + ref2 + ": unknown revision");
+
+    // Otherwise, perform diff.
     } else {
+
+      // Gitlet only shows the name of each changed file and whether
+      // it was added, modified or deleted.  For simplicity, the
+      // changed content is not shown.
+
+      // The diff happens between two versions of the repo.  The first
+      // version is either the hash that `ref1` resolves to, or the
+      // index.  The second version is either the hash that `ref2`
+      // resolves to, or the working copy.
       var nameToStatus = diff.nameStatus(diff.diff(refs.hash(ref1), refs.hash(ref2)));
+
+      // Show the path of each changed file.
       return Object.keys(nameToStatus)
         .map(function(path) { return nameToStatus[path] + " " + path; })
         .join("\n") + "\n";
     }
   },
 
+  // **remote()** records the locations of remote versions of this
+  // repo.
   remote: function(command, name, path, _) {
     files.assertInRepo();
 
+    // Abort if `command` is not "add".  Only "add" is supported.
     if (command !== "add") {
       throw new Error("unsupported");
+
+    // Abort if repo already has a record for a remote called `name`.
     } else if (name in config.read()["remote"]) {
       throw new Error("remote " + name + " already exists");
-    } else if (command === "add") {
+
+    // Otherwise, add remote record.
+    } else {
+
+      // Write to the config file a record of the `name` and `path` of
+      // the remote.
       config.write(util.assocIn(config.read(), ["remote", name, "url", path]));
       return "\n";
     }
   },
 
+  // **fetch()** records the commit that the passed `branch` is at on
+  // the passed `remote`.  It does not change the local branch.
   fetch: function(remote, branch, _) {
     files.assertInRepo();
 
+    // Abort if a `remote` or `branch` not passed.
     if (remote === undefined || branch === undefined) {
       throw new Error("unsupported");
+
+    // Abort if `remote` not recorded in config file.
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
+
     } else {
+
+      // Get the location of the remote.
       var remoteUrl = config.read().remote[remote].url;
+
+      // Turn the unqualified branch name into a fully qualified remote ref eg
+      // `[branch] -> refs/remotes/[remote]/[branch]`
       var remoteRef =  refs.toRemoteRef(remote, branch);
-      var oldHash = refs.hash(remoteRef);
+
+      // Go to the remote repo and get the hash of the commit that
+      // `branch` is on.
       var newHash = util.remote(remoteUrl)(refs.hash, branch);
+
+      // Abort if `branch` did not exist on the remote.
       if (newHash === undefined) {
         throw new Error("couldn't find remote ref " + branch);
+
+      // Otherwise, perform the fetch.
       } else {
+
+        // Note down the commit this repo currently thinks the remote
+        // branch is on.
+        var oldHash = refs.hash(remoteRef);
+
+        // Get all the objects in the remote database and write them.
+        // to the local database.  (This is an
+        // inefficient way of getting all the objects required to
+        // recreate the commit locally.)
         var remoteObjects = util.remote(remoteUrl)(objects.allObjects);
         remoteObjects.forEach(objects.write);
+
+        // Set the contents of the file at
+        // `.gitlet/refs/remotes/[remote]/[branch]` to `newHash`, the
+        // hash of the commit that the remote branch is on.
         gitlet.update_ref(remoteRef, newHash);
+
+        // Record the hash of the commit that the remote branch is on to
+        // `FETCH_HEAD`.  (The user can call `gitlet merge FETCH_HEAD` to
+        // merge the remote version of the branch into their local branch.
+        // For more details, see `merge()`.)
         refs.write("FETCH_HEAD", newHash + " branch " + branch + " of " + remoteUrl);
 
+        // Report the result of the fetch.
         return ["From " + remoteUrl,
                 "Count " + remoteObjects.length,
                 branch + " -> " + remote + "/" + branch +
