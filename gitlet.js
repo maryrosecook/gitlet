@@ -338,14 +338,14 @@ var gitlet = module.exports = {
       // Otherwise, perform the fetch.
       } else {
 
-        // Note down the commit this repo currently thinks the remote
+        // Note down the hash of the commit this repo currently thinks the remote
         // branch is on.
         var oldHash = refs.hash(remoteRef);
 
         // Get all the objects in the remote database and write them.
         // to the local database.  (This is an
         // inefficient way of getting all the objects required to
-        // recreate the commit locally.)
+        // recreate locally the commit the remote branch is on.)
         var remoteObjects = util.remote(remoteUrl)(objects.allObjects);
         remoteObjects.forEach(objects.write);
 
@@ -354,7 +354,7 @@ var gitlet = module.exports = {
         // hash of the commit that the remote branch is on.
         gitlet.update_ref(remoteRef, newHash);
 
-        // Record the hash of the commit that the remote branch is on to
+        // Record the hash of the commit that the remote branch is on in
         // `FETCH_HEAD`.  (The user can call `gitlet merge FETCH_HEAD` to
         // merge the remote version of the branch into their local branch.
         // For more details, see `merge()`.)
@@ -369,29 +369,86 @@ var gitlet = module.exports = {
     }
   },
 
+  // **merge()** finds the set of differences between the commit that
+  // the currently checked out branch is on and the commit that the
+  // passed `ref` points to.  It finds or creates a commit that
+  // applies these differences to the checked out branch.
   merge: function(ref, _) {
     files.assertInRepo();
     config.assertNotBare();
 
+    // Get the `receiverHash`, the hash of the commit that thet current branch is on.
     var receiverHash = refs.hash("HEAD");
+
+    // Get the `giverHash`, the hash for the commit to merge into the receiver commit.
     var giverHash = refs.hash(ref);
+
+    // Abort if head is detached.  Merging into a detached head is not supported.
     if (refs.isHeadDetached()) {
       throw new Error("unsupported");
+
+    // Abort if `ref` did not resolve to a hash, or if that hash is not for a commit object.
     } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
       throw new Error(ref + ": expected commit type");
+
+    // Abort if the current branch - the receiver - already has the
+    // giver's changes.  This is the case if the receiver and giver
+    // are the same commit, or if the giver is an ancestor of the
+    // receiver.
     } else if (objects.isUpToDate(receiverHash, giverHash)) {
       return "Already up-to-date";
+
     } else {
+
+      // Get a list of files changed in the working copy.  Get a list
+      // of the files that are different in the receiver and giver. If
+      // any files appear in both lists then abort.
       var paths = diff.changedFilesCommitWouldOverwrite(giverHash);
       if (paths.length > 0) {
         throw new Error("local changes would be lost\n" + paths.join("\n") + "\n");
+
+      // If the receiver is an ancestor of the giver, a fast forward
+      // is performed.  This is possible because there is already a commit
+      // that incorporates all of the giver's changes into the
+      // receiver.
       } else if (merge.canFastForward(receiverHash, giverHash)) {
+
+        // Fast forwarding means making the current branch reflect the
+        // commit that `giverHash` points at.  The branch is is
+        // pointed at `giverHash`.  The index is set to match the
+        // contents of the commit that `giverHash` points at.  The
+        // working copy is set to match the contents of that commit.
         merge.writeFastForwardMerge(receiverHash, giverHash);
         return "Fast-forward";
+
+      // If the receiver is not an ancestor of the giver, a merge commit
+      // must be created.
       } else {
+
+        // The repo is put into the merge state.  The
+        // `MERGE_HEAD` file is written and its contents set to
+        // `giverHash`.  The `MERGE_MSG` file is written and its
+        // contents set to a boilerplate merge commit message.  A
+        // merge diff is created that will turn the contents of
+        // receiver into the contents of giver.  This contains the
+        // path of every file that is different and whether it was
+        // added, removed or modified, or is in conflict.  Added files
+        // are added to the index and working copy.  Removed files are
+        // removed from the index and working copy.  Modified files
+        // are modified in the index and working copy.  Files that are
+        // in conflict are written to the working copy to include the
+        // receiver and giver versions.  Both the receiver and giver
+        // versions are written to the index.
         merge.writeNonFastForwardMerge(receiverHash, giverHash, ref);
+
+        // If there are any conflicted files, a message is shown to
+        // say that the user must sort them out before the merge can
+        // be completed.
         if (merge.hasConflicts(receiverHash, giverHash)) {
           return "Automatic merge failed. Fix conflicts and commit the result.";
+
+        // If there are no conflicted files, a commit is created from
+        // the merged changes and the merge is over.
         } else {
           return this.commit();
         }
@@ -399,6 +456,9 @@ var gitlet = module.exports = {
     }
   },
 
+  // **pull()** fetches the commit that the passed `branch` is on at
+  // the passed `remote`.  It merges that commit into the currntly
+  // checked out branch.
   pull: function(remote, branch, _) {
     files.assertInRepo();
     config.assertNotBare();
