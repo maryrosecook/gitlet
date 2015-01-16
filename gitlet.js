@@ -6,10 +6,10 @@ var nodePath = require("path");
 
 var gitlet = module.exports = {
 
-  // **init()** initializes the current directory as a new repo.
+  // **init()** initializes the current directory as a new repository.
   init: function(opts) {
 
-    // Abort if already a repo.
+    // Abort if already a repository.
     if (files.inRepo()) { return; }
 
     opts = opts || {};
@@ -19,8 +19,8 @@ var gitlet = module.exports = {
       HEAD: "ref: refs/heads/master\n",
 
       // If `--bare` was passed, write to the Git config indicating
-      // that the repo is bare.  If `--bare` was not passed, write to
-      // the Git config saying the repo is not bare.
+      // that the repository is bare.  If `--bare` was not passed, write to
+      // the Git config saying the repository is not bare.
       config: config.objToStr({ core: { "": { bare: opts.bare === true }}}),
 
       objects: {},
@@ -30,9 +30,9 @@ var gitlet = module.exports = {
     };
 
     // Write the standard Git directory structure using the
-    // `gitletStructure` JS object.  If the repo is not bare, put the
-    // directories inside the `.gitlet` directory.  If the repo is
-    // bare, put them in the top level of the repo.
+    // `gitletStructure` JS object.  If the repository is not bare, put the
+    // directories inside the `.gitlet` directory.  If the repository is
+    // bare, put them in the top level of the repository.
     files.writeFilesFromTree(opts.bare ? gitletStructure : { ".gitlet": gitletStructure },
                              process.cwd());
   },
@@ -116,7 +116,7 @@ var gitlet = module.exports = {
 
     } else {
 
-      // Abort if the repo is in the merge state and there are
+      // Abort if the repository is in the merge state and there are
       // unresolved merge conflicts.
       var conflictedPaths = index.conflictedPaths();
       if (merge.isMergeInProgress() && conflictedPaths.length > 0) {
@@ -126,8 +126,8 @@ var gitlet = module.exports = {
       // Otherwise, do the commit.
       } else {
 
-        // If the repo is in the merge state, use a pre-written merge
-        // commit message.  If the repo is not in the merge state, use
+        // If the repository is in the merge state, use a pre-written merge
+        // commit message.  If the repository is not in the merge state, use
         // the message passed with `-m`.
         var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
 
@@ -137,7 +137,7 @@ var gitlet = module.exports = {
         // Point `HEAD` at new commit.
         this.update_ref("HEAD", commitHash);
 
-        // If `MERGE_HEAD` exists, the repo was in the merge
+        // If `MERGE_HEAD` exists, the repository was in the merge
         // state. Remove `MERGE_HEAD` and `MERGE_MSG`to exit the merge
         // state.  Report that the merge is complete.
         if (merge.isMergeInProgress()) {
@@ -145,7 +145,7 @@ var gitlet = module.exports = {
           refs.rm("MERGE_HEAD");
           return "Merge made by the three-way strategy";
 
-        // Repo was not in the merge state, so just report that the
+        // Repository was not in the merge state, so just report that the
         // commit is complete.
         } else {
           return "[" + headDesc + " " + commitHash + "] " + m;
@@ -168,7 +168,7 @@ var gitlet = module.exports = {
 
     // `HEAD` is not pointing at a commit, so there is no commit for
     // the new branch to point at.  Abort.  This is most likely to
-    // happen if the repo has no commits.
+    // happen if the repository has no commits.
     } else if (refs.hash("HEAD") === undefined) {
       throw new Error(refs.headBranchName() + " not a valid object name");
 
@@ -249,7 +249,7 @@ var gitlet = module.exports = {
     }
   },
 
-  // **diff()** returns the differences between two versions of the repo.
+  // **diff()** returns the differences between two versions of the repository.
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
     config.assertNotBare();
@@ -269,7 +269,7 @@ var gitlet = module.exports = {
       // it was added, modified or deleted.  For simplicity, the
       // changed content is not shown.
 
-      // The diff happens between two versions of the repo.  The first
+      // The diff happens between two versions of the repository.  The first
       // version is either the hash that `ref1` resolves to, or the
       // index.  The second version is either the hash that `ref2`
       // resolves to, or the working copy.
@@ -283,7 +283,7 @@ var gitlet = module.exports = {
   },
 
   // **remote()** records the locations of remote versions of this
-  // repo.
+  // repository.
   remote: function(command, name, path, _) {
     files.assertInRepo();
 
@@ -291,7 +291,7 @@ var gitlet = module.exports = {
     if (command !== "add") {
       throw new Error("unsupported");
 
-    // Abort if repo already has a record for a remote called `name`.
+    // Abort if repository already has a record for a remote called `name`.
     } else if (name in config.read()["remote"]) {
       throw new Error("remote " + name + " already exists");
 
@@ -327,7 +327,7 @@ var gitlet = module.exports = {
       // `[branch] -> refs/remotes/[remote]/[branch]`
       var remoteRef =  refs.toRemoteRef(remote, branch);
 
-      // Go to the remote repo and get the hash of the commit that
+      // Go to the remote repository and get the hash of the commit that
       // `branch` is on.
       var newHash = util.remote(remoteUrl)(refs.hash, branch);
 
@@ -338,7 +338,7 @@ var gitlet = module.exports = {
       // Otherwise, perform the fetch.
       } else {
 
-        // Note down the hash of the commit this repo currently thinks the remote
+        // Note down the hash of the commit this repository currently thinks the remote
         // branch is on.
         var oldHash = refs.hash(remoteRef);
 
@@ -391,7 +391,7 @@ var gitlet = module.exports = {
     } else if (giverHash === undefined || objects.type(objects.read(giverHash)) !== "commit") {
       throw new Error(ref + ": expected commit type");
 
-    // Abort if the current branch - the receiver - already has the
+    // Do not merge if the current branch - the receiver - already has the
     // giver's changes.  This is the case if the receiver and giver
     // are the same commit, or if the giver is an ancestor of the
     // receiver.
@@ -425,7 +425,7 @@ var gitlet = module.exports = {
       // must be created.
       } else {
 
-        // The repo is put into the merge state.  The
+        // The repository is put into the merge state.  The
         // `MERGE_HEAD` file is written and its contents set to
         // `giverHash`.  The `MERGE_MSG` file is written and its
         // contents set to a boilerplate merge commit message.  A
@@ -457,8 +457,8 @@ var gitlet = module.exports = {
   },
 
   // **pull()** fetches the commit that the passed `branch` is on at
-  // the passed `remote`.  It merges that commit into the currntly
-  // checked out branch.
+  // the passed `remote`.  It merges that commit into the current
+  // branch.
   pull: function(remote, branch, _) {
     files.assertInRepo();
     config.assertNotBare();
@@ -466,30 +466,66 @@ var gitlet = module.exports = {
     return this.merge("FETCH_HEAD");
   },
 
+  // **push()** gets the commit that `branch` is on in the local repo
+  // and points `branch` on `remote` at the same commit.
   push: function(remote, branch, opts) {
     files.assertInRepo();
     opts = opts || {};
 
+    // Abort if a `remote` or `branch` not passed.
     if (remote === undefined || branch === undefined) {
       throw new Error("unsupported");
+
+    // Abort if `remote` not recorded in config file.
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
+
     } else {
       var remotePath = config.read().remote[remote].url;
       var remoteCall = util.remote(remotePath);
+
+      // Abort if remote repository is not bare and `branch` is checked out.
       if (remoteCall(refs.isCheckedOut, branch)) {
         throw new Error("refusing to update checked out branch " + branch);
+
       } else {
+
+        // Get `receiverHash`, the hash of the commit that `branch` is
+        // on at `remote`.
         var receiverHash = remoteCall(refs.hash, branch);
+
+        // Get `giverHash`, the hash of the commit that `branch` is on
+        // at the local repository.
         var giverHash = refs.hash(branch);
+
+        // Do nothing if the remote branch - the receiver - has
+        // already incorporated the commit that `giverHash` points
+        // to. This is the case if the receiver commit and giver commit are the same,
+        // or if the giver commit is an ancestor of the receiver commit.
         if (objects.isUpToDate(receiverHash, giverHash)) {
           return "Already up-to-date";
+
+        // Abort if `branch` on `remote` cannot be fast forwarded to
+        // the commit that `giverHash` points to.  A fast forward can
+        // only be done if the receiver commit is an ancestor of the
+        // giver commit.
         } else if (!opts.f && !merge.canFastForward(receiverHash, giverHash)) {
           throw new Error("failed to push some refs to " + remotePath);
+
+        // Otherwise, do the push.
         } else {
+
+          // Put all the objects in the local database into the remote database.
           objects.allObjects().forEach(function(o) { remoteCall(objects.write, o); });
-          gitlet.update_ref(refs.toRemoteRef(remote, branch), giverHash);
+
+          // Point `branch` on `remote` at `giverHash`.
           remoteCall(gitlet.update_ref, refs.toLocalRef(branch), giverHash);
+
+          // Set the local repo's record of what commit `branch` is on
+          // at `remote` to `giverHash` (since that is what it is now is).
+          gitlet.update_ref(refs.toRemoteRef(remote, branch), giverHash);
+
+          // Report the result of the push.
           return ["To " + remotePath,
                   "Count " + objects.allObjects().length,
                   branch + " -> " + branch].join("\n") + "\n";
@@ -498,41 +534,70 @@ var gitlet = module.exports = {
     }
   },
 
+  // **status()** reports the state of the repo: the current branch,
+  // untracked files, conflicted files, files that are staged to be
+  // committed and files that are not staged to be committed.
   status: function(_) {
     files.assertInRepo();
     config.assertNotBare();
     return status.toString();
   },
 
+  // **clone()** copies the repository at `remotePath` to `targetPath`.
   clone: function(remotePath, targetPath, opts) {
     opts = opts || {};
 
+    // Abort if a `remotePath` or `targetPath` not passed.
     if (remotePath === undefined || targetPath === undefined) {
       throw new Error("you must specify remote path and target path");
+
+    // Abort if `remotePath` does not exist, or is not a Gitlet repository.
     } else if (!fs.existsSync(remotePath) || !util.remote(remotePath)(files.inRepo)) {
       throw new Error("repository " + remotePath + " does not exist");
+
+    // Abort if `targetPath` exists and is not empty.
     } else if (fs.existsSync(targetPath) && fs.readdirSync(targetPath).length > 0) {
       throw new Error(targetPath + " already exists and is not empty");
+
+    // Otherwise, do the clone.
     } else {
+
       remotePath = nodePath.resolve(process.cwd(), remotePath);
+
+      // If `targetPath` doesn't exist, create it.
       if (!fs.existsSync(targetPath)) {
         fs.mkdirSync(targetPath)
       }
 
+      // In the directory for the new remote repository...
       util.remote(targetPath)(function() {
+
+        // Initialize the directory as a Gitlet repository.
         gitlet.init(opts);
+
+        // Set up `remotePath` as a remote called "origin".
         gitlet.remote("add", "origin", nodePath.relative(process.cwd(), remotePath));
-        var remoteHeadHash = util.remote(remotePath)(refs.hash, "HEAD");
+
+        // Get the hash of the commit that master is pointing at on
+        // the remote repository.
+        var remoteHeadHash = util.remote(remotePath)(refs.hash, "master");
+
+        // If the remote repo has any commits, that hash will exist.
+        // The new repository records the commit that the passed `branch` is at on
+        // the remote.  It then sets master on the new repository to point at that commit.
         if (remoteHeadHash !== undefined) {
           gitlet.fetch("origin", "master");
           merge.writeFastForwardMerge(undefined, remoteHeadHash);
         }
       });
 
+      // Report the result of the clone.
       return "Cloning into " + targetPath;
     }
   },
 
+  // **update_index()** adds the contents of the file at `path` to the
+  // index, or removes the file from the index.
   update_index: function(path, opts) {
     files.assertInRepo();
     config.assertNotBare();
@@ -542,43 +607,76 @@ var gitlet = module.exports = {
     var isOnDisk = fs.existsSync(path);
     var isInIndex = index.hasFile(path, 0);
 
+    // Abort if `path` is a directory.  `update_index()` only handles single files.
     if (isOnDisk && fs.statSync(path).isDirectory()) {
       throw new Error(pathFromRoot + " is a directory - add files inside\n");
+
     } else if (opts.remove && !isOnDisk && isInIndex) {
+
+      // Abort if file is being removed and is in conflict.  Gitlet doesn't support this.
       if (index.isFileInConflict(path)) {
         throw new Error("unsupported");
+
+      // If files is being removed, is not on disk and is in the
+      // index, remove it from the index.
       } else {
         index.writeRm(path);
         return "\n";
       }
+
+    // If file is being removed, is not on disk and not in the index,
+    // there is no work to do.
     } else if (opts.remove && !isOnDisk && !isInIndex) {
       return "\n";
+
+    // Abort if the file is on disk and not in the index and the
+    // `--add` was not passed.
     } else if (!opts.add && isOnDisk && !isInIndex) {
       throw new Error("cannot add " + pathFromRoot + " to index - use --add option\n");
+
+    // If file is on disk and either `-add` was passed or the file is
+    // in the index, add the file's current content to the index.
     } else if (isOnDisk && (opts.add || isInIndex)) {
       index.writeAdd(path);
       return "\n";
+
+    // Abort if the file is not on disk and `--remove` not passed.
     } else if (!opts.remove && !isOnDisk) {
       throw new Error(pathFromRoot + " does not exist and --remove not passed\n");
     }
   },
 
+  // **write_tree()** takes the content of the index and stores a tree
+  // object that represents that content to the database.
   write_tree: function(_) {
     files.assertInRepo();
     return objects.writeTree(files.nestFlatTree(index.toc()));
   },
 
+  // **update_ref()** gets the hash of the commit that `refToUpdateTo`
+  // points at and sets `refToUpdate` to point at the same hash.
   update_ref: function(refToUpdate, refToUpdateTo, _) {
     files.assertInRepo();
 
+    // Get the hash that `refToUpdateTo` points at.
     var hash = refs.hash(refToUpdateTo);
+
+    // Abort if `refToUpdateTo` does not point at a hash.
     if (!objects.exists(hash)) {
       throw new Error(refToUpdateTo + " not a valid SHA1");
+
+    // Abort if `refToUpdate` does not follow the syntax of a ref.
     } else if (!refs.isRef(refToUpdate)) {
       throw new Error("cannot lock the ref " + refToUpdate);
+
+    // Abort if `hash` points to a database object that is not a
+    // commit.
     } else if (objects.type(objects.read(hash)) !== "commit") {
       var branch = refs.terminalRef(refToUpdate);
-      throw new Error(branch + " cannot refer to non-commit object " + hash + "\n")
+      throw new Error(branch + " cannot refer to non-commit object " + hash + "\n");
+
+    // Otherwise, set the contents of the file that the ref represents
+    // to `hash`.
     } else {
       refs.write(refs.terminalRef(refToUpdate), hash);
     }
