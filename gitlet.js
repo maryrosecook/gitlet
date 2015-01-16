@@ -472,8 +472,6 @@ var gitlet = module.exports = {
 
     if (remote === undefined || branch === undefined) {
       throw new Error("unsupported");
-    } else if (refs.isHeadDetached()) {
-      throw new Error("you are not currently on a branch");
     } else if (!(remote in config.read().remote)) {
       throw new Error(remote + " does not appear to be a git repository");
     } else {

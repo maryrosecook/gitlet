@@ -25,17 +25,6 @@ describe("push", function() {
       .toThrow("origin does not appear to be a git repository");
   });
 
-  it("should throw if try to push when head detached", function() {
-    testUtil.createStandardFileStructure();
-    g.init();
-    g.add("1a/filea");
-    g.commit({ m: "first" });
-    g.checkout("17a11ad4");
-
-    expect(function() { g.push("origin", "master"); })
-      .toThrow("you are not currently on a branch");
-  });
-
   it("should throw if try push to non-bare repo where pushed branch checked out", function() {
     var gl = g, gr = g;
     var localRepo = process.cwd();
