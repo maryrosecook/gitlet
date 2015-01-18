@@ -1059,11 +1059,24 @@ var objects = {
   }
 };
 
+// Index module
+// ------------
+// The index maps files to hashes of their content.  When a commit is
+// created, a tree is built that mirrors the content of the index.
+
+// Index entry keys are actually a `filepath,stage` combination.
+// Stage is always `0`, unless the entry is about a file that is in
+// conflict.  See `merge.writeIndex()` for more details.
+
 var index = {
+
+  // **hasFile()** returns true if there is an entry for `path` in the
+  // index `stage`.
   hasFile: function(path, stage) {
     return index.read()[index.key(path, stage)] !== undefined;
   },
 
+  // **read()** returns the index as a JS object.
   read: function() {
     var indexFilePath = files.gitletPath("index");
     return util.lines(fs.existsSync(indexFilePath) ? files.read(indexFilePath) : "\n")
@@ -1074,25 +1087,34 @@ var index = {
       }, {});
   },
 
+  // **key()** returns an index key made from `path` and `stage`.
   key: function(path, stage) {
     return path + "," + stage;
   },
 
+  // **keyPieces()** returns a JS object that contains the path and
+  // stage of 'key`.
   keyPieces: function(key) {
     var pieces = key.split(/,/);
     return { path: pieces[0], stage: parseInt(pieces[1]) };
   },
 
+  // **toc()** returns an object that maps file paths to hashes of
+  // their content.  This function is like `read()`, except the JS
+  // object it returns only uses the file path as a key.
   toc: function() {
     var idx = index.read();
     return Object.keys(idx)
       .reduce(function(obj, k) { return util.assocIn(obj, [k.split(",")[0], idx[k]]); }, {});
   },
 
+  // **isFileInConflict()** returns true the file for `path` is in conflict.
   isFileInConflict: function(path) {
     return index.hasFile(path, 2);
   },
 
+  // **conflictedPaths()** returns an array of all the paths of files
+  // that are in conflict.
   conflictedPaths: function() {
     var idx = index.read();
     return Object.keys(idx)
@@ -1100,6 +1122,9 @@ var index = {
       .map(function(k) { return index.keyPieces(k).path; });
   },
 
+  // **writeAdd()** gets the current content of the file at `path` in
+  // the working copy.  It stores that content in the index.  If that
+  // file is in conflict, it is set to be no longer in conflict.
   writeAdd: function(path) {
     if (index.isFileInConflict(path)) {
       index.rmEntry(path, 1);
@@ -1110,22 +1135,29 @@ var index = {
     index.writeEntry(path, 0, files.read(files.workingCopyPath(path)));
   },
 
+  // **writeRm()** removes `path` from the index.  This operation will
+  // do nothing if the file is in conflict.
   writeRm: function(path) {
     index.rmEntry(path, 0);
   },
 
+  // **writeEntry()** adds a hash of `content` to the index at key
+  // `path,stage`.
   writeEntry: function(path, stage, content) {
     var idx = index.read();
     idx[index.key(path, stage)] = objects.write(content);
     index.write(idx);
   },
 
+  // **rmEntry()** removes the entry at key `path,stage`.
   rmEntry: function(path, stage) {
     var idx = index.read();
     delete idx[index.key(path, stage)];
     index.write(idx);
   },
 
+  // **write()** takes a JS object that represents an index and writes
+  // it to `.git/index`.
   write: function(index) {
     var indexStr = Object.keys(index)
         .map(function(k) { return k.split(",")[0] + " " + k.split(",")[1] + " " + index[k] })
@@ -1133,6 +1165,8 @@ var index = {
     files.write(files.gitletPath("index"), indexStr);
   },
 
+  // **workingCopyToc()** returns an object that maps the file paths
+  // in the working copy to hashes of those files' content.
   workingCopyToc: function() {
     return Object.keys(index.read())
       .map(function(k) { return k.split(",")[0]; })
@@ -1143,13 +1177,17 @@ var index = {
       }, {});
   },
 
+  // **tocToIndex()** takes an object that maps file paths to hashes
+  // of the files' content.  It returns an object that is identical,
+  // except the keys of the object are composed of the file paths and
+  // stage `0`.  eg: `{ "file1,0": hash(1), "src/file2,0": hash(2) }'
   tocToIndex: function(toc) {
     return Object.keys(toc)
       .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 0), toc[p]]); }, {});
   },
 
-  matchingFiles: function(pathSpec) {
-    var prefix = nodePath.relative(files.workingCopyPath(), process.cwd());
+  // **matchingFiles()** returns all the paths in the index that match
+  // `pathSpec`.  It matches relative to `currentDir`.
   matchingFiles: function(pathSpec, currentDir) {
     var prefix = nodePath.relative(files.workingCopyPath(), currentDir);
     var searchPath = nodePath.join(prefix, pathSpec);
