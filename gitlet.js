@@ -154,7 +154,7 @@ var gitlet = module.exports = {
     opts = opts || {};
 
     // Get the paths of all files in the index that match `path`.
-    var filesToRm = index.matchingFiles(path);
+    var filesToRm = index.matchingFiles(path, process.cwd());
 
     // Abort if `-f` was passed. The removal of files with changes is not supported.
     if (opts.f) {
@@ -1150,6 +1150,8 @@ var index = {
 
   matchingFiles: function(pathSpec) {
     var prefix = nodePath.relative(files.workingCopyPath(), process.cwd());
+  matchingFiles: function(pathSpec, currentDir) {
+    var prefix = nodePath.relative(files.workingCopyPath(), currentDir);
     var searchPath = nodePath.join(prefix, pathSpec);
     return Object.keys(index.toc())
       .filter(function(p) { return p.match("^" + searchPath); });
