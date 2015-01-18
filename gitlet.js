@@ -1,3 +1,91 @@
+// Introduction
+// ------------
+
+// This code is intended to show how Git works under the covers.  It
+// is written to be readable.  It is heavily commented.  However, my
+// most digestible explanation of how Git works is in the (unfinished)
+// essay, Git from the inside out.  It is best to read that before you
+// read the code.  Or you can read the summary of the essay below.
+
+// Git in six hundred words
+// ------------------------
+
+// Imagine you have a directory called `alpha`.  It contains a file
+// called `number.txt` that contains just the string `"first"`.
+
+// You run `git init` to set up the directory as a Git repository.
+// This creates a `.git` folder inside the `alpha` directory.
+
+// You run `git add number.txt` to add `number.txt` to the index.  The
+// index maps filenames to hashes of the files' content.  The index
+// now has the mapping `number.txt -> hash(first)`.  Running `add` has
+// also created a new file in the Git object database at
+// `alpha/.git/objects/`.  This file is called `hash(first)` and
+// contains `"first"`.
+
+// You run `git commit -m "first"`.  This creates a tree object in the
+// objects database that represents the list of items in the top level
+// of the alpha directory.  This object has an entry that points to
+// the `hash(first)` object created when you ran `git add`.  It
+// creates a commit object that represents the version of the repo
+// that you just committed.  This includes a pointer to the tree that
+// was created.  It sets the content of the file at
+// `alpha/.git/refs/heads/master` to the hash of the commit object.
+
+// You run `git clone . ../beta`.  This creates a new, separate
+// directory called `beta`.  It initializes it as a Git repository.
+// It copies the files in the objects directory of alpha to the
+// objects directory of beta.  It sets the content of the file at
+// `beta/.git/refs/heads/master` to the hash of the commit that the
+// master branch on alpha is pointing at.  It sets the index on beta
+// to mirror the content of the first commit.  It updates the working
+// copy - the contents of the `beta` directory excluding the `.git`
+// directory - so it mirrors the index.
+
+// You move to the beta repository.  You change the content of
+// `number.txt` to `second`.  You run `git add number.txt` and `git
+// commit -m "second"`.  This time, the commit object that is created
+// has a pointer to its parent, the first commit.
+
+// You move back to the alpha repository.  You run `git pull beta
+// master`.
+
+// Under the covers, this runs `git fetch beta master`.  This finds
+// the objects that comprise the second commit and copies them from
+// the beta repository to the alpha repository.  It sets the content
+// of the file at `alpha/.git/refs/remotes/beta/master` to the hash of
+// the second commit.  It sets the contents of `alpha/.git/FETCH_HEAD`
+// to indicate that master was fetched from the beta repository.
+
+// Under the covers, the pull command runs `git merge FETCH_HEAD`.
+// This reads `FETCH_HEAD`, which indicates that master on the beta
+// repository was the most recently fetched branch.  It gets the hash
+// in `alpha/.git/refs/remotes/beta/master` and uses it to get the
+// second commit.  Since `master` on alpha is pointing at the first
+// commit, and the first commit is an ancestor of the second commit,
+// the contents of `alpha/.git/refs/heads/master` can just be set to
+// the hash of the second commit.  Merge updates the index to mirror
+// the contents of the second commit.  It updates the working copy to
+// mirror the index.
+
+// You run `git branch other`.  This creates a new file at
+// `alpha/.git/refs/heads/other` that contains the hash for the second
+// commit.
+
+// You run `git checkout other`.  This changes the contents of the
+// file at `alpha/.git/HEAD` from `"refs/heads/master"` to
+// `"refs/heads/other"`.  `other` is now the current branch.
+
+// You set the contents of `number.txt` to `"third"`, run `git add
+// numbers.txt` and run `git commit -m "third"`.
+
+// You run `git remote add beta ../beta`.  This sets the beta
+// repository as a remote repository.  You run `git push beta other`.
+// This finds the objects that comprise the third commit and copies
+// them from the alpha repository to the beta repository.  It sets the
+// content of the file at `beta/.git/refs/heads/other` to the hash of
+// the third commit.
+
 // Imports
 // -------
 
