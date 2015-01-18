@@ -186,7 +186,7 @@ var gitlet = module.exports = {
   },
 
   // **commit()** creates a commit object that represents the current
-  // state of the index, writes the commit to the database and points
+  // state of the index, writes the commit to the `objects` directory and points
   // `HEAD` at the commit.
   commit: function(opts) {
     files.assertInRepo();
@@ -222,7 +222,7 @@ var gitlet = module.exports = {
         // the message passed with `-m`.
         var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
 
-        // Write the new commit to the database.
+        // Write the new commit to the `objects` directory.
         var commitHash = objects.writeCommit(treeHash, m, refs.commitParentHashes());
 
         // Point `HEAD` at new commit.
@@ -276,7 +276,7 @@ var gitlet = module.exports = {
   },
 
   // **checkout()** changes the index, working copy and `HEAD` to
-  // reflect the content of the passed `ref`.  `ref` might be a branch
+  // reflect the content of `ref`.  `ref` might be a branch
   // name or a commit hash.
   checkout: function(ref, _) {
     files.assertInRepo();
@@ -314,7 +314,7 @@ var gitlet = module.exports = {
       } else {
         process.chdir(files.workingCopyPath());
 
-        // If the ref is in the object database, it must be a hash and
+        // If the ref is in the `objects` directory, it must be a hash and
         // so this checkout is detaching the head.
         var isDetachingHead = objects.exists(ref);
 
@@ -396,8 +396,8 @@ var gitlet = module.exports = {
     }
   },
 
-  // **fetch()** records the commit that the passed `branch` is at on
-  // the passed `remote`.  It does not change the local branch.
+  // **fetch()** records the commit that `branch` is at on
+  // `remote`.  It does not change the local branch.
   fetch: function(remote, branch, _) {
     files.assertInRepo();
 
@@ -433,8 +433,8 @@ var gitlet = module.exports = {
         // branch is on.
         var oldHash = refs.hash(remoteRef);
 
-        // Get all the objects in the remote database and write them.
-        // to the local database.  (This is an
+        // Get all the objects in the remote `objects` directory and write them.
+        // to the local `objects` directory.  (This is an
         // inefficient way of getting all the objects required to
         // recreate locally the commit the remote branch is on.)
         var remoteObjects = util.remote(remoteUrl)(objects.allObjects);
@@ -448,7 +448,7 @@ var gitlet = module.exports = {
         // Record the hash of the commit that the remote branch is on in
         // `FETCH_HEAD`.  (The user can call `gitlet merge FETCH_HEAD` to
         // merge the remote version of the branch into their local branch.
-        // For more details, see `merge()`.)
+        // For more details, see [gitlet.merge()](#section-76).)
         refs.write("FETCH_HEAD", newHash + " branch " + branch + " of " + remoteUrl);
 
         // Report the result of the fetch.
@@ -461,8 +461,8 @@ var gitlet = module.exports = {
   },
 
   // **merge()** finds the set of differences between the commit that
-  // the currently checked out branch is on and the commit that the
-  // passed `ref` points to.  It finds or creates a commit that
+  // the currently checked out branch is on and the commit that
+  // `ref` points to.  It finds or creates a commit that
   // applies these differences to the checked out branch.
   merge: function(ref, _) {
     files.assertInRepo();
@@ -547,8 +547,8 @@ var gitlet = module.exports = {
     }
   },
 
-  // **pull()** fetches the commit that the passed `branch` is on at
-  // the passed `remote`.  It merges that commit into the current
+  // **pull()** fetches the commit that `branch` is on at
+  // `remote`.  It merges that commit into the current
   // branch.
   pull: function(remote, branch, _) {
     files.assertInRepo();
@@ -606,7 +606,8 @@ var gitlet = module.exports = {
         // Otherwise, do the push.
         } else {
 
-          // Put all the objects in the local database into the remote database.
+          // Put all the objects in the local `objects` directory into
+          // the remote `objects` directory.
           objects.allObjects().forEach(function(o) { remoteCall(objects.write, o); });
 
           // Point `branch` on `remote` at `giverHash`.
@@ -738,7 +739,7 @@ var gitlet = module.exports = {
   },
 
   // **write_tree()** takes the content of the index and stores a tree
-  // object that represents that content to the database.
+  // object that represents that content to the `objects` directory.
   write_tree: function(_) {
     files.assertInRepo();
     return objects.writeTree(files.nestFlatTree(index.toc()));
@@ -760,8 +761,8 @@ var gitlet = module.exports = {
     } else if (!refs.isRef(refToUpdate)) {
       throw new Error("cannot lock the ref " + refToUpdate);
 
-    // Abort if `hash` points to a database object that is not a
-    // commit.
+    // Abort if `hash` points to an object in the `objects` directory
+    // that is not a commit.
     } else if (objects.type(objects.read(hash)) !== "commit") {
       var branch = refs.terminalRef(refToUpdate);
       throw new Error(branch + " cannot refer to non-commit object " + hash + "\n");
@@ -785,7 +786,7 @@ var gitlet = module.exports = {
 
 var refs = {
 
-  // **isRef()** returns true if the passed `ref` matches valid
+  // **isRef()** returns true if `ref` matches valid
   // qualified ref syntax.
   isRef: function(ref) {
     return ref !== undefined &&
@@ -794,7 +795,7 @@ var refs = {
        ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1);
   },
 
-  // **terminalRef()** resolves the passed `ref` to the most specific ref possible.
+  // **terminalRef()** resolves `ref` to the most specific ref possible.
   terminalRef: function(ref) {
     // If `ref` is "HEAD" and head is pointing at a branch, return the branch.
     if (ref === "HEAD" && !this.isHeadDetached()) {
@@ -838,20 +839,20 @@ var refs = {
     return !config.isBare() && refs.headBranchName() === branch;
   },
 
-  // **toLocalRef()** converts the passed branch `name` into a
+  // **toLocalRef()** converts the branch name `name` into a
   // qualified local branch ref.
   toLocalRef: function(name) {
     return "refs/heads/" + name;
   },
 
-  // **toLocalRef()** converts the passed `remote` and branch `name` into a
+  // **toLocalRef()** converts `remote` and branch name `name` into a
   // qualified remote branch ref.
   toRemoteRef: function(remote, name) {
     return "refs/remotes/" + remote + "/" + name;
   },
 
-  // **write()** sets content of the file for the passed qualified
-  // `ref` to the passed `content`.
+  // **write()** sets the content of the file for the qualified ref
+  // `ref` to `content`.
   write: function(ref, content) {
     if(refs.isRef(ref)) {
       var tree = util.assocIn({}, ref.split(nodePath.sep).concat(content));
@@ -859,7 +860,7 @@ var refs = {
     }
   },
 
-  // **rm()** removes the file for the passed qualified `ref`.
+  // **rm()** removes the file for the qualified ref `ref`.
   rm: function(ref) {
     if(refs.isRef(ref)) {
       fs.unlinkSync(files.gitletPath(ref));
@@ -867,8 +868,8 @@ var refs = {
   },
 
   // **fetchHeadBranchToMerge()** reads the `FETCH_HEAD` file and gets
-  // the hash that the passed remote `branchName` is pointing at.  For
-  // more information about `FETCH_HEAD` see the fetch() function.
+  // the hash that the remote `branchName` is pointing at.  For
+  // more information about `FETCH_HEAD` see [gitlet.fetch()](#section-63).
   fetchHeadBranchToMerge: function(branchName) {
     return util.lines(files.read(files.gitletPath("FETCH_HEAD")))
       .filter(function(l) { return l.match("^.+ branch " + branchName + " of"); })
@@ -882,7 +883,7 @@ var refs = {
       .reduce(function(o, n) { return util.assocIn(o, [n, refs.hash(n)]); }, {});
   },
 
-  // **exists()** returns true if the passed qualified `ref` exists.
+  // **exists()** returns true if the qualified ref `ref` exists.
   exists: function(ref) {
     return refs.isRef(ref) && fs.existsSync(files.gitletPath(ref));
   },
