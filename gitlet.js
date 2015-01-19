@@ -1313,7 +1313,14 @@ var diff = {
   }
 };
 
+
+// Merge module
+// ------------
+
 var merge = {
+
+  // **commonAncestor()** returns the hash of the commit that is the
+  // most recent common ancestor of `aHash` and `bHash`.
   commonAncestor: function(aHash, bHash) {
     var sorted = [aHash, bHash].sort();
     aHash = sorted[0];
@@ -1323,22 +1330,37 @@ var merge = {
     return util.intersection(aAncestors, bAncestors)[0];
   },
 
+  // **isMergeInProgress()** returns true if the repository is in the
+  // middle of a merge.
   isMergeInProgress: function() {
     return refs.hash("MERGE_HEAD");
   },
 
+  // **canFastForward()** A fast forward is possible if the changes
+  // made to get to the `giverHash` commit already incorporate the
+  // changes made to get to the `receiverHash` commit.  So,
+  // `canFastForward()` returns true if the `receiverHash` commit is
+  // an ancestor of the `giverHash` commit.  It also returns true if
+  // there is no `receiverHash` commit because this indicates the
+  // repository has no commits, yet.
   canFastForward: function(receiverHash, giverHash) {
     return receiverHash === undefined || objects.isAncestor(giverHash, receiverHash);
   },
 
+  // **isAForceFetch()** returns true if hash for local commit
+  // (`receiverHash`) is not ancestor of hash for fetched commit
+  // (`giverHash`).
   isAForceFetch: function(receiverHash, giverHash) {
     return receiverHash !== undefined && !objects.isAncestor(giverHash, receiverHash);
   },
 
+  // **hasConflicts()** returns true if merging the commit for
+  // `giverHash` into the commit for `receiverHash` would produce
+  // conflicts.
   hasConflicts: function(receiverHash, giverHash) {
     var mergeDiff = merge.mergeDiff(receiverHash, giverHash);
     return Object.keys(mergeDiff)
-      .filter(function(p) {return mergeDiff[p].status===diff.FILE_STATUS.CONFLICT }).length > 0
+      .filter(function(p){return mergeDiff[p].status===diff.FILE_STATUS.CONFLICT }).length > 0
   },
 
   mergeDiff: function(receiverHash, giverHash) {
