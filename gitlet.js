@@ -1212,7 +1212,7 @@ var diff = {
   },
 
   tocDiff: function(receiver, giver, base) {
-    function fileStatus(receiver, base, giver) {
+    function fileStatus(receiver, giver, base) {
       var receiverPresent = receiver !== undefined;
       var basePresent = base !== undefined;
       var giverPresent = giver !== undefined;
@@ -1237,7 +1237,7 @@ var diff = {
     var paths = Object.keys(receiver).concat(Object.keys(base)).concat(Object.keys(giver));
     return util.unique(paths).reduce(function(idx, p) {
       return util.assocIn(idx, [p, {
-        status: fileStatus(receiver[p], base[p], giver[p]),
+        status: fileStatus(receiver[p], giver[p], base[p]),
         receiver: receiver[p],
         base: base[p],
         giver: giver[p]
