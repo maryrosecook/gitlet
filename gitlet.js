@@ -455,7 +455,7 @@ var gitlet = module.exports = {
         return ["From " + remoteUrl,
                 "Count " + remoteObjects.length,
                 branch + " -> " + remote + "/" + branch +
-                (merge.isForce(oldHash, newHash) ? " (forced)" : "")].join("\n") + "\n";
+                (merge.isAForceFetch(oldHash, newHash) ? " (forced)" : "")].join("\n") + "\n";
       }
     }
   },
@@ -1331,7 +1331,7 @@ var merge = {
     return receiverHash === undefined || objects.isAncestor(giverHash, receiverHash);
   },
 
-  isForce: function(receiverHash, giverHash) {
+  isAForceFetch: function(receiverHash, giverHash) {
     return receiverHash !== undefined && !objects.isAncestor(giverHash, receiverHash);
   },
 
