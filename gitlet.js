@@ -1202,7 +1202,7 @@ var index = {
 // are represented as JS objects that map file paths to objects that
 // indicate the change required to get from the first version of the
 // file (the receiver) to the second (the giver).  eg:
-// <pre>`{
+// <pre>{
 //   file1: {
 //     status: "A",
 //     receiver: undefined,
@@ -1215,7 +1215,7 @@ var index = {
 //     base: hash(a),
 //     giver: hash(c)
 //   }
-// }`</pre>
+// }</pre>
 
 var diff = {
   FILE_STATUS: { ADD: "A", MODIFY: "M", DELETE: "D", SAME: "SAME", CONFLICT: "CONFLICT" },
