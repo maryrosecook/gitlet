@@ -777,6 +777,7 @@ var gitlet = module.exports = {
 
 // Refs module
 // -----------
+
 // Refs are names for commit hashes.  The ref is the name of a file.
 // Some refs represent local branches, like `refs/heads/master` or
 // `refs/heads/feature`.  Some represent remote branches, like
@@ -920,6 +921,7 @@ var refs = {
 
 // Objects module
 // -----------
+
 // Objects are files in the `.git/objects/` directory.
 // - A blob object stores the content of a file.  For example, if a
 //   file called `numbers.txt` that contains `first` is added to the
@@ -1061,6 +1063,7 @@ var objects = {
 
 // Index module
 // ------------
+
 // The index maps files to hashes of their content.  When a commit is
 // created, a tree is built that mirrors the content of the index.
 
@@ -1198,6 +1201,7 @@ var index = {
 
 // Diff module
 // -----------
+
 // Produces diffs between versions of the repository content.  Diffs
 // are represented as JS objects that map file paths to objects that
 // indicate the change required to get from the first version of the
