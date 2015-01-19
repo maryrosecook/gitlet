@@ -1064,7 +1064,7 @@ var objects = {
 // The index maps files to hashes of their content.  When a commit is
 // created, a tree is built that mirrors the content of the index.
 
-// Index entry keys are actually a `filepath,stage` combination.
+// Index entry keys are actually a `path,stage` combination.
 // Stage is always `0`, unless the entry is about a file that is in
 // conflict.  See `merge.writeIndex()` for more details.
 
