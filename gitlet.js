@@ -1603,8 +1603,8 @@ var util = {
     }, []);
   },
 
-  unique: function(array) {
-    return array.reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, []);
+  unique: function(arr) {
+    return arr.reduce(function(a, p) { return a.indexOf(p) === -1 ? a.concat(p) : a; }, []);
   },
 
   intersection: function(a, b) {
