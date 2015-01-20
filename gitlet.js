@@ -1897,6 +1897,16 @@ var status = {
   }
 };
 
+// Running gitlet.js as a script
+// -----------------------------
+
+// Gitlet can be used from the command line.  For example, executing
+// `node gitlet.js commit -m woo` would commit to the current repo
+// with the message "woo".
+
+// **parseOptions()** takes the `process.argv` object passed when
+// gitlet.js is run as a script. It returns an object that contains
+// the parsed parameters to be formed into a Gitlet command.
 var parseOptions = function(argv) {
   var name;
   return argv.reduce(function(opts, arg) {
@@ -1914,6 +1924,10 @@ var parseOptions = function(argv) {
   }, { _: [] });
 };
 
+// **runCli()** takes the `process.argv` object passed when gitlet.js
+// is run as a script.  It parses the command line arguments, runs the
+// corresponding Gitlet command and returns the string returned by the
+// command.
 var runCli = module.exports.runCli = function (argv) {
   var rawArgs = parseOptions(argv);
   var commandFnName = rawArgs._[2].replace(/-/g, "_");
@@ -1926,6 +1940,10 @@ var runCli = module.exports.runCli = function (argv) {
   return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
 };
 
+// If `gitlet.js` is run as a script, pass the `process.argv` array of
+// script arguments to `runCli()` so they can be used to run a Gitlet
+// command.  Print the return value of the Gitlet command.  If the
+// Gitlet command throws, print the error message.
 if (require.main === module) {
   try {
     console.log(runCli(process.argv));
