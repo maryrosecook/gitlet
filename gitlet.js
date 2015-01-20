@@ -392,7 +392,7 @@ var gitlet = module.exports = {
 
       // Write to the config file a record of the `name` and `path` of
       // the remote.
-      config.write(util.assocIn(config.read(), ["remote", name, "url", path]));
+      config.write(util.setIn(config.read(), ["remote", name, "url", path]));
       return "\n";
     }
   },
@@ -857,7 +857,7 @@ var refs = {
   // `ref` to `content`.
   write: function(ref, content) {
     if(refs.isRef(ref)) {
-      var tree = util.assocIn({}, ref.split(nodePath.sep).concat(content));
+      var tree = util.setIn({}, ref.split(nodePath.sep).concat(content));
       files.writeFilesFromTree(tree, files.gitletPath());
     }
   },
@@ -882,7 +882,7 @@ var refs = {
   // to the hash of the commit they point to.
   localHeads: function() {
     return fs.readdirSync(nodePath.join(files.gitletPath(), "refs", "heads"))
-      .reduce(function(o, n) { return util.assocIn(o, [n, refs.hash(n)]); }, {});
+      .reduce(function(o, n) { return util.setIn(o, [n, refs.hash(n)]); }, {});
   },
 
   // **exists()** returns true if the qualified ref `ref` exists.
@@ -1109,7 +1109,7 @@ var index = {
   toc: function() {
     var idx = index.read();
     return Object.keys(idx)
-      .reduce(function(obj, k) { return util.assocIn(obj, [k.split(",")[0], idx[k]]); }, {});
+      .reduce(function(obj, k) { return util.setIn(obj, [k.split(",")[0], idx[k]]); }, {});
   },
 
   // **isFileInConflict()** returns true the file for `path` is in conflict.
@@ -1187,7 +1187,7 @@ var index = {
   // stage `0`.  eg: `{ "file1,0": hash(1), "src/file2,0": hash(2) }'
   tocToIndex: function(toc) {
     return Object.keys(toc)
-      .reduce(function(idx, p) { return util.assocIn(idx, [index.key(p, 0), toc[p]]); }, {});
+      .reduce(function(idx, p) { return util.setIn(idx, [index.key(p, 0), toc[p]]); }, {});
   },
 
   // **matchingFiles()** returns all the paths in the index that match
@@ -1241,7 +1241,7 @@ var diff = {
   nameStatus: function(dif) {
     return Object.keys(dif)
       .filter(function(p) { return dif[p].status !== diff.FILE_STATUS.SAME; })
-      .reduce(function(ns, p) { return util.assocIn(ns, [p, dif[p].status]); }, {});
+      .reduce(function(ns, p) { return util.setIn(ns, [p, dif[p].status]); }, {});
   },
 
   // **tocDiff()** takes three JS objects that map file paths to
@@ -1286,7 +1286,7 @@ var diff = {
 
     // Create and return diff.
     return util.unique(paths).reduce(function(idx, p) {
-      return util.assocIn(idx, [p, {
+      return util.setIn(idx, [p, {
         status: fileStatus(receiver[p], giver[p], base[p]),
         receiver: receiver[p],
         base: base[p],
@@ -1543,7 +1543,7 @@ var config = {
           return s;
         }, {}));
 
-        return util.assocIn(c, entry);
+        return util.setIn(c, entry);
       }, { "remote": {} });
   },
 
@@ -1582,12 +1582,12 @@ var util = {
     return Math.abs(hashInt).toString(16);
   },
 
-  assocIn: function(obj, arr) {
+  setIn: function(obj, arr) {
     if (arr.length === 2) {
       obj[arr[0]] = arr[1];
     } else if (arr.length > 2) {
       obj[arr[0]] = obj[arr[0]] || {};
-      util.assocIn(obj[arr[0]], arr.slice(1));
+      util.setIn(obj[arr[0]], arr.slice(1));
     }
 
     return obj;
@@ -1638,7 +1638,7 @@ var files = {
   },
 
   write: function(path, content) {
-    files.writeFilesFromTree(util.assocIn({}, path.split(nodePath.sep).concat(content)), "/");
+    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), "/");
   },
 
   writeFilesFromTree: function(tree, prefix) {
@@ -1712,7 +1712,7 @@ var files = {
 
   nestFlatTree: function(obj) {
     return Object.keys(obj).reduce(function(tree, wholePath) {
-      return util.assocIn(tree, wholePath.split(nodePath.sep).concat(obj[wholePath]));
+      return util.setIn(tree, wholePath.split(nodePath.sep).concat(obj[wholePath]));
     }, {});
   },
 
