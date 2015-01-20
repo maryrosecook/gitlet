@@ -1611,10 +1611,10 @@ var util = {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
   },
 
-  remote: function(remoteUrl) {
+  remote: function(remotePath) {
     return function(fn) {
       var originalDir = process.cwd();
-      process.chdir(remoteUrl);
+      process.chdir(remotePath);
       var result = fn.apply(null, Array.prototype.slice.call(arguments, 1));
       process.chdir(originalDir);
       return result;
