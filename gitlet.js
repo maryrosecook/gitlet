@@ -340,7 +340,8 @@ var gitlet = module.exports = {
     }
   },
 
-  // **diff()** returns the differences between two versions of the repository.
+  // **diff()** shows the changes required to go from the `ref1`
+  // commit to the `ref2` commit.
   diff: function(ref1, ref2, opts) {
     files.assertInRepo();
     config.assertNotBare();
