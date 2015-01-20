@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gitlet</title>
+    <script type="text/javascript" src="//use.typekit.net/ori7wsv.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+    <link type="text/css" rel="stylesheet" href="resources/main.css" />
+  </head>
+
+  <body>
+    <a href="https://github.com/maryrosecook/gitlet"><img style="position: absolute; top: 0; left: 0; border: 0;" src="/resources/forkme_left_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+    <h1>Gitlet</h1>
+    <center>Git implemented in JavaScript</center>
+
+    <hr/>
+
+    <p>I wrote Gitlet to demonstrate how Git works under the covers.  The code is about 1000 lines.  It's written to be readable.  It's not written to be fast or feature complete.</p>
+
+    <p>It supports <code>init</code>, <code>add</code>, <code>rm</code>, <code>commit</code>, <code>branch</code>, <code>checkout</code>, <code>diff</code>, <code>remote</code>, <code>fetch</code>, <code>merge</code>, <code>push</code>, <code>pull</code>, <code>status</code> and <code>clone</code>.</p>
+
+    <h2>How to use Gitlet to understand Git</h2>
+
+    <p>
+      Read my essay, <a href="!!!!!!!">Git in six hundred words</a>.
+    </p>
+
+    <p>
+      Afterwards, read the <a href="/docs/gitlet.html">heavily annotated Gitlet source</a>.
+      1000 lines of code sounds intimidating.
+      But it's OK.
+      The annotations explain both Git and the code in great detail.
+      The code mirrors the terminology of the Git command line interface,
+      so it should be approachable.
+      And the implementation of the main Git commands is just 350 lines.
+    </p>
+
+    <!-- <h3>Git from the inside out</h3> -->
+
+    <!-- <p> -->
+    <!--   The easiest way is to read my (unfinished) essay Git from the inside out. -->
+    <!--   As you go, or afterwards, read the <a href="/docs/gitlet.html">heavily annotated -->
+    <!--     source code</a>. -->
+    <!-- </p> -->
+
+    <h2>Running Gitlet</h2>
+
+    <p>
+      I wrote Gitlet to explain how Git works.
+      I didn't write it to be used.
+      It's unwise to use Gitlet to version control your projects.
+      But it does work.  Sort of.
+    </p>
+
+
+
+    <pre>
+<span class="dir-path">~   $</span> git clone git@github.com:maryrosecook/gitlet.git
+<span class="dir-path">~   $</span> alias gitlet='node ~/gitlet/gitlet.js'
+
+<span class="dir-path">~   $</span> mkdir a
+<span class="dir-path">~   $</span> cd a
+<span class="dir-path">~/a $</span> gitlet init
+
+<span class="dir-path">~/a $</span> echo first > number.txt
+<span class="dir-path">~/a $</span> gitlet add number.txt
+<span class="dir-path">~/a $</span> gitlet commit -m "first"
+      [master 2912d7a2] first
+
+<span class="dir-path">~/a $</span> cd ..
+<span class="dir-path">~   $</span> gitlet clone a b
+
+<span class="dir-path">~   $</span> cd b
+<span class="dir-path">~/b $</span> echo second > number.txt
+<span class="dir-path">~/b $</span> gitlet add number.txt
+<span class="dir-path">~/b $</span> gitlet commit -m "second"
+      [master 484de172] second
+
+<span class="dir-path">~   $</span> cd ../a
+<span class="dir-path">~/a $</span> gitlet remote add b ../b
+<span class="dir-path">~/a $</span> gitlet fetch b master
+      From ../b
+      Count 6
+      master -> b/master
+<span class="dir-path">~/a $</span> gitlet merge FETCH_HEAD
+      Fast-forward
+
+<span class="dir-path">~/a $</span> gitlet branch other
+<span class="dir-path">~/a $</span> gitlet checkout other
+      Switched to branch other
+
+<span class="dir-path">~/a $</span> echo third > number.txt
+<span class="dir-path">~/a $</span> gitlet add number.txt
+<span class="dir-path">~/a $</span> gitlet commit -m "third"
+      [other 656b332d] third
+
+<span class="dir-path">~/a $</span> gitlet push b other
+      To ../b
+      Count 9
+      other -> other</pre>
+
+    <h2>Running the tests</h2>
+
+    Install <a href="http://nodejs.org/#download">Node.js</a>.
+
+<pre>
+<span class="dir-path">$</span> git clone git@github.com:maryrosecook/gitlet.git
+<span class="dir-path">$</span> cd gitlet
+<span class="dir-path">$</span> npm install
+<span class="dir-path">$</span> npm test
+</pre>
+
+    <h2>Licence</h2>
+
+    <p>
+      The <a href='http://github.com/maryrosecook/gitlet'>code</a> is open source, under the <a href='http://en.wikipedia.org/wiki/MIT_License'>MIT licence</a>.
+    </p>
+
+    <hr/>
+    <div class="footer">
+      <a href="http://maryrosecook.com">Mary Rose Cook</a>
+    </div>
+   </body>
+ </html>

@@ -1,0 +1,54 @@
+body {
+  font-family: "garamond-premier-pro";
+  font-size: 18px;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern";
+  -webkit-font-feature-settings: "kern";
+  -moz-font-feature-settings: "kern";
+  -moz-font-feature-settings: "kern=1";
+
+  width: 500px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align: justify;
+}
+
+code {
+  font-family: "inconsolata";
+  font-size: 0.9em;
+}
+
+a { color:black; }
+a:visited { color:black; }
+a:hover { text-decoration:none; border:none; }
+
+h1 { font-size: 55px; font-weight:normal;
+     margin-left:auto; margin-right:auto; text-align:center;
+     margin-top:0; margin-bottom:-10px;
+   }
+h2 { font-size: 30px; line-height: 30px; font-weight:normal; margin: 0.5em 0 0.5em -2px; }
+h3 { font-size: 21px; line-height: 24px; font-weight:normal; margin-top:16px; margin-bottom:14px;  }
+h4 { font-size: 18px; line-height: 21px; font-weight:normal; margin-top:16px; margin-bottom:16px; }
+h5 { font-size: 14px; line-height: 16px; font-weight:normal; margin-top:16px; margin-bottom:16px; }
+
+p { line-height:22px; margin:0.5em 0 0.5em 0; }
+
+hr { color: #aaa; background-color:#aaa; height:1px; border:0; }
+
+.footer { width:120px; margin-left: auto; margin-right: auto;  }
+
+.dir-path { color: #777; }
+
+pre {
+  font-size: 0.9em;
+  border-top:1px solid #ddd;
+  border-bottom:1px solid #ddd;
+  padding-left:-50px;
+  margin-bottom:15px;
+  padding: 1em 0;
+  overflow: scroll;
+  font-family: "inconsolata";
+}
+
+ul { padding-left: 25px; }
+li { padding: 2px 0; }
