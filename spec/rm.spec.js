@@ -31,6 +31,18 @@ describe("rm", function() {
       expect(function() { g.rm("blah"); })
         .toThrow("1/2/blah did not match any files");
     });
+
+    it("should rm from index+disk if in idx + on disk and cwd not in repo root", function() {
+      g.init();
+      testUtil.createFilesFromTree({ a: { b: { filea: "filea" }}});
+      g.add("a/b/filea", { add: true });
+      g.commit({ m: "first" });
+
+      process.chdir("a/b");
+      g.rm("filea");
+      expect(testUtil.index().length).toEqual(0);
+      expect(fs.existsSync("filea")).toEqual(false);
+    });
   });
 
   it("should throw pathspec error if file on disk but not in index", function() {

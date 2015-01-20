@@ -179,7 +179,7 @@ var gitlet = module.exports = {
       // Otherwise, remove the files that match `path`. Delete them
       // from disk and remove from the index.
       } else {
-        filesToRm.filter(fs.existsSync).forEach(fs.unlinkSync);
+        filesToRm.map(files.workingCopyPath).filter(fs.existsSync).forEach(fs.unlinkSync);
         filesToRm.forEach(function(p) { gitlet.update_index(p, { remove: true }); });
       }
     }
@@ -1761,7 +1761,7 @@ var files = {
   },
 
   workingCopyPath: function(path) {
-    return nodePath.join(nodePath.join(this.gitletPath(), ".."), path || "");
+    return nodePath.join(nodePath.join(files.gitletPath(), ".."), path || "");
   },
 
   lsRecursive: function(path) {
