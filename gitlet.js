@@ -1969,7 +1969,10 @@ var runCli = module.exports.runCli = function (argv) {
 // Gitlet command throws, print the error message.
 if (require.main === module) {
   try {
-    console.log(runCli(process.argv));
+    var result = runCli(process.argv);
+    if (result !== undefined) {
+      console.log(result);
+    }
   } catch (e) {
     console.log(e)
   }
