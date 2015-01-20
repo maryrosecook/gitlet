@@ -47,8 +47,11 @@
 // commit -m "second"`.  This time, the commit object that is created
 // has a pointer to its parent, the first commit.
 
-// You move back to the alpha repository.  You run `git pull beta
-// master`.
+// You move back to the alpha repository.  You run `git remote add
+// beta ../beta`.  This sets the beta repository as a remote
+// repository.
+
+// You run `git pull beta master`.
 
 // Under the covers, this runs `git fetch beta master`.  This finds
 // the objects that comprise the second commit and copies them from
@@ -79,8 +82,7 @@
 // You set the contents of `number.txt` to `"third"`, run `git add
 // numbers.txt` and run `git commit -m "third"`.
 
-// You run `git remote add beta ../beta`.  This sets the beta
-// repository as a remote repository.  You run `git push beta other`.
+// You run `git push beta other`.
 // This finds the objects that comprise the third commit and copies
 // them from the alpha repository to the beta repository.  It sets the
 // content of the file at `beta/.git/refs/heads/other` to the hash of
