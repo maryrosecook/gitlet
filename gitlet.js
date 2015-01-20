@@ -1923,16 +1923,13 @@ var runCli = module.exports.runCli = function (argv) {
       .apply(null, new Array(fn.length - commandArgs.length - 1))
       .map(function() { return undefined; });
 
-  try {
-    return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
-  } catch (e) {
-    console.log(e)
-  }
+  return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
 };
 
 if (require.main === module) {
-  var result = runCli(process.argv);
-  if (result !== undefined) {
-    console.log(result);
+  try {
+    console.log(runCli(process.argv));
+  } catch (e) {
+    console.log(e)
   }
 }
