@@ -1529,25 +1529,40 @@ var workingCopy = {
   }
 };
 
+// Config module
+// -------------
+
+// This code allows the config file at `.gitlet/config` to be read and
+// written.
+
 var config = {
+
+  // **isBare()** returns true if the repository is bare.
   isBare: function() {
     return config.read().core[""].bare === "true";
   },
 
+  // **assertNotBare()** throws if the repository is bare.
   assertNotBare: function() {
     if (config.isBare()) {
       throw new Error("this operation must be run in a work tree");
     }
   },
 
+  // **read()** returns the contents of the config file as a nested JS
+  // object.
   read: function() {
     return config.strToObj(files.read(files.gitletPath("config")));
   },
 
+  // **write()** stringifies the nested JS object `configObj` and
+  // overwrites the config file with it.
   write: function(configObj) {
     files.write(files.gitletPath("config"), config.objToStr(configObj));
   },
 
+  // **strToObj()** parses the config string `str` and returns its
+  // contents as a nested JS object.
   strToObj: function(str) {
     return str.split("[")
       .map(function(item) { return item.trim(); })
@@ -1574,6 +1589,9 @@ var config = {
       }, { "remote": {} });
   },
 
+  // **objToStr()** `configObj` is a JS object that holds the config
+  // for the repository.  `objToStr()` stringifies the object and
+  // returns the string.
   objToStr: function(configObj) {
     return Object.keys(configObj)
       .reduce(function(arr, section) {
