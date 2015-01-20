@@ -923,7 +923,7 @@ var refs = {
 // Objects module
 // -----------
 
-// Objects are files in the `.git/objects/` directory.
+// Objects are files in the `.gitlet/objects/` directory.
 // - A blob object stores the content of a file.  For example, if a
 //   file called `numbers.txt` that contains `first` is added to the
 //   index, a blob called `hash(first)` will be created containinc
@@ -1161,7 +1161,7 @@ var index = {
   },
 
   // **write()** takes a JS object that represents an index and writes
-  // it to `.git/index`.
+  // it to `.gitlet/index`.
   write: function(index) {
     var indexStr = Object.keys(index)
         .map(function(k) { return k.split(",")[0] + " " + k.split(",")[1] + " " + index[k] })
@@ -1379,7 +1379,7 @@ var merge = {
   // **writeMergeMsg()** creates a message for the merge commit that
   // will potentially be created when the `giverHash` commit is merged
   // into the `receiverHash` commit.  It writes this message to
-  // `.git/MERGE_MSG`.
+  // `.gitlet/MERGE_MSG`.
   writeMergeMsg: function(receiverHash, giverHash, ref) {
     var msg = "Merge " + ref + " into " + refs.headBranchName();
 
@@ -1452,7 +1452,7 @@ var merge = {
   // motion.
   writeNonFastForwardMerge: function(receiverHash, giverHash, giverRef) {
 
-    // Write `giverHash` to `.git/MERGE_HEAD`.  This file acts as a
+    // Write `giverHash` to `.gitlet/MERGE_HEAD`.  This file acts as a
     // record of `giverHash` and as the signal that the repository is
     // in the merging state.
     refs.write("MERGE_HEAD", giverHash);
