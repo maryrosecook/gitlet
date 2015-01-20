@@ -506,10 +506,10 @@ var gitlet = module.exports = {
       } else if (merge.canFastForward(receiverHash, giverHash)) {
 
         // Fast forwarding means making the current branch reflect the
-        // commit that `giverHash` points at.  The branch is is
-        // pointed at `giverHash`.  The index is set to match the
-        // contents of the commit that `giverHash` points at.  The
-        // working copy is set to match the contents of that commit.
+        // commit that `giverHash` points at.  The branch is pointed
+        // at `giverHash`.  The index is set to match the contents of
+        // the commit that `giverHash` points at.  The working copy is
+        // set to match the contents of that commit.
         merge.writeFastForwardMerge(receiverHash, giverHash);
         return "Fast-forward";
 
@@ -1244,13 +1244,14 @@ var diff = {
       .reduce(function(ns, p) { return util.assocIn(ns, [p, dif[p].status]); }, {});
   },
 
-  // **tocDiff()** takes three JS objects that map file paths to file
-  // content.  It returns a diff between `receiver` and `giver`
-  // (see the module description for the format).  `base` is the
-  // version that is the most recent commen ancestor of the `receiver`
-  // and `giver`.  If `base` is not passed, `receiver` is used as the
-  // base.  The base is only passed when getting the diff for a merge.
-  // This is the only time the conflict status might be used.
+  // **tocDiff()** takes three JS objects that map file paths to
+  // hashes of file content.  It returns a diff between `receiver` and
+  // `giver` (see the module description for the format).  `base` is
+  // the version that is the most recent commen ancestor of the
+  // `receiver` and `giver`.  If `base` is not passed, `receiver` is
+  // used as the base.  The base is only passed when getting the diff
+  // for a merge.  This is the only time the conflict status might be
+  // used.
   tocDiff: function(receiver, giver, base) {
 
     // fileStatus() takes three strings that represent different
@@ -1364,12 +1365,21 @@ var merge = {
       .filter(function(p){return mergeDiff[p].status===diff.FILE_STATUS.CONFLICT }).length > 0
   },
 
+  // **mergeDiff()** returns a diff that represents the changes to get
+  // from the `receiverHash` commit to the `giverHash` commit.
+  // Because this is a merge diff, the function uses the common
+  // ancestor of the `receiverHash` commit and `giverHash` commit to
+  // avoid trivial conflicts.
   mergeDiff: function(receiverHash, giverHash) {
     return diff.tocDiff(objects.commitToc(receiverHash),
                         objects.commitToc(giverHash),
                         objects.commitToc(merge.commonAncestor(receiverHash, giverHash)));
   },
 
+  // **writeMergeMsg()** creates a message for the merge commit that
+  // will potentially be created when the `giverHash` commit is merged
+  // into the `receiverHash` commit.  It writes this message to
+  // `.git/MERGE_MSG`.
   writeMergeMsg: function(receiverHash, giverHash, ref) {
     var msg = "Merge " + ref + " into " + refs.headBranchName();
 
@@ -1383,6 +1393,8 @@ var merge = {
     files.write(files.gitletPath("MERGE_MSG"), msg);
   },
 
+  // **writeIndex()** merges the `giverHash` commit into the
+  // `receiverHash` commit and writes the merged content to the index.
   writeIndex: function(receiverHash, giverHash) {
     var mergeDiff = merge.mergeDiff(receiverHash, giverHash);
     index.write({});
@@ -1404,20 +1416,61 @@ var merge = {
     });
   },
 
+  // **writeFastForwardMerge()** Fast forwarding means making the
+  // current branch reflect the commit that `giverHash` points at.  No
+  // new commit is created.
   writeFastForwardMerge: function(receiverHash, giverHash) {
+
+    // Point head at `giverHash`.
     refs.write(refs.toLocalRef(refs.headBranchName()), giverHash);
+
+    // Make the index mirror the content of `giverHash`.
     index.write(index.tocToIndex(objects.commitToc(giverHash)));
+
+    // If the repo is bare, it has no working copy, so there is no
+    // more work to do.  If the repo is not bare...
     if (!config.isBare()) {
+
+      // ...Get an object that maps from file paths in the `receiverHash`
+      // commit to hashes of the files' content.  If `recevierHash` is
+      // undefined, the repository has no commits, yet, and the
+      // mapping object is empty.
       var receiverToc = receiverHash === undefined ? {} : objects.commitToc(receiverHash);
+
+      // ...and write the content of the files to the working copy.
       workingCopy.write(diff.tocDiff(receiverToc, objects.commitToc(giverHash)));
     }
   },
 
+  // **writeNonFastForwardMerge()** A non fast forward merge creates a
+  // merge commit to integrate the content of the `receiverHash`
+  // commit with the content of the `giverHash` commit.  This
+  // integration requires a merge commit because, unlike a fast
+  // forward merge, no commit yet exists that embodies the combination
+  // of these two commits.  `writeNonFastForwardMerge()` does not
+  // actually create the merge commit.  It just sets the wheels in
+  // motion.
   writeNonFastForwardMerge: function(receiverHash, giverHash, giverRef) {
+
+    // Write `giverHash` to `.git/MERGE_HEAD`.  This file acts as a
+    // record of `giverHash` and as the signal that the repository is
+    // in the merging state.
     refs.write("MERGE_HEAD", giverHash);
+
+    // Write a standard merge commit message that will be used when the
+    // merge commit is created.
     merge.writeMergeMsg(receiverHash, giverHash, giverRef);
+
+    // Merge the `receiverHash` commit with the `giverHash` commit and
+    // write the content to the index.
     merge.writeIndex(receiverHash, giverHash);
+
+    // If the repo is bare, it has no working copy, so there is no
+    // more work to do.  If the repo is not bare...
     if (!config.isBare()) {
+
+      // ...merge the `receiverHash` commit with the `giverHash` commit and
+      // write the content to the working copy.
       workingCopy.write(merge.mergeDiff(receiverHash, giverHash));
     }
   }
