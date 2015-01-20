@@ -1832,23 +1832,40 @@ var files = {
   }
 };
 
+// Status module
+// -------------
+
+// Outputs the repository status as a human-readable string.
+
 var status = {
+
+  // **toString()** returns the repository status as a human-readable
+  // string.
   toString: function() {
+
+    // **currentBranch()** returns an array of lines stating what
+    // branch the repository is on.
     function currentBranch() {
       return ["On branch " + refs.headBranchName()];
     };
 
+    // **untracked()** returns an array of lines listing the files not
+    // being tracked by Gitlet.
     function untracked() {
       var paths = fs.readdirSync(files.workingCopyPath())
           .filter(function(p) { return index.toc()[p] === undefined && p !== ".gitlet"; });
       return paths.length > 0 ? ["Untracked files:"].concat(paths) : [];
     };
 
+    // **conflicted()** returns an array of lines listing the files
+    // that are in conflict.
     function conflicted() {
       var paths = index.conflictedPaths();
       return paths.length > 0 ? ["Unmerged paths:"].concat(paths) : [];
     };
 
+    // **toBeCommitted()** returns an array of lines listing the files
+    // that have changes that will be included in the next commit.
     function toBeCommitted() {
       var headHash = refs.hash("HEAD");
       var headToc = headHash === undefined ? {} : objects.commitToc(headHash);
@@ -1857,12 +1874,17 @@ var status = {
       return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
     };
 
+    // **notStagedForCommit()** returns an array of lines listing the
+    // files that have changes that will not be included in the next
+    // commit.
     function notStagedForCommit() {
       var ns = diff.nameStatus(diff.diff());
       var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
       return entries.length > 0 ? ["Changes not staged for commit:"].concat(entries) : [];
     };
 
+    // Gather all the arrays of lines for each section.  Throw away
+    // the sections with no content. Return the rest as string.
     return [currentBranch(),
             untracked(),
             conflicted(),
