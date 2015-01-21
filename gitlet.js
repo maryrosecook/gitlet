@@ -2,10 +2,10 @@
 // ------------
 
 // This code is intended to show how Git works under the covers.  It
-// is written to be readable.  It is heavily commented.  However, my
-// most digestible explanation of how Git works is in the (unfinished)
-// essay, Git from the inside out.  It is best to read that before you
-// read the code.  Or you can read the summary of the essay below.
+// is written to be readable.  It is heavily commented.
+
+// If you would like to understand what happens when you run the basic
+// Git commands, you can read the short essay below.
 
 // Git in six hundred words
 // ------------------------
