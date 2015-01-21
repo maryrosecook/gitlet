@@ -1,3 +1,6 @@
+// [Home](/) |
+// [GitHub](https://github.com/maryrosecook/gitlet)
+
 // Introduction
 // ------------
 
