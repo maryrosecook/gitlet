@@ -454,7 +454,7 @@ var gitlet = module.exports = {
         // in `FETCH_HEAD`.  (The user can call `gitlet merge
         // FETCH_HEAD` to merge the remote version of the branch into
         // their local branch.  For more details, see
-        // [gitlet.merge()](#section-76).)
+        // [gitlet.merge()](#section-93).)
         refs.write("FETCH_HEAD", newHash + " branch " + branch + " of " + remoteUrl);
 
         // Report the result of the fetch.
@@ -890,7 +890,7 @@ var refs = {
 
   // **fetchHeadBranchToMerge()** reads the `FETCH_HEAD` file and gets
   // the hash that the remote `branchName` is pointing at.  For more
-  // information about `FETCH_HEAD` see [gitlet.fetch()](#section-63).
+  // information about `FETCH_HEAD` see [gitlet.fetch()](#section-80).
   fetchHeadBranchToMerge: function(branchName) {
     return util.lines(files.read(files.gitletPath("FETCH_HEAD")))
       .filter(function(l) { return l.match("^.+ branch " + branchName + " of"); })
