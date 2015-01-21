@@ -53,62 +53,59 @@
       But it does work.  Sort of.
     </p>
 
+    <pre><span class="output">~   <span class="prompt">$</span></span> git clone git@github.com:maryrosecook/gitlet.git
+<span class="output">~   <span class="prompt">$</span></span> alias gitlet='node ~/gitlet/gitlet.js'
 
+<span class="output">~   <span class="prompt">$</span></span> mkdir a
+<span class="output">~   <span class="prompt">$</span></span> cd a
+<span class="output">~/a <span class="prompt">$</span></span> gitlet init
 
-    <pre>
-<span class="dir-path">~   $</span> git clone git@github.com:maryrosecook/gitlet.git
-<span class="dir-path">~   $</span> alias gitlet='node ~/gitlet/gitlet.js'
+<span class="output">~/a <span class="prompt">$</span></span> echo first > number.txt
+<span class="output">~/a <span class="prompt">$</span></span> gitlet add number.txt
+<span class="output">~/a <span class="prompt">$</span></span> gitlet commit -m "first"
+      <span class="output">[master 2912d7a2] first</span>
 
-<span class="dir-path">~   $</span> mkdir a
-<span class="dir-path">~   $</span> cd a
-<span class="dir-path">~/a $</span> gitlet init
+<span class="output">~/a <span class="prompt">$</span></span> cd ..
+<span class="output">~   <span class="prompt">$</span></span> gitlet clone a b
 
-<span class="dir-path">~/a $</span> echo first > number.txt
-<span class="dir-path">~/a $</span> gitlet add number.txt
-<span class="dir-path">~/a $</span> gitlet commit -m "first"
-      [master 2912d7a2] first
+<span class="output">~   <span class="prompt">$</span></span> cd b
+<span class="output">~/b <span class="prompt">$</span></span> echo second > number.txt
+<span class="output">~/b <span class="prompt">$</span></span> gitlet add number.txt
+<span class="output">~/b <span class="prompt">$</span></span> gitlet commit -m "second"
+      <span class="output">[master 484de172] second</span>
 
-<span class="dir-path">~/a $</span> cd ..
-<span class="dir-path">~   $</span> gitlet clone a b
+<span class="output">~   <span class="prompt">$</span></span> cd ../a
+<span class="output">~/a <span class="prompt">$</span></span> gitlet remote add b ../b
+<span class="output">~/a <span class="prompt">$</span></span> gitlet fetch b master
+      <span class="output">From ../b</span>
+      <span class="output">Count 6</span>
+      <span class="output">master -> b/master</span>
+<span class="output">~/a <span class="prompt">$</span></span> gitlet merge FETCH_HEAD
+      <span class="output">Fast-forward</span>
 
-<span class="dir-path">~   $</span> cd b
-<span class="dir-path">~/b $</span> echo second > number.txt
-<span class="dir-path">~/b $</span> gitlet add number.txt
-<span class="dir-path">~/b $</span> gitlet commit -m "second"
-      [master 484de172] second
+<span class="output">~/a <span class="prompt">$</span></span> gitlet branch other
+<span class="output">~/a <span class="prompt">$</span></span> gitlet checkout other
+      <span class="output">Switched to branch other</span>
 
-<span class="dir-path">~   $</span> cd ../a
-<span class="dir-path">~/a $</span> gitlet remote add b ../b
-<span class="dir-path">~/a $</span> gitlet fetch b master
-      From ../b
-      Count 6
-      master -> b/master
-<span class="dir-path">~/a $</span> gitlet merge FETCH_HEAD
-      Fast-forward
+<span class="output">~/a <span class="prompt">$</span></span> echo third > number.txt
+<span class="output">~/a <span class="prompt">$</span></span> gitlet add number.txt
+<span class="output">~/a <span class="prompt">$</span></span> gitlet commit -m "third"
+      <span class="output">[other 656b332d] third</span>
 
-<span class="dir-path">~/a $</span> gitlet branch other
-<span class="dir-path">~/a $</span> gitlet checkout other
-      Switched to branch other
-
-<span class="dir-path">~/a $</span> echo third > number.txt
-<span class="dir-path">~/a $</span> gitlet add number.txt
-<span class="dir-path">~/a $</span> gitlet commit -m "third"
-      [other 656b332d] third
-
-<span class="dir-path">~/a $</span> gitlet push b other
-      To ../b
-      Count 9
-      other -> other</pre>
+<span class="output">~/a <span class="prompt">$</span></span> gitlet push b other
+      <span class="output">To ../b</span>
+      <span class="output">Count 9</span>
+      <span class="output">other -> other</span></pre>
 
     <h2>Running the tests</h2>
 
     Install <a href="http://nodejs.org/#download">Node.js</a>.
 
 <pre>
-<span class="dir-path">$</span> git clone git@github.com:maryrosecook/gitlet.git
-<span class="dir-path">$</span> cd gitlet
-<span class="dir-path">$</span> npm install
-<span class="dir-path">$</span> npm test
+<span class="output"><span class="prompt">$</span></span> git clone git@github.com:maryrosecook/gitlet.git
+<span class="output"><span class="prompt">$</span></span> cd gitlet
+<span class="output"><span class="prompt">$</span></span> npm install
+<span class="output"><span class="prompt">$</span></span> npm test
 </pre>
 
     <h2>Licence</h2>
