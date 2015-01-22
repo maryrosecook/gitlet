@@ -17,7 +17,7 @@ body {
 
 code {
   font-family: "inconsolata";
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 a {
@@ -78,7 +78,7 @@ hr {
 }
 
 pre {
-  font-size: 0.9em;
+  font-size: 0.85em;
   border-top:1px solid #ddd;
   border-bottom:1px solid #ddd;
   padding-left:-50px;
