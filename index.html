@@ -12,15 +12,30 @@
     <a href="https://github.com/maryrosecook/gitlet"><img style="position: absolute; top: 0; left: 0; border: 0;" src="/resources/forkme_left_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
     <h1>Gitlet</h1>
-    <center>Git implemented in JavaScript</center>
-
+    <div class="tagline">Git implemented in JavaScript</div>
     <hr/>
 
-    <p>I wrote Gitlet to demonstrate how Git works under the covers.  The code is about 1000 lines.  It's written to be readable.  It's not written to be fast or feature complete.</p>
+    <p>
+      Gitlet is an implemention of Git in JavaScript.
+    </p>
 
-    <p>It supports <code>init</code>, <code>add</code>, <code>rm</code>, <code>commit</code>, <code>branch</code>, <code>checkout</code>, <code>diff</code>, <code>remote</code>, <code>fetch</code>, <code>merge</code>, <code>push</code>, <code>pull</code>, <code>status</code> and <code>clone</code>.</p>
+    <p>
+      Over the last six years, I've become better at using Git for version control.
+      But my conceptions of the index, the working copy, the object graph and remotes have just grown fuzzier.
+    </p>
 
-    The <a href="https://github.com/maryrosecook/gitlet">code</a> is on GitHub.
+    <p>
+      Sometimes, I can only understand something by implementing it.
+      So, I wrote Gitlet, my own version of Git.
+      I pored over tutorials.
+      I read articles about internals.
+      I tried to understand how API commands work by reading the docs, then gave up and ran hurdreds of experiments on repositories and rummaged throught the <code>.git</code> directory to figure out the results.
+    </p>
+
+    <p>
+      I discovered that, if approached from the inside out, Git is easy to understand.
+      It is the product of simple ideas that, when combined, produce something very deep and beautiful.
+    </p>
 
     <h2>How to use Gitlet to understand Git</h2>
 
@@ -29,7 +44,7 @@
     </p>
 
     <p>
-      Afterwards, you can read the <a href="/docs/gitlet.html">heavily annotated Gitlet source</a>.
+      Afterwards, read the <a href="/docs/gitlet.html">heavily annotated Gitlet source</a>.
       1000 lines of code sounds intimidating.
       But it's OK.
       The annotations explain both Git and the code in great detail.
@@ -38,7 +53,11 @@
       And the implementation of the main Git commands is just 350 lines.
     </p>
 
-    <h2>Use Gitlet</h2>
+    <p>
+      The <a href="https://github.com/maryrosecook/gitlet">source code</a> is on GitHub.
+    </p>
+
+    <h2>Using Gitlet</h2>
 
     <p>
       I wrote Gitlet to explain how Git works.
@@ -91,7 +110,7 @@
       <span class="output">Count 9</span>
       <span class="output">other -> other</span></pre>
 
-    <h2>Run the tests</h2>
+    <h2>Running the tests</h2>
 
     Install <a href="http://nodejs.org/#download">Node.js</a>.
 
