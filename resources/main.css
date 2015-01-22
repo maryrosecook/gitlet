@@ -18,6 +18,8 @@ body {
 code {
   font-family: "inconsolata";
   font-size: 0.85em;
+  background-color: #eee;
+  padding: 1px 3px;
 }
 
 a {
