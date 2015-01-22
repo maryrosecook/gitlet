@@ -1,15 +1,17 @@
 body {
   font-family: "garamond-premier-pro";
-  font-size: 18px;
+  font-size: 1.25em;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern";
   -webkit-font-feature-settings: "kern";
   -moz-font-feature-settings: "kern";
   -moz-font-feature-settings: "kern=1";
 
-  width: 500px;
+  width: 600px;
   margin-left:auto;
   margin-right:auto;
+  padding: 0 10px 0 10px;
+
   text-align: justify;
 }
 
@@ -22,20 +24,17 @@ a { color:black; }
 a:visited { color:black; }
 a:hover { text-decoration:none; border:none; }
 
-h1 { font-size: 55px; font-weight:normal;
+h1 { font-size:2.8em; font-weight:normal;
      margin-left:auto; margin-right:auto; text-align:center;
      margin-top:0; margin-bottom:-10px;
    }
-h2 { font-size: 30px; line-height: 30px; font-weight:normal; margin: 0.5em 0 0.5em -1.5px; }
-h3 { font-size: 21px; line-height: 24px; font-weight:normal; margin-top:16px; margin-bottom:14px;  }
-h4 { font-size: 18px; line-height: 21px; font-weight:normal; margin-top:16px; margin-bottom:16px; }
-h5 { font-size: 14px; line-height: 16px; font-weight:normal; margin-top:16px; margin-bottom:16px; }
+h2 { font-size: 1.6em; line-height: 34px; font-weight:normal; margin: 0 0 0.2em -1.5px; padding: 0; }
+h3 { font-size: 1.4em; font-weight:normal; margin-top:16px; margin-bottom:14px;  }
+h4 { font-size: 1.2em; font-weight:normal; margin-top:16px; margin-bottom:16px; }
 
-p { line-height:23px; margin:0.5em 0 0.5em 0; }
+p { margin:0 0 0.5em 0; }
 
 hr { color: #aaa; background-color:#aaa; height:1px; border:0; }
-
-.footer { width:120px; margin-left: auto; margin-right: auto;  }
 
 pre {
   font-size: 0.9em;
@@ -59,4 +58,16 @@ pre .prompt {
 ul { padding-left: 25px; }
 li { padding: 2px 0; }
 
-.tagline { margin-left: auto; margin-right: auto; width: 208px; }
+.tagline { margin-left: auto; margin-right: auto; width: 230px; }
+
+.footer { width:120px; margin-left: auto; margin-right: auto; }
+
+@media handheld, only screen and (max-width: 767px) {
+  body {
+    width: 350px;
+  }
+
+  #fork-me {
+    display: none;
+  }
+}
