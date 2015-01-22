@@ -20,21 +20,61 @@ code {
   font-size: 0.9em;
 }
 
-a { color:black; }
-a:visited { color:black; }
-a:hover { text-decoration:none; border:none; }
+a {
+  color:black;
+}
 
-h1 { font-size:2.8em; font-weight:normal;
-     margin-left:auto; margin-right:auto; text-align:center;
-     margin-top:0; margin-bottom:-10px;
-   }
-h2 { font-size: 1.6em; line-height: 34px; font-weight:normal; margin: 0 0 0.2em -1.5px; padding: 0; }
-h3 { font-size: 1.4em; font-weight:normal; margin-top:16px; margin-bottom:14px;  }
-h4 { font-size: 1.2em; font-weight:normal; margin-top:16px; margin-bottom:16px; }
+a:visited {
+  color:black;
+}
 
-p { margin:0 0 0.5em 0; }
+a:hover {
+  text-decoration:none;
+  border:none;
+}
 
-hr { color: #aaa; background-color:#aaa; height:1px; border:0; }
+h1 {
+  font-size:2.8em;
+  font-weight:normal;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+  margin-top:0;
+  margin-bottom:-10px;
+}
+
+h2 {
+  font-size: 1.6em;
+  line-height: 34px;
+  font-weight:normal;
+  margin: 0 0 0.2em -1.5px;
+  padding: 0;
+}
+
+h3 {
+  font-size: 1.4em;
+  font-weight:normal;
+  margin-top:16px;
+  margin-bottom:14px;
+}
+
+h4 {
+  font-size: 1.2em;
+  font-weight:normal;
+  margin-top:16px;
+  margin-bottom:16px;
+}
+
+p {
+  margin:0 0 0.5em 0;
+}
+
+hr {
+  color: #aaa;
+  background-color:#aaa;
+  height:1px;
+  border:0;
+}
 
 pre {
   font-size: 0.9em;
@@ -55,12 +95,25 @@ pre .prompt {
   color: #00f;
 }
 
-ul { padding-left: 25px; }
-li { padding: 2px 0; }
+ul {
+  padding-left: 25px;
+}
 
-.tagline { margin-left: auto; margin-right: auto; width: 230px; }
+li {
+  padding: 2px 0;
+}
 
-.footer { width:120px; margin-left: auto; margin-right: auto; }
+.tagline {
+  margin-left: auto;
+  margin-right: auto;
+  width: 230px;
+}
+
+.footer {
+  width:120px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 @media handheld, only screen and (max-width: 767px) {
   body {
