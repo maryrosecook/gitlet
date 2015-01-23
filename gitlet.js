@@ -1913,8 +1913,7 @@ var status = {
                          untracked(),
                          conflicted(),
                          toBeCommitted(),
-                         notStagedForCommit()])
-               .join("\n");
+                         notStagedForCommit()]).join("\n");
   }
 };
 
