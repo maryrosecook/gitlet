@@ -879,8 +879,7 @@ var refs = {
   // `ref` to `content`.
   write: function(ref, content) {
     if (refs.isRef(ref)) {
-      var tree = util.setIn({}, ref.split(nodePath.sep).concat(content));
-      files.writeFilesFromTree(tree, files.gitletPath());
+      files.write(files.gitletPath(ref), content);
     }
   },
 
