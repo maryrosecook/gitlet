@@ -1909,15 +1909,12 @@ var status = {
 
     // Gather all the arrays of lines for each section.  Throw away
     // the sections with no content. Return the rest as string.
-    return [currentBranch(),
-            untracked(),
-            conflicted(),
-            toBeCommitted(),
-            notStagedForCommit()]
-      .reduce(function(a, section) {
-        return section.length > 0 ? a.concat(section, "") : a;
-      }, [])
-      .join("\n");
+    return util.flatten([currentBranch(),
+                         untracked(),
+                         conflicted(),
+                         toBeCommitted(),
+                         notStagedForCommit()])
+               .join("\n");
   }
 };
 
