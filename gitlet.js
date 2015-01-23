@@ -869,7 +869,7 @@ var refs = {
     return "refs/heads/" + name;
   },
 
-  // **toLocalRef()** converts `remote` and branch name `name` into a
+  // **toRemoteRef()** converts `remote` and branch name `name` into a
   // qualified remote branch ref.
   toRemoteRef: function(remote, name) {
     return "refs/remotes/" + remote + "/" + name;
