@@ -10,7 +10,7 @@
 
   "bin": {
     "gitlet": "./gitlet.js"
-  }
+  },
 
   "scripts": {
     "test": "node_modules/jasmine-node/bin/jasmine-node spec/"
