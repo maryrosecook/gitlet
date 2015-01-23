@@ -312,7 +312,7 @@ var gitlet = module.exports = {
       // abort.
       var paths = diff.changedFilesCommitWouldOverwrite(toHash);
       if (paths.length > 0) {
-        throw new Error("local changes would be lost\n" + paths.join("\n") + "\n")
+        throw new Error("local changes would be lost\n" + paths.join("\n") + "\n");
 
       // Otherwise, perform the checkout.
       } else {
@@ -675,7 +675,7 @@ var gitlet = module.exports = {
 
       // If `targetPath` doesn't exist, create it.
       if (!fs.existsSync(targetPath)) {
-        fs.mkdirSync(targetPath)
+        fs.mkdirSync(targetPath);
       }
 
       // In the directory for the new remote repository...
@@ -1974,6 +1974,6 @@ if (require.main === module) {
       console.log(result);
     }
   } catch (e) {
-    console.log(e)
+    console.log(e);
   }
 }
