@@ -947,7 +947,7 @@ var refs = {
 // Objects are files in the `.gitlet/objects/` directory.
 // - A blob object stores the content of a file.  For example, if a
 //   file called `numbers.txt` that contains `first` is added to the
-//   index, a blob called `hash(first)` will be created containinc
+//   index, a blob called `hash(first)` will be created containing
 //   `"first"`.
 // - A tree object stores a list of files and directories in a
 //   directory in the repository.  Entries in the list for files point
