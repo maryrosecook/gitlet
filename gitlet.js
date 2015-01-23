@@ -1803,7 +1803,7 @@ var files = {
     }
   },
 
-  // **gitletPath()** returns a string made by concatenating `path` to
+  // **workingCopyPath()** returns a string made by concatenating `path` to
   // the absolute path of the root of the repository.
   workingCopyPath: function(path) {
     return nodePath.join(nodePath.join(files.gitletPath(), ".."), path || "");
