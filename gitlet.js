@@ -1957,11 +1957,10 @@ var runCli = module.exports.runCli = function (argv) {
   var commandFnName = rawArgs._[2].replace(/-/g, "_");
   var fn = gitlet[commandFnName];
   var commandArgs = rawArgs._.slice(3);
-  var unspecifiedArgs = Array
-      .apply(null, new Array(fn.length - commandArgs.length - 1))
-      .map(function() { return undefined; });
-
-  return fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
+  while (commandArgs.length < fn.length - 1) {
+    commandArgs.push(undefined);
+  }
+  return fn.apply(gitlet, commandArgs.concat(rawArgs));
 };
 
 // If `gitlet.js` is run as a script, pass the `process.argv` array of
