@@ -1953,14 +1953,14 @@ var parseOptions = function(argv) {
 // corresponding Gitlet command and returns the string returned by the
 // command.
 var runCli = module.exports.runCli = function (argv) {
-  var rawArgs = parseOptions(argv);
-  var commandFnName = rawArgs._[2].replace(/-/g, "_");
+  var opts = parseOptions(argv);
+  var commandFnName = opts._[2].replace(/-/g, "_");
   var fn = gitlet[commandFnName];
-  var commandArgs = rawArgs._.slice(3);
+  var commandArgs = opts._.slice(3);
   while (commandArgs.length < fn.length - 1) {
     commandArgs.push(undefined);
   }
-  return fn.apply(gitlet, commandArgs.concat(rawArgs));
+  return fn.apply(gitlet, commandArgs.concat(opts));
 };
 
 // If `gitlet.js` is run as a script, pass the `process.argv` array of
