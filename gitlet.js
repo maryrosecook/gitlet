@@ -1867,25 +1867,11 @@ var status = {
   // string.
   toString: function() {
 
-    // **currentBranch()** returns an array of lines stating what
-    // branch the repository is on.
-    function currentBranch() {
-      return ["On branch " + refs.headBranchName()];
-    };
-
     // **untracked()** returns an array of lines listing the files not
     // being tracked by Gitlet.
     function untracked() {
-      var paths = fs.readdirSync(files.workingCopyPath())
+      return fs.readdirSync(files.workingCopyPath())
           .filter(function(p) { return index.toc()[p] === undefined && p !== ".gitlet"; });
-      return paths.length > 0 ? ["Untracked files:"].concat(paths) : [];
-    };
-
-    // **conflicted()** returns an array of lines listing the files
-    // that are in conflict.
-    function conflicted() {
-      var paths = index.conflictedPaths();
-      return paths.length > 0 ? ["Unmerged paths:"].concat(paths) : [];
     };
 
     // **toBeCommitted()** returns an array of lines listing the files
@@ -1894,8 +1880,7 @@ var status = {
       var headHash = refs.hash("HEAD");
       var headToc = headHash === undefined ? {} : objects.commitToc(headHash);
       var ns = diff.nameStatus(diff.tocDiff(headToc, index.toc()));
-      var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
-      return entries.length > 0 ? ["Changes to be committed:"].concat(entries) : [];
+      return Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
     };
 
     // **notStagedForCommit()** returns an array of lines listing the
@@ -1903,17 +1888,22 @@ var status = {
     // commit.
     function notStagedForCommit() {
       var ns = diff.nameStatus(diff.diff());
-      var entries = Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
-      return entries.length > 0 ? ["Changes not staged for commit:"].concat(entries) : [];
+      return Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
     };
 
-    // Gather all the arrays of lines for each section.  Throw away
-    // the sections with no content. Return the rest as string.
-    return util.flatten([currentBranch(),
-                         untracked(),
-                         conflicted(),
-                         toBeCommitted(),
-                         notStagedForCommit()]).join("\n");
+    // **listing()** keeps lines (prefixed by heading) only if it's nonempty.
+    function listing(heading, lines) {
+      return lines.length > 0 ? [heading, lines] : [];
+    }
+
+    // Gather all the sections, keeping only nonempty ones, and flatten them
+    // together into a string.
+    return util.flatten(["On branch " + refs.headBranchName(),
+                         listing("Untracked files:", untracked()),
+                         listing("Unmerged paths:", index.conflictedPaths()),
+                         listing("Changes to be committed:", toBeCommitted()),
+                         listing("Changes not staged for commit:", notStagedForCommit())])
+        .join("\n");
   }
 };
 
