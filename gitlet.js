@@ -1759,7 +1759,7 @@ var files = {
     });
   },
 
-  // **rmEmptyDirs()** recursively remotes all the empty directories
+  // **rmEmptyDirs()** recursively removes all the empty directories
   // inside `path`.
   rmEmptyDirs: function(path) {
     if (fs.statSync(path).isDirectory()) {
