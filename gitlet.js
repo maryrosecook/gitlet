@@ -878,7 +878,7 @@ var refs = {
   // **write()** sets the content of the file for the qualified ref
   // `ref` to `content`.
   write: function(ref, content) {
-    if(refs.isRef(ref)) {
+    if (refs.isRef(ref)) {
       var tree = util.setIn({}, ref.split(nodePath.sep).concat(content));
       files.writeFilesFromTree(tree, files.gitletPath());
     }
@@ -886,7 +886,7 @@ var refs = {
 
   // **rm()** removes the file for the qualified ref `ref`.
   rm: function(ref) {
-    if(refs.isRef(ref)) {
+    if (refs.isRef(ref)) {
       fs.unlinkSync(files.gitletPath(ref));
     }
   },
