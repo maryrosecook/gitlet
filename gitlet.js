@@ -1952,7 +1952,7 @@ var parseOptions = function(argv) {
 // is run as a script.  It parses the command line arguments, runs the
 // corresponding Gitlet command and returns the string returned by the
 // command.
-var runCli = module.exports.runCli = function (argv) {
+var runCli = module.exports.runCli = function(argv) {
   var opts = parseOptions(argv);
   var commandFnName = opts._[2].replace(/-/g, "_");
   var fn = gitlet[commandFnName];
