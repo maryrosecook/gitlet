@@ -811,8 +811,8 @@ var refs = {
   // syntax.
   isRef: function(ref) {
     return ref !== undefined &&
-      (ref.match("refs/heads/[A-Za-z-]+") ||
-       ref.match("refs/remotes/[A-Za-z-]+/[A-Za-z-]+") ||
+      (ref.match("^refs/heads/[A-Za-z-]+$") ||
+       ref.match("^refs/remotes/[A-Za-z-]+/[A-Za-z-]+$") ||
        ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1);
   },
 
