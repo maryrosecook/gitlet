@@ -28,7 +28,7 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <p><a href="/">Home</a> |
-<a href="https://github.com/maryrosecook/gitlet">Github</a></p>
+<a href="https://github.com/maryrosecook/gitlet">GitHub</a></p>
 
             </div>
             
@@ -1053,7 +1053,7 @@ abort.</p>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> paths = diff.changedFilesCommitWouldOverwrite(toHash);
       <span class="hljs-keyword">if</span> (paths.length &gt; <span class="hljs-number">0</span>) {
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"local changes would be lost\n"</span> + paths.join(<span class="hljs-string">"\n"</span>) + <span class="hljs-string">"\n"</span>)</pre></div></div>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"local changes would be lost\n"</span> + paths.join(<span class="hljs-string">"\n"</span>) + <span class="hljs-string">"\n"</span>);</pre></div></div>
             
         </li>
         
@@ -2195,7 +2195,7 @@ repository.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!fs.existsSync(targetPath)) {
-        fs.mkdirSync(targetPath)
+        fs.mkdirSync(targetPath);
       }</pre></div></div>
             
         </li>
@@ -2629,8 +2629,8 @@ syntax.</p>
             
             <div class="content"><div class='highlight'><pre>  isRef: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(ref)</span> {</span>
     <span class="hljs-keyword">return</span> ref !== <span class="hljs-literal">undefined</span> &amp;&amp;
-      (ref.match(<span class="hljs-string">"refs/heads/[A-Za-z-]+"</span>) ||
-       ref.match(<span class="hljs-string">"refs/remotes/[A-Za-z-]+/[A-Za-z-]+"</span>) ||
+      (ref.match(<span class="hljs-string">"^refs/heads/[A-Za-z-]+$"</span>) ||
+       ref.match(<span class="hljs-string">"^refs/remotes/[A-Za-z-]+/[A-Za-z-]+$"</span>) ||
        [<span class="hljs-string">"HEAD"</span>, <span class="hljs-string">"FETCH_HEAD"</span>, <span class="hljs-string">"MERGE_HEAD"</span>].indexOf(ref) !== -<span class="hljs-number">1</span>);
   },</pre></div></div>
             
@@ -2792,7 +2792,7 @@ local branch ref.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-161">&#182;</a>
               </div>
-              <p><strong>toLocalRef()</strong> converts <code>remote</code> and branch name <code>name</code> into a
+              <p><strong>toRemoteRef()</strong> converts <code>remote</code> and branch name <code>name</code> into a
 qualified remote branch ref.</p>
 
             </div>
@@ -2816,9 +2816,8 @@ qualified remote branch ref.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  write: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(ref, content)</span> {</span>
-    <span class="hljs-keyword">if</span>(refs.isRef(ref)) {
-      <span class="hljs-keyword">var</span> tree = util.setIn({}, ref.split(nodePath.sep).concat(content));
-      files.writeFilesFromTree(tree, files.gitletPath());
+    <span class="hljs-keyword">if</span> (refs.isRef(ref)) {
+      files.write(files.gitletPath(ref), content);
     }
   },</pre></div></div>
             
@@ -2836,7 +2835,7 @@ qualified remote branch ref.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  rm: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(ref)</span> {</span>
-    <span class="hljs-keyword">if</span>(refs.isRef(ref)) {
+    <span class="hljs-keyword">if</span> (refs.isRef(ref)) {
       fs.unlinkSync(files.gitletPath(ref));
     }
   },</pre></div></div>
@@ -3026,7 +3025,7 @@ currently pointing at.</p>
 <ul>
 <li>A blob object stores the content of a file.  For example, if a
 file called <code>numbers.txt</code> that contains <code>first</code> is added to the
-index, a blob called <code>hash(first)</code> will be created containinc
+index, a blob called <code>hash(first)</code> will be created containing
 <code>&quot;first&quot;</code>.</li>
 <li>A tree object stores a list of files and directories in a
 directory in the repository.  Entries in the list for files point
@@ -5084,7 +5083,7 @@ the tree.  <code>tree</code> format is: <code>{ a: { b: { c: &quot;filecontent&q
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-279">&#182;</a>
               </div>
-              <p><strong>rmEmptyDirs()</strong> recursively remotes all the empty directories
+              <p><strong>rmEmptyDirs()</strong> recursively removes all the empty directories
 inside <code>path</code>.</p>
 
             </div>
@@ -5163,7 +5162,7 @@ the absolute path of the <code>.gitlet</code> directory of the repository.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-282">&#182;</a>
               </div>
-              <p><strong>gitletPath()</strong> returns a string made by concatenating <code>path</code> to
+              <p><strong>workingCopyPath()</strong> returns a string made by concatenating <code>path</code> to
 the absolute path of the root of the repository.</p>
 
             </div>
@@ -5321,13 +5320,14 @@ string.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-290">&#182;</a>
               </div>
-              <p><strong>currentBranch()</strong> returns an array of lines stating what
-branch the repository is on.</p>
+              <p><strong>untracked()</strong> returns an array of lines listing the files not
+being tracked by Gitlet.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">currentBranch</span><span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">return</span> [<span class="hljs-string">"On branch "</span> + refs.headBranchName()];
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">untracked</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> fs.readdirSync(files.workingCopyPath())
+          .filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> index.toc()[p] === <span class="hljs-literal">undefined</span> &amp;&amp; p !== <span class="hljs-string">".gitlet"</span>; });
     };</pre></div></div>
             
         </li>
@@ -5339,15 +5339,16 @@ branch the repository is on.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-291">&#182;</a>
               </div>
-              <p><strong>untracked()</strong> returns an array of lines listing the files not
-being tracked by Gitlet.</p>
+              <p><strong>toBeCommitted()</strong> returns an array of lines listing the files
+that have changes that will be included in the next commit.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">untracked</span><span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">var</span> paths = fs.readdirSync(files.workingCopyPath())
-          .filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> index.toc()[p] === <span class="hljs-literal">undefined</span> &amp;&amp; p !== <span class="hljs-string">".gitlet"</span>; });
-      <span class="hljs-keyword">return</span> paths.length &gt; <span class="hljs-number">0</span> ? [<span class="hljs-string">"Untracked files:"</span>].concat(paths) : [];
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toBeCommitted</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> headHash = refs.hash(<span class="hljs-string">"HEAD"</span>);
+      <span class="hljs-keyword">var</span> headToc = headHash === <span class="hljs-literal">undefined</span> ? {} : objects.commitToc(headHash);
+      <span class="hljs-keyword">var</span> ns = diff.nameStatus(diff.tocDiff(headToc, index.toc()));
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(ns).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> ns[p] + <span class="hljs-string">" "</span> + p; });
     };</pre></div></div>
             
         </li>
@@ -5359,14 +5360,15 @@ being tracked by Gitlet.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-292">&#182;</a>
               </div>
-              <p><strong>conflicted()</strong> returns an array of lines listing the files
-that are in conflict.</p>
+              <p><strong>notStagedForCommit()</strong> returns an array of lines listing the
+files that have changes that will not be included in the next
+commit.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">conflicted</span><span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">var</span> paths = index.conflictedPaths();
-      <span class="hljs-keyword">return</span> paths.length &gt; <span class="hljs-number">0</span> ? [<span class="hljs-string">"Unmerged paths:"</span>].concat(paths) : [];
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">notStagedForCommit</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> ns = diff.nameStatus(diff.diff());
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(ns).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> ns[p] + <span class="hljs-string">" "</span> + p; });
     };</pre></div></div>
             
         </li>
@@ -5378,18 +5380,13 @@ that are in conflict.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-293">&#182;</a>
               </div>
-              <p><strong>toBeCommitted()</strong> returns an array of lines listing the files
-that have changes that will be included in the next commit.</p>
+              <p><strong>listing()</strong> keeps <code>lines</code> (prefixed by <code>heading</code>) only if it’s nonempty.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toBeCommitted</span><span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">var</span> headHash = refs.hash(<span class="hljs-string">"HEAD"</span>);
-      <span class="hljs-keyword">var</span> headToc = headHash === <span class="hljs-literal">undefined</span> ? {} : objects.commitToc(headHash);
-      <span class="hljs-keyword">var</span> ns = diff.nameStatus(diff.tocDiff(headToc, index.toc()));
-      <span class="hljs-keyword">var</span> entries = <span class="hljs-built_in">Object</span>.keys(ns).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> ns[p] + <span class="hljs-string">" "</span> + p; });
-      <span class="hljs-keyword">return</span> entries.length &gt; <span class="hljs-number">0</span> ? [<span class="hljs-string">"Changes to be committed:"</span>].concat(entries) : [];
-    };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">listing</span><span class="hljs-params">(heading, lines)</span> {</span>
+      <span class="hljs-keyword">return</span> lines.length &gt; <span class="hljs-number">0</span> ? [heading, lines] : [];
+    }</pre></div></div>
             
         </li>
         
@@ -5400,17 +5397,19 @@ that have changes that will be included in the next commit.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-294">&#182;</a>
               </div>
-              <p><strong>notStagedForCommit()</strong> returns an array of lines listing the
-files that have changes that will not be included in the next
-commit.</p>
+              <p>Gather all the sections, keeping only nonempty ones, and flatten them
+together into a string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">notStagedForCommit</span><span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">var</span> ns = diff.nameStatus(diff.diff());
-      <span class="hljs-keyword">var</span> entries = <span class="hljs-built_in">Object</span>.keys(ns).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> ns[p] + <span class="hljs-string">" "</span> + p; });
-      <span class="hljs-keyword">return</span> entries.length &gt; <span class="hljs-number">0</span> ? [<span class="hljs-string">"Changes not staged for commit:"</span>].concat(entries) : [];
-    };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> util.flatten([<span class="hljs-string">"On branch "</span> + refs.headBranchName(),
+                         listing(<span class="hljs-string">"Untracked files:"</span>, untracked()),
+                         listing(<span class="hljs-string">"Unmerged paths:"</span>, index.conflictedPaths()),
+                         listing(<span class="hljs-string">"Changes to be committed:"</span>, toBeCommitted()),
+                         listing(<span class="hljs-string">"Changes not staged for commit:"</span>, notStagedForCommit())])
+        .join(<span class="hljs-string">"\n"</span>);
+  }
+};</pre></div></div>
             
         </li>
         
@@ -5421,22 +5420,9 @@ commit.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-295">&#182;</a>
               </div>
-              <p>Gather all the arrays of lines for each section.  Throw away
-the sections with no content. Return the rest as string.</p>
+              <h2 id="running-gitlet-js-as-a-script">Running gitlet.js as a script</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> [currentBranch(),
-            untracked(),
-            conflicted(),
-            toBeCommitted(),
-            notStagedForCommit()]
-      .reduce(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(a, section)</span> {</span>
-        <span class="hljs-keyword">return</span> section.length &gt; <span class="hljs-number">0</span> ? a.concat(section, <span class="hljs-string">""</span>) : a;
-      }, [])
-      .join(<span class="hljs-string">"\n"</span>);
-  }
-};</pre></div></div>
             
         </li>
         
@@ -5447,8 +5433,7 @@ the sections with no content. Return the rest as string.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-296">&#182;</a>
               </div>
-              <h2 id="running-gitlet-js-as-a-script">Running gitlet.js as a script</h2>
-
+              
             </div>
             
         </li>
@@ -5460,7 +5445,10 @@ the sections with no content. Return the rest as string.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-297">&#182;</a>
               </div>
-              
+              <p>Gitlet can be used from the command line.  For example, executing
+<code>node gitlet.js commit -m woo</code> would commit to the current repo
+with the message “woo”.</p>
+
             </div>
             
         </li>
@@ -5471,21 +5459,6 @@ the sections with no content. Return the rest as string.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-298">&#182;</a>
-              </div>
-              <p>Gitlet can be used from the command line.  For example, executing
-<code>node gitlet.js commit -m woo</code> would commit to the current repo
-with the message “woo”.</p>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-299">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-299">&#182;</a>
               </div>
               <p><strong>parseOptions()</strong> takes the <code>process.argv</code> object passed when
 gitlet.js is run as a script. It returns an object that contains
@@ -5513,11 +5486,11 @@ the parsed parameters to be formed into a Gitlet command.</p>
         </li>
         
         
-        <li id="section-300">
+        <li id="section-299">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-300">&#182;</a>
+                <a class="pilcrow" href="#section-299">&#182;</a>
               </div>
               <p><strong>runCli()</strong> takes the <code>process.argv</code> object passed when gitlet.js
 is run as a script.  It parses the command line arguments, runs the
@@ -5526,26 +5499,25 @@ command.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> runCli = module.exports.runCli = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(argv)</span> {</span>
-  <span class="hljs-keyword">var</span> rawArgs = parseOptions(argv);
-  <span class="hljs-keyword">var</span> commandFnName = rawArgs._[<span class="hljs-number">2</span>].replace(<span class="hljs-regexp">/-/g</span>, <span class="hljs-string">"_"</span>);
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> runCli = module.exports.runCli = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(argv)</span> {</span>
+  <span class="hljs-keyword">var</span> opts = parseOptions(argv);
+  <span class="hljs-keyword">var</span> commandFnName = opts._[<span class="hljs-number">2</span>].replace(<span class="hljs-regexp">/-/g</span>, <span class="hljs-string">"_"</span>);
   <span class="hljs-keyword">var</span> fn = gitlet[commandFnName];
-  <span class="hljs-keyword">var</span> commandArgs = rawArgs._.slice(<span class="hljs-number">3</span>);
-  <span class="hljs-keyword">var</span> unspecifiedArgs = <span class="hljs-built_in">Array</span>
-      .apply(<span class="hljs-literal">null</span>, <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(fn.length - commandArgs.length - <span class="hljs-number">1</span>))
-      .map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span> <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>; });
-
-  <span class="hljs-keyword">return</span> fn.apply(gitlet, commandArgs.concat(unspecifiedArgs).concat(rawArgs));
+  <span class="hljs-keyword">var</span> commandArgs = opts._.slice(<span class="hljs-number">3</span>);
+  <span class="hljs-keyword">while</span> (commandArgs.length &lt; fn.length - <span class="hljs-number">1</span>) {
+    commandArgs.push(<span class="hljs-literal">undefined</span>);
+  }
+  <span class="hljs-keyword">return</span> fn.apply(gitlet, commandArgs.concat(opts));
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-301">
+        <li id="section-300">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-301">&#182;</a>
+                <a class="pilcrow" href="#section-300">&#182;</a>
               </div>
               <p>If <code>gitlet.js</code> is run as a script, pass the <code>process.argv</code> array of
 script arguments to <code>runCli()</code> so they can be used to run a Gitlet
@@ -5561,7 +5533,7 @@ Gitlet command throws, print the error message.</p>
       console.log(result);
     }
   } <span class="hljs-keyword">catch</span> (e) {
-    console.log(e)
+    console.log(e);
   }
 }</pre></div></div>
             
