@@ -1890,7 +1890,7 @@ var status = {
       return Object.keys(ns).map(function(p) { return ns[p] + " " + p; });
     };
 
-    // **listing()** keeps lines (prefixed by heading) only if it's nonempty.
+    // **listing()** keeps `lines` (prefixed by `heading`) only if it's nonempty.
     function listing(heading, lines) {
       return lines.length > 0 ? [heading, lines] : [];
     }
