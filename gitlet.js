@@ -478,7 +478,7 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    // Get the `receiverHash`, the hash of the commit that thet
+    // Get the `receiverHash`, the hash of the commit that the
     // current branch is on.
     var receiverHash = refs.hash("HEAD");
 
