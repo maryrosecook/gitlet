@@ -14,7 +14,21 @@ If you would like to understand what happens when you run the basic Git commands
 
 Afterwards, read the [heavily annotated Gitlet source](http://gitlet.maryrosecook.com/docs/gitlet.html). 1000 lines of code sounds intimidating. But it's OK. The annotations explain both Git and the code in great detail. The code mirrors the terminology of the Git command line interface, so it should be approachable. And the implementation of the main Git commands is just 350 lines.
 
-The [source code](https://github.com/maryrosecook/gitlet) is on GitHub. I wrote an article, [Introducing Gitlet](http://maryrosecook.com/blog/post/introducing-gitlet), about what it was like to write the code.
+I wrote an article, [Introducing Gitlet](http://maryrosecook.com/blog/post/introducing-gitlet), about the process of writing the code.
+
+## Getting the code
+
+Clone it from GitHub
+
+```bash
+$ git clone git@github.com:maryrosecook/gitlet.git
+```
+
+Or install it from [npm](https://www.npmjs.com/package/gitlet).
+
+```bash
+$ npm install -g gitlet
+```
 
 ## Using Gitlet for version control
 
