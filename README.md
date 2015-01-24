@@ -18,7 +18,7 @@ I wrote an article, [Introducing Gitlet](http://maryrosecook.com/blog/post/intro
 
 ## Getting the code
 
-Clone it from GitHub
+Clone it from [GitHub](https://github.com/maryrosecook/gitlet)
 
 ```bash
 $ git clone git@github.com:maryrosecook/gitlet.git
