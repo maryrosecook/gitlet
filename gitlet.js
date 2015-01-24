@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // [Home](/) |
 // [GitHub](https://github.com/maryrosecook/gitlet)
 
