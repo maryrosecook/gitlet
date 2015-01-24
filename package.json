@@ -2,7 +2,7 @@
   "name": "gitlet",
   "description": "Git implemented in JavaScript.",
   "author": "Mary Rose Cook <maryrosecook@maryrosecook.com> (http://maryrosecook.com/)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/maryrosecook/gitlet.git"
