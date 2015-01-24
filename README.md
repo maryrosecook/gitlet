@@ -80,5 +80,5 @@ $ npm test
 
 ## Contact
 
-Mary Rose Cook - http://maryrosecook.com
-I made this while working at [Hacker School](https://www.hackerschool.com)
+Mary Rose Cook - http://maryrosecook.com<br/>
+I made this while working at [Hacker School](https://www.hackerschool.com).
