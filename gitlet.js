@@ -1940,8 +1940,11 @@ var parseOptions = function(argv) {
 var runCli = module.exports.runCli = function(argv) {
   var opts = parseOptions(argv);
   var commandFnName = opts._[2].replace(/-/g, "_");
-  var fn = gitlet[commandFnName];
   var commandArgs = opts._.slice(3);
+  var fn = gitlet[commandFnName];
+  if (!fn) {
+    throw new Error("'" + commandFnName + "' is not a Gitlet command.");
+  }
   while (commandArgs.length < fn.length - 1) {
     commandArgs.push(undefined);
   }
