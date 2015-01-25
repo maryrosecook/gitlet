@@ -2811,7 +2811,7 @@ qualified remote branch ref.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  toRemoteRef: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(remote, name)</span> {</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-string">"refs/remotes/"</span> + remote + <span class="hljs-string">"/"</span> + name;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"refs/remotes/"</span> + remote + nodePath.sep + name;
   },</pre></div></div>
             
         </li>
@@ -5482,7 +5482,7 @@ the parsed parameters to be formed into a Gitlet command.</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> parseOptions = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(argv)</span> {</span>
   <span class="hljs-keyword">var</span> name;
   <span class="hljs-keyword">return</span> argv.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(opts, arg)</span> {</span>
-    <span class="hljs-keyword">if</span> (arg.match(<span class="hljs-string">"^-"</span>)) {
+    <span class="hljs-keyword">if</span> (arg.match(<span class="hljs-regexp">/^-/</span>)) {
       name = arg.replace(<span class="hljs-regexp">/^-+/</span>, <span class="hljs-string">""</span>);
       opts[name] = <span class="hljs-literal">true</span>;
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (name !== <span class="hljs-literal">undefined</span>) {
@@ -5514,13 +5514,25 @@ command.</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> runCli = module.exports.runCli = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(argv)</span> {</span>
   <span class="hljs-keyword">var</span> opts = parseOptions(argv);
-  <span class="hljs-keyword">var</span> commandFnName = opts._[<span class="hljs-number">2</span>].replace(<span class="hljs-regexp">/-/g</span>, <span class="hljs-string">"_"</span>);
-  <span class="hljs-keyword">var</span> fn = gitlet[commandFnName];
-  <span class="hljs-keyword">var</span> commandArgs = opts._.slice(<span class="hljs-number">3</span>);
-  <span class="hljs-keyword">while</span> (commandArgs.length &lt; fn.length - <span class="hljs-number">1</span>) {
-    commandArgs.push(<span class="hljs-literal">undefined</span>);
+  <span class="hljs-keyword">var</span> commandName = opts._[<span class="hljs-number">2</span>];
+
+  <span class="hljs-keyword">if</span> (commandName === <span class="hljs-literal">undefined</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"you must specify a Gitlet command to run"</span>);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">var</span> commandFnName = commandName.replace(<span class="hljs-regexp">/-/g</span>, <span class="hljs-string">"_"</span>);
+    <span class="hljs-keyword">var</span> fn = gitlet[commandFnName];
+
+    <span class="hljs-keyword">if</span> (fn === <span class="hljs-literal">undefined</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"'"</span> + commandFnName + <span class="hljs-string">"' is not a Gitlet command"</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">var</span> commandArgs = opts._.slice(<span class="hljs-number">3</span>);
+      <span class="hljs-keyword">while</span> (commandArgs.length &lt; fn.length - <span class="hljs-number">1</span>) {
+        commandArgs.push(<span class="hljs-literal">undefined</span>);
+      }
+
+      <span class="hljs-keyword">return</span> fn.apply(gitlet, commandArgs.concat(opts));
+    }
   }
-  <span class="hljs-keyword">return</span> fn.apply(gitlet, commandArgs.concat(opts));
 };</pre></div></div>
             
         </li>
@@ -5546,7 +5558,7 @@ Gitlet command throws, print the error message.</p>
       console.log(result);
     }
   } <span class="hljs-keyword">catch</span> (e) {
-    console.log(e);
+    console.log(e.toString());
   }
 }</pre></div></div>
             
