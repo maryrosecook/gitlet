@@ -872,7 +872,7 @@ var refs = {
   // **toRemoteRef()** converts `remote` and branch name `name` into a
   // qualified remote branch ref.
   toRemoteRef: function(remote, name) {
-    return "refs/remotes/" + remote + "/" + name;
+    return "refs/remotes/" + remote + nodePath.sep + name;
   },
 
   // **write()** sets the content of the file for the qualified ref
