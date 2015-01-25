@@ -1939,13 +1939,25 @@ var parseOptions = function(argv) {
 // command.
 var runCli = module.exports.runCli = function(argv) {
   var opts = parseOptions(argv);
-  var commandFnName = opts._[2].replace(/-/g, "_");
-  var fn = gitlet[commandFnName];
-  var commandArgs = opts._.slice(3);
-  while (commandArgs.length < fn.length - 1) {
-    commandArgs.push(undefined);
+  var commandName = opts._[2];
+
+  if (commandName === undefined) {
+    throw new Error("you must specify a Gitlet command to run");
+  } else {
+    var commandFnName = commandName.replace(/-/g, "_");
+    var fn = gitlet[commandFnName];
+
+    if (fn === undefined) {
+      throw new Error("'" + commandFnName + "' is not a Gitlet command");
+    } else {
+      var commandArgs = opts._.slice(3);
+      while (commandArgs.length < fn.length - 1) {
+        commandArgs.push(undefined);
+      }
+
+      return fn.apply(gitlet, commandArgs.concat(opts));
+    }
   }
-  return fn.apply(gitlet, commandArgs.concat(opts));
 };
 
 // If `gitlet.js` is run as a script, pass the `process.argv` array of
