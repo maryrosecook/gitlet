@@ -1919,7 +1919,7 @@ var status = {
 var parseOptions = function(argv) {
   var name;
   return argv.reduce(function(opts, arg) {
-    if (arg.match("^-")) {
+    if (arg.match(/^-/)) {
       name = arg.replace(/^-+/, "");
       opts[name] = true;
     } else if (name !== undefined) {
