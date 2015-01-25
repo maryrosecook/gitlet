@@ -12,6 +12,18 @@ describe("gitlet cli", function() {
     });
   });
 
+  it("should throw if no command passed", function() {
+    g.init();
+    expect(function() { g.runCli(["node", "gitlet"]); })
+      .toThrow("you must specify a Gitlet command to run")
+  });
+
+  it("should throw if no command passed", function() {
+    g.init();
+    expect(function() { g.runCli(["node", "gitlet", "nonexistent"]); })
+      .toThrow("'nonexistent' is not a Gitlet command")
+  });
+
   describe("running each gitlet command under normal circs", function() {
     it("gitlet init a repo", function() {
       g.runCli(["node", "gitlet", "init"]);
