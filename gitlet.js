@@ -1787,6 +1787,7 @@ var files = {
         var potentialConfigFile = nodePath.join(dir, "config");
         var potentialGitletPath = nodePath.join(dir, ".gitlet");
         if (fs.existsSync(potentialConfigFile) &&
+            fs.statSync(potentialConfigFile).isFile() &&
             files.read(potentialConfigFile).match(/\[core\]/)) {
           return dir;
         } else if (fs.existsSync(potentialGitletPath)) {
