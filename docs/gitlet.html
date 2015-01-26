@@ -798,7 +798,7 @@ merge state, use the message passed with <code>-m</code>.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> m = merge.isMergeInProgress() ? files.read(files.gitletPath(<span class="hljs-string">"MERGE_MSG"</span>)) : opts.m</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> m = merge.isMergeInProgress() ? files.read(files.gitletPath(<span class="hljs-string">"MERGE_MSG"</span>)) : opts.m;</pre></div></div>
             
         </li>
         
@@ -5558,7 +5558,7 @@ Gitlet command throws, print the error message.</p>
       console.log(result);
     }
   } <span class="hljs-keyword">catch</span> (e) {
-    console.log(e.toString());
+    console.error(e.toString());
   }
 }</pre></div></div>
             
