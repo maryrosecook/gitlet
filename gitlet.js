@@ -1971,6 +1971,6 @@ if (require.main === module) {
       console.log(result);
     }
   } catch (e) {
-    console.log(e.toString());
+    console.error(e.toString());
   }
 }
