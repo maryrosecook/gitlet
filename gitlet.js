@@ -224,7 +224,7 @@ var gitlet = module.exports = {
         // If the repository is in the merge state, use a pre-written
         // merge commit message.  If the repository is not in the
         // merge state, use the message passed with `-m`.
-        var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m
+        var m = merge.isMergeInProgress() ? files.read(files.gitletPath("MERGE_MSG")) : opts.m;
 
         // Write the new commit to the `objects` directory.
         var commitHash = objects.writeCommit(treeHash, m, refs.commitParentHashes());
