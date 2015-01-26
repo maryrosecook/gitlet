@@ -1738,7 +1738,8 @@ var files = {
   // **write()** writes `content` to file at `path`, overwriting
   // anything that is already there.
   write: function(path, content) {
-    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), "/");
+    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)),
+                             files.root());
   },
 
   // **writeFilesFromTree()** takes `tree` of files as a nested JS obj
@@ -1790,7 +1791,7 @@ var files = {
           return dir;
         } else if (fs.existsSync(potentialGitletPath)) {
           return potentialGitletPath;
-        } else if (dir !== "/") {
+        } else if (dir !== files.root()) {
           return gitletDir(nodePath.join(dir, ".."));
         }
       }
@@ -1852,6 +1853,10 @@ var files = {
     });
 
     return obj;
+  },
+
+  root: function() {
+    return require("os").platform == "win32" ? process.cwd().split(path.sep)[0] : "/";
   }
 };
 
