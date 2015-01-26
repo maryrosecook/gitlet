@@ -1773,7 +1773,7 @@ var files = {
   // **read()** returns the contents of the file at `path` as a
   // string.  It returns `undefined` if the file doesn't exist.
   read: function(path) {
-    if (fs.existsSync(path)) {
+    if (fs.existsSync(path) && fs.statSync(path).isFile()) {
       return fs.readFileSync(path, "utf8");
     }
   },
