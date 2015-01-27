@@ -1738,6 +1738,7 @@ var files = {
   // **write()** writes `content` to file at `path`, overwriting
   // anything that is already there.
   write: function(path, content) {
+    console.log(path)
     files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)),
                              files.root());
   },
