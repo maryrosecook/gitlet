@@ -5,7 +5,7 @@ var testUtil = require("./test-util");
 ddescribe("add", function() {
   beforeEach(testUtil.initTestDataDir);
 
-  iit("should throw if not in repo", function() {
+  it("should throw if not in repo", function() {
     expect(function() { g.add(); })
       .toThrow("not a Gitlet repository");
   });
