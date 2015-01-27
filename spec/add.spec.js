@@ -17,7 +17,7 @@ ddescribe("add", function() {
   });
 
   describe("pathspec matching", function() {
-    iit("should throw rel path if in root and pathspec does not match files", function() {
+    it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
         .toThrow("blah did not match any files");
