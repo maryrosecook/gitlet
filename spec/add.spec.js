@@ -2,7 +2,7 @@ var fs = require("fs");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
-ddescribe("add", function() {
+describe("add", function() {
   beforeEach(testUtil.initTestDataDir);
 
   it("should throw if not in repo", function() {
@@ -16,7 +16,7 @@ ddescribe("add", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  describe("pathspec matching", function() {
+  ddescribe("pathspec matching", function() {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
