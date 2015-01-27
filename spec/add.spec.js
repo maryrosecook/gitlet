@@ -2,10 +2,10 @@ var fs = require("fs");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
-ddescribe("add", function() {
+describe("add", function() {
   beforeEach(testUtil.initTestDataDir);
 
-  it("should throw if not in repo", function() {
+  iit("should throw if not in repo", function() {
     expect(function() { g.add(); })
       .toThrow("not a Gitlet repository");
   });
