@@ -1,4 +1,5 @@
 var fs = require("fs");
+var nodePath = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -28,7 +29,7 @@ describe("add", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.add("blah"); })
-        .toThrow("1/2/blah did not match any files");
+        .toThrow(nodePath.normalize("1/2/blah") + " did not match any files");
     });
   });
 
