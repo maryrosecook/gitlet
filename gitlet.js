@@ -1782,6 +1782,7 @@ var files = {
   // **gitletPath()** returns a string made by concatenating `path` to
   // the absolute path of the `.gitlet` directory of the repository.
   gitletPath: function(path) {
+    console.log(path)
     function gitletDir(dir) {
       if (fs.existsSync(dir)) {
         var potentialConfigFile = nodePath.join(dir, "config");
