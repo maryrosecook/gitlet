@@ -1799,6 +1799,7 @@ var files = {
     };
 
     var gDir = gitletDir(process.cwd());
+    console.log(gDir)
     if (gDir !== undefined) {
       return nodePath.join(gDir, path || "");
     }
