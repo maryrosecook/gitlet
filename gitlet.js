@@ -1791,7 +1791,7 @@ var files = {
           return dir;
         } else if (fs.existsSync(potentialGitletPath)) {
           return potentialGitletPath;
-        } else if (dir !== "/") {
+        } else if (dir !== files.root()) {
           return gitletDir(nodePath.join(dir, ".."));
         }
       }
@@ -1853,6 +1853,10 @@ var files = {
     });
 
     return obj;
+  },
+
+  root: function() {
+    return require("os").platform() == "win32" ? process.cwd().split(nodePath.sep)[0] : "/";
   }
 };
 
