@@ -1748,7 +1748,7 @@ var files = {
   writeFilesFromTree: function(tree, prefix) {
     Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
-      console.log(path)
+      console.log(prefix, name, files.root())
       if (util.isString(tree[name])) {
         fs.writeFileSync(path, tree[name]);
       } else {
