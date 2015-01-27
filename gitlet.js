@@ -813,6 +813,7 @@ var refs = {
     return ref !== undefined &&
       (ref.match("^refs/heads/[A-Za-z-]+$") ||
        ref.match("^refs/remotes/[A-Za-z-]+/[A-Za-z-]+$") ||
+       ref.match("^refs/remotes/[A-Za-z-]+\\\\[A-Za-z-]+$") ||
        ["HEAD", "FETCH_HEAD", "MERGE_HEAD"].indexOf(ref) !== -1);
   },
 
@@ -1746,7 +1747,12 @@ var files = {
   // the tree.  `tree` format is: `{ a: { b: { c: "filecontent" }}}`
   writeFilesFromTree: function(tree, prefix) {
     Object.keys(tree).forEach(function(name) {
-      var path = nodePath.join(prefix, name);
+      var path;
+      if (prefix == "/" && process.platform == "win32") {
+        path = nodePath.join(name, prefix);
+      } else {
+        path = nodePath.join(prefix, name);
+      }
       if (util.isString(tree[name])) {
         fs.writeFileSync(path, tree[name]);
       } else {
