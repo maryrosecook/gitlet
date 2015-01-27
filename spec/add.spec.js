@@ -10,7 +10,7 @@ ddescribe("add", function() {
       .toThrow("not a Gitlet repository");
   });
 
-  it("should throw if in bare repo", function() {
+  iit("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.add(); })
       .toThrow("this operation must be run in a work tree");
