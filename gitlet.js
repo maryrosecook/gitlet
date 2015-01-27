@@ -1852,6 +1852,10 @@ var files = {
     });
 
     return obj;
+  },
+
+  root: function() {
+    return require("os").platform == "win32" ? process.cwd().split(path.sep)[0] : "/";
   }
 };
 
@@ -1971,6 +1975,6 @@ if (require.main === module) {
       console.log(result);
     }
   } catch (e) {
-    console.error(e.toString());
+    console.error(e.stack)
   }
 }
