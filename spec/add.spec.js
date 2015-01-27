@@ -17,19 +17,21 @@ describe("add", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  ddescribe("pathspec matching", function() {
+  ddescribe("pathspec matching", function(done) {
     it("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
         .toThrow("blah did not match any files");
+      done();
     });
 
-    it("should throw rel path if not in root and pathspec does not match files", function() {
+    it("should throw rel path if not in root and pathspec does not match files", function(done) {
       g.init();
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.add("blah"); })
         .toThrow(nodePath.normalize("1/2/blah") + " did not match any files");
+      done();
     });
   });
 
