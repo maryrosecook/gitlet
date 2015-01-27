@@ -1746,10 +1746,10 @@ var files = {
   // and writes all those files to disk taking `prefix` as the root of
   // the tree.  `tree` format is: `{ a: { b: { c: "filecontent" }}}`
   writeFilesFromTree: function(tree, prefix) {
-    // console.log(tree)
+    console.log(tree)
     Object.keys(tree).forEach(function(name) {
       var path = nodePath.join(prefix, name);
-      // console.log(prefix, name)
+      console.log(prefix, name)
       if (util.isString(tree[name])) {
         fs.writeFileSync(path, tree[name]);
       } else {
