@@ -133,7 +133,6 @@ var gitlet = module.exports = {
 
   // **add()** adds files that match `path` to the index.
   add: function(path, _) {
-    console.log(files.inRepo())
     files.assertInRepo();
     config.assertNotBare();
 
