@@ -6,8 +6,7 @@ describe("add", function() {
   beforeEach(testUtil.initTestDataDir);
 
   iit("should throw if not in repo", function() {
-    expect(function() { g.add(); })
-      .toThrow("not a Gitlet repository");
+    g.add();
   });
 
   it("should throw if in bare repo", function() {
