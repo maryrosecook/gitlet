@@ -1133,7 +1133,7 @@ var index = {
       .reduce(function(obj, k) { return util.setIn(obj, [k.split(",")[0], idx[k]]); }, {});
   },
 
-  // **isFileInConflict()** returns true the file for `path` is in
+  // **isFileInConflict()** returns true if the file for `path` is in
   // conflict.
   isFileInConflict: function(path) {
     return index.hasFile(path, 2);
