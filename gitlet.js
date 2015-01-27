@@ -1790,7 +1790,6 @@ var files = {
             files.read(potentialConfigFile).match(/\[core\]/)) {
           return dir;
         } else if (fs.existsSync(potentialGitletPath)) {
-          console.log(potentialGitletPath)
           return potentialGitletPath;
         } else if (dir !== files.root()) {
           return gitletDir(nodePath.join(dir, ".."));
