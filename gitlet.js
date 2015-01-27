@@ -133,6 +133,7 @@ var gitlet = module.exports = {
 
   // **add()** adds files that match `path` to the index.
   add: function(path, _) {
+    console.log(files.inRepo())
     files.assertInRepo();
     config.assertNotBare();
 
@@ -1783,7 +1784,6 @@ var files = {
   // the absolute path of the `.gitlet` directory of the repository.
   gitletPath: function(path) {
     function gitletDir(dir) {
-      console.log(dir)
       if (fs.existsSync(dir)) {
         var potentialConfigFile = nodePath.join(dir, "config");
         var potentialGitletPath = nodePath.join(dir, ".gitlet");
