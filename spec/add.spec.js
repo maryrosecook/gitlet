@@ -10,14 +10,14 @@ ddescribe("add", function() {
       .toThrow("not a Gitlet repository");
   });
 
-  iit("should throw if in bare repo", function() {
+  it("should throw if in bare repo", function() {
     g.init({ bare: true });
     expect(function() { g.add(); })
       .toThrow("this operation must be run in a work tree");
   });
 
   describe("pathspec matching", function() {
-    it("should throw rel path if in root and pathspec does not match files", function() {
+    iit("should throw rel path if in root and pathspec does not match files", function() {
       g.init();
       expect(function() { g.add("blah"); })
         .toThrow("blah did not match any files");
