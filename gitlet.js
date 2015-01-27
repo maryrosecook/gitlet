@@ -1859,7 +1859,7 @@ var files = {
 
   root: function() {
     return require("os").platform() == "win32" ?
-      process.cwd().split(nodePath.sep)[0] + "\\" :
+      process.cwd().split(nodePath.sep)[0] + nodePath.sep + nodePath.sep :
       "/";
   }
 };
