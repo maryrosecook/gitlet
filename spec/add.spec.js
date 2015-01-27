@@ -17,8 +17,8 @@ describe("add", function() {
       .toThrow("this operation must be run in a work tree");
   });
 
-  ddescribe("pathspec matching", function(done) {
-    it("should throw rel path if in root and pathspec does not match files", function() {
+  ddescribe("pathspec matching", function() {
+    it("should throw rel path if in root and pathspec does not match files", function(done) {
       g.init();
       expect(function() { g.add("blah"); })
         .toThrow("blah did not match any files");
