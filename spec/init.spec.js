@@ -28,6 +28,12 @@ describe("init", function() {
                         "[core]\n  bare = false\n");
   });
 
+  it("should not crash when config is a directory", function() {
+    var dir = __dirname + "/testData/repo1/";
+    fs.mkdirSync(dir + 'config');
+    g.init();
+  });
+
   describe("bare repos", function() {
     it("should put all gitlet files and folders in root if specify bare", function() {
       g.init({ bare: true });
