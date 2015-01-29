@@ -11,6 +11,7 @@ body {
   margin-left:auto;
   margin-right:auto;
   padding: 0 10px 0 10px;
+  color: #333;
 
   text-align: justify;
 }
@@ -23,11 +24,11 @@ code {
 }
 
 a {
-  color:black;
+  color:#444;
 }
 
 a:visited {
-  color:black;
+  color:#444;
 }
 
 a:hover {
