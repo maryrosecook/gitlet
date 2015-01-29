@@ -114,7 +114,8 @@ li {
 }
 
 .footer {
-  width:350px;
+  text-align: center;
+  width:310px;
   margin-left: auto;
   margin-right: auto;
 }
