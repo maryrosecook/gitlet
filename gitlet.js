@@ -1738,7 +1738,8 @@ var files = {
   // **write()** writes `content` to file at `path`, overwriting
   // anything that is already there.
   write: function(path, content) {
-    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), "/");
+    var prefix = require("os").platform() == "win32" ? "." : "/";
+    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), prefix);
   },
 
   // **writeFilesFromTree()** takes `tree` of files as a nested JS obj
