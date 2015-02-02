@@ -1,4 +1,5 @@
 var fs = require("fs");
+var p = require('path');
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -21,7 +22,7 @@ describe("branch", function() {
   it("should create new branch pointed at HEAD when call branch w branch name", function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
-    g.add("1/filea");
+    g.add(p.normalize("1/filea"));
     g.commit({ m: "first" });
     g.branch("woo");
     testUtil.expectFile(".gitlet/refs/heads/woo", "3606c2bf");
@@ -30,7 +31,7 @@ describe("branch", function() {
   it("should should leave master pointed at orig hash after branching", function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
-    g.add("1/filea");
+    g.add(p.normalize("1/filea"));
     g.commit({ m: "first" });
     testUtil.expectFile(".gitlet/refs/heads/master", "3606c2bf");
     g.branch("woo");
@@ -40,7 +41,7 @@ describe("branch", function() {
   it("should return list of branches when called with no args", function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
-    g.add("1/filea");
+    g.add(p.normalize("1/filea"));
     g.commit({ m: "first" });
     g.branch("woo");
     g.branch("boo");
@@ -50,7 +51,7 @@ describe("branch", function() {
   it("should prevent branching if branch already exists", function() {
     g.init();
     testUtil.createFilesFromTree({ "1": { "filea": "filea"}});
-    g.add("1/filea");
+    g.add(p.normalize("1/filea"));
     g.commit({ m: "first" });
     g.branch("woo");
     expect(function() { g.branch("woo") })
@@ -60,7 +61,7 @@ describe("branch", function() {
   it("should be able to branch on bare repo", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "first" });
 
     process.chdir("../");

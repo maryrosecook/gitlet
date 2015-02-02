@@ -1,4 +1,5 @@
 var fs = require("fs");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -34,8 +35,8 @@ describe("gitlet cli", function() {
     it("gitlet add a file", function() {
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       g.init();
-      g.runCli(["node", "gitlet", "add", "1/filea"]);
-      expect(testUtil.index()[0].path).toEqual("1/filea");
+      g.runCli(["node", "gitlet", "add", p.normalize("1/filea")]);
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1/filea"));
       expect(testUtil.index().length).toEqual(1);
     });
 
@@ -44,7 +45,7 @@ describe("gitlet cli", function() {
 
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       g.init();
-      g.add("1/filea");
+      g.add(p.normalize("1/filea"));
       g.commit({ m: "blah" });
       g.runCli(["node", "gitlet", "branch", "woo"]);
       testUtil.expectFile(".gitlet/refs/heads/woo", "48cbafcc");
@@ -57,7 +58,7 @@ describe("gitlet cli", function() {
 
       testUtil.createFilesFromTree({ "1": { filea: "filea" }});
       g.init();
-      g.add("1/filea");
+      g.add(p.normalize("1/filea"));
       g.runCli(["node", "gitlet", "commit", "-m", "blah"]);
       testUtil.expectFile(".gitlet/refs/heads/master", "48cbafcc");
 

@@ -1,5 +1,5 @@
 var fs = require("fs");
-var nodePath = require("path");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -22,7 +22,7 @@ describe("status", function() {
   it("should say what current branch is", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "first" });
     g.branch("other");
     g.checkout("other");
@@ -94,50 +94,53 @@ describe("status", function() {
   it("should mention changes to be committed", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "a" });
-    g.add("1b/fileb");
+    g.add(p.normalize("1b/fileb"));
     g.commit({ m: "b" });
 
     fs.writeFileSync("1a/filea", "aa");
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
 
-    g.rm("1b/fileb");
+    g.rm(p.normalize("1b/fileb"));
 
-    g.add("1b/2b/filec");
+    g.add(p.normalize("1b/2b/filec"));
 
-    expect(g.status()).toMatch("Changes to be committed:\n" +
-                               "M 1a/filea\n" +
-                               "D 1b/fileb\n" +
-                               "A 1b/2b/filec");
+    expect(g.status()).toMatch(("Changes to be committed:\n" +
+                                "M " + p.normalize("1a/filea") + "\n" +
+                                "D " + p.normalize("1b/fileb") + "\n" +
+                                "A " + p.normalize("1b/2b/filec"))
+                                .replace(/\\/g, "\\\\"));
   });
 
   it("should mention changes to be committed when no commits yet", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1a/filea");
-    g.add("1b/fileb");
+    g.add(p.normalize("1a/filea"));
+    g.add(p.normalize("1b/fileb"));
 
-    expect(g.status()).toMatch("Changes to be committed:\n" +
-                               "A 1a/filea\n" +
-                               "A 1b/fileb");
+    expect(g.status()).toMatch(("Changes to be committed:\n" +
+                                "A " + p.normalize("1a/filea") + "\n" +
+                                "A " + p.normalize("1b/fileb"))
+                                .replace(/\\/g, "\\\\"));
   });
 
   it("should mention unstaged changes", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "a" });
-    g.add("1b/fileb");
+    g.add(p.normalize("1b/fileb"));
     g.commit({ m: "b" });
 
     fs.writeFileSync("1a/filea", "aa");
 
-    g.rm("1b/fileb");
+    g.rm(p.normalize("1b/fileb"));
 
-    g.add("1b/2b/filec");
+    g.add(p.normalize("1b/2b/filec"));
 
-    expect(g.status()).toMatch("Changes not staged for commit:\n" +
-                               "M 1a/filea");
+    expect(g.status()).toMatch(("Changes not staged for commit:\n" +
+                                "M " + p.normalize("1a/filea"))
+                                .replace(/\\/g, "\\\\"));
   });
 });

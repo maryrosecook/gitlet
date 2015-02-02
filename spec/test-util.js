@@ -66,7 +66,7 @@ var testUtil = module.exports = {
 
   initTestDataDir: function() {
     var testDataDir = __dirname + "/testData";
-
+    process.chdir(__dirname)
     if (fs.existsSync(testDataDir)) {
       testUtil.rmdirSyncRecursive(testDataDir);
     }

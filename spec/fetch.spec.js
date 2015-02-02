@@ -1,5 +1,5 @@
 var fs = require("fs");
-var nodePath = require("path");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -32,7 +32,7 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
@@ -50,9 +50,9 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
@@ -63,8 +63,8 @@ describe("fetch", function() {
     ["17a11ad4", "63e0627e", "17653b6d", "5ceba65", // first commit
      "16b35712", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
-        var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
-        testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
+        var exp = fs.readFileSync(p.join(remoteRepo, ".gitlet", "objects", h), "utf8");
+        testUtil.expectFile(p.join(".gitlet/objects", h), exp);
       });
   });
 
@@ -75,9 +75,9 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
@@ -88,8 +88,8 @@ describe("fetch", function() {
     ["17a11ad4", "63e0627e", "17653b6d", "5ceba65", // first commit
      "16b35712", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
-        var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
-        testUtil.expectFile(nodePath.join("objects", h), exp);
+        var exp = fs.readFileSync(p.join(remoteRepo, ".gitlet", "objects", h), "utf8");
+        testUtil.expectFile(p.join("objects", h), exp);
       });
   });
 
@@ -100,7 +100,7 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
     var remoteMasterHash = fs.readFileSync(".gitlet/refs/heads/master", "utf8");
 
@@ -120,12 +120,12 @@ describe("fetch", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
     gr.branch("other");
 
     gr.checkout("other");
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
@@ -136,8 +136,8 @@ describe("fetch", function() {
     ["17a11ad4", "63e0627e", "17653b6d", "5ceba65", // first commit
      "16b35712", "794ea686", "507bf191", "5ceba66"] // second commit
       .forEach(function(h) {
-        var exp = fs.readFileSync(nodePath.join(remoteRepo, ".gitlet", "objects", h), "utf8");
-        testUtil.expectFile(nodePath.join(".gitlet/objects", h), exp);
+        var exp = fs.readFileSync(p.join(remoteRepo, ".gitlet", "objects", h), "utf8");
+        testUtil.expectFile(p.join(".gitlet/objects", h), exp);
       });
   });
 
@@ -149,7 +149,7 @@ describe("fetch", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
     gr.branch("other");
     var remoteOtherHash = fs.readFileSync(".gitlet/refs/heads/other", "utf8");
@@ -169,13 +169,13 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
     gl.init();
     gl.remote("add", "origin", remoteRepo);
-    expect(gl.fetch("origin", "master")).toMatch("From " + remoteRepo);
+    expect(gl.fetch("origin", "master")).toEqual("From " + remoteRepo + "\nCount 4\nmaster -> origin/master\n");
   });
 
   it("should announce total objects transferred from remote (all of them)", function() {
@@ -185,7 +185,7 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
@@ -201,7 +201,7 @@ describe("fetch", function() {
 
     gr.init();
     testUtil.createStandardFileStructure();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
@@ -209,7 +209,7 @@ describe("fetch", function() {
     gl.remote("add", "origin", remoteRepo);
 
     process.chdir(remoteRepo);
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
@@ -224,7 +224,7 @@ describe("fetch", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
@@ -244,9 +244,9 @@ describe("fetch", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
@@ -281,13 +281,13 @@ describe("fetch", function() {
       gr.init();
       testUtil.createStandardFileStructure();
 
-      gr.add("1a/filea");
+      gr.add(p.normalize("1a/filea"));
       gr.commit({ m: "first" });
 
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gl.add("1a/filea");
+      gl.add(p.normalize("1a/filea"));
       gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
 
       gl.remote("add", "origin", remoteRepo);
@@ -306,14 +306,14 @@ describe("fetch", function() {
       gr.init();
       testUtil.createStandardFileStructure();
 
-      gr.add("1a/filea");
+      gr.add(p.normalize("1a/filea"));
       gr.commit({ m: "first" });
       gr.branch("other");
 
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gl.add("1a/filea");
+      gl.add(p.normalize("1a/filea"));
       gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
       gl.remote("add", "origin", remoteRepo);
 
@@ -333,14 +333,14 @@ describe("fetch", function() {
       gr.init();
       testUtil.createStandardFileStructure();
 
-      gr.add("1a/filea");
+      gr.add(p.normalize("1a/filea"));
       gr.commit({ m: "first" });
       gr.branch("other");
 
       process.chdir(localRepo);
       gl.init();
       testUtil.createStandardFileStructure();
-      gl.add("1a/filea");
+      gl.add(p.normalize("1a/filea"));
       gl.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
       gl.remote("add", "origin", remoteRepo);
 
@@ -358,7 +358,7 @@ describe("fetch", function() {
       gr.init();
       testUtil.createStandardFileStructure();
 
-      gr.add("1a/filea");
+      gr.add(p.normalize("1a/filea"));
       gr.commit({ m: "first" });
 
       process.chdir(localRepo);

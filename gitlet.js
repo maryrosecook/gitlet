@@ -872,14 +872,14 @@ var refs = {
   // **toRemoteRef()** converts `remote` and branch name `name` into a
   // qualified remote branch ref.
   toRemoteRef: function(remote, name) {
-    return "refs/remotes/" + remote + nodePath.sep + name;
+    return "refs/remotes/" + remote + "/" + name;
   },
 
   // **write()** sets the content of the file for the qualified ref
   // `ref` to `content`.
   write: function(ref, content) {
     if (refs.isRef(ref)) {
-      files.write(files.gitletPath(ref), content);
+      files.write(files.gitletPath(nodePath.normalize(ref)), content);
     }
   },
 
@@ -1217,7 +1217,7 @@ var index = {
   matchingFiles: function(pathSpec) {
     var searchPath = files.pathFromRepoRoot(pathSpec);
     return Object.keys(index.toc())
-      .filter(function(p) { return p.match("^" + searchPath); });
+      .filter(function(p) { return p.match("^" + searchPath.replace(/\\/g, "\\\\")); });
   }
 };
 

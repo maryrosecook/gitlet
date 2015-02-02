@@ -1,4 +1,5 @@
 var fs = require("fs");
+var p = require('path');
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -28,7 +29,7 @@ describe("add", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1/2");
       expect(function() { g.add("blah"); })
-        .toThrow("1/2/blah did not match any files");
+        .toThrow(p.normalize("1/2/blah") + " did not match any files");
     });
   });
 
@@ -37,8 +38,8 @@ describe("add", function() {
       // regression test
       g.init();
       testUtil.createFilesFromTree({ "1": { "filea": "filea" }});
-      g.add("1/filea");
-      expect(testUtil.index()[0].path).toEqual("1/filea");
+      g.add(p.normalize("1/filea"));
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1/filea"));
       expect(testUtil.index().length).toEqual(1);
     });
 
@@ -46,9 +47,9 @@ describe("add", function() {
       g.init();
       testUtil.createStandardFileStructure();
       g.add("1b");
-      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
-      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
-      expect(testUtil.index()[2].path).toEqual("1b/fileb");
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1b/2b/3b/4b/filed"));
+      expect(testUtil.index()[1].path).toEqual(p.normalize("1b/2b/filec"));
+      expect(testUtil.index()[2].path).toEqual(p.normalize("1b/fileb"));
       expect(testUtil.index().length).toEqual(3);
     });
 
@@ -56,9 +57,9 @@ describe("add", function() {
       g.init();
       testUtil.createStandardFileStructure();
       g.add("1b");
-      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
-      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
-      expect(testUtil.index()[2].path).toEqual("1b/fileb");
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1b/2b/3b/4b/filed"));
+      expect(testUtil.index()[1].path).toEqual(p.normalize("1b/2b/filec"));
+      expect(testUtil.index()[2].path).toEqual(p.normalize("1b/fileb"));
       expect(testUtil.index().length).toEqual(3);
     });
 
@@ -66,13 +67,13 @@ describe("add", function() {
       g.init();
       testUtil.createStandardFileStructure();
 
-      g.add("1b/2b");
-      expect(testUtil.index()[0].path).toEqual("1b/2b/3b/4b/filed");
-      expect(testUtil.index()[1].path).toEqual("1b/2b/filec");
+      g.add(p.normalize("1b/2b"));
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1b/2b/3b/4b/filed"));
+      expect(testUtil.index()[1].path).toEqual(p.normalize("1b/2b/filec"));
       expect(testUtil.index().length).toEqual(2);
 
       g.add("1a");
-      expect(testUtil.index()[2].path).toEqual("1a/filea");
+      expect(testUtil.index()[2].path).toEqual(p.normalize("1a/filea"));
       expect(testUtil.index().length).toEqual(3);
     });
 
@@ -82,10 +83,10 @@ describe("add", function() {
 
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       fs.unlinkSync("1a/filea");
-      expect(function() { g.add("1a/filea"); })
-        .toThrow("1a/filea did not match any files");
+      expect(function() { g.add(p.normalize("1a/filea")); })
+        .toThrow(p.normalize("1a/filea") + " did not match any files");
     });
   });
 });

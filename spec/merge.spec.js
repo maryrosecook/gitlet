@@ -1,5 +1,5 @@
 var fs = require("fs");
-var nodePath = require("path");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -45,9 +45,9 @@ describe("merge", function() {
       it("should throw if try to merge when head detached", function() {
         testUtil.createStandardFileStructure();
         g.init();
-        g.add("1a/filea");
+        g.add(p.normalize("1a/filea"));
         g.commit({ m: "first" });
-        g.add("1b/fileb");
+        g.add(p.normalize("1b/fileb"));
         g.commit({ m: "second" });
         g.checkout("17a11ad4");
 
@@ -107,53 +107,53 @@ describe("merge", function() {
           testUtil.createStandardFileStructure();
           g.init();
 
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "first" });
 
           g.branch("other");
 
           fs.writeFileSync("1a/filea", "fileachange1");
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "second" });
           g.checkout("other");
 
           fs.writeFileSync("1a/filea", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n" + p.normalize("1a/filea") + "\n");
         });
 
         it("should throw if file has changes even if make it same as giver", function() {
           testUtil.createStandardFileStructure();
           g.init();
 
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "first" });
 
           g.branch("other");
 
           fs.writeFileSync("1a/filea", "fileachange1");
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "second" });
           g.checkout("other");
 
           fs.writeFileSync("1a/filea", "fileachange1");
 
           expect(function() { g.merge("master"); })
-            .toThrow("local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n" + p.normalize("1a/filea") + "\n");
         });
 
         it("should throw if file has staged changes w/o common orig content with c/o", function() {
           testUtil.createStandardFileStructure();
           g.init();
 
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "first" });
 
           g.branch("other");
 
           fs.writeFileSync("1a/filea", "fileachange1");
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
           g.commit({ m: "second" });
           g.checkout("other");
 
@@ -161,16 +161,16 @@ describe("merge", function() {
           g.add("1a/filea");
 
           expect(function() { g.merge("master"); })
-            .toThrow("local changes would be lost\n1a/filea\n");
+            .toThrow("local changes would be lost\n" + p.normalize("1a/filea") + "\n");
         });
 
         it("should list all files that would be overwritten when throwing", function() {
           testUtil.createStandardFileStructure();
           g.init();
 
-          g.add("1a/filea");
-          g.add("1b/fileb");
-          g.add("1b/2b/filec");
+          g.add(p.normalize("1a/filea"));
+          g.add(p.normalize("1b/fileb"));
+          g.add(p.normalize("1b/2b/filec"));
           g.commit({ m: "first" });
 
           g.branch("other");
@@ -178,9 +178,9 @@ describe("merge", function() {
           fs.writeFileSync("1a/filea", "fileachange1");
           fs.writeFileSync("1b/fileb", "fileachange1");
           fs.writeFileSync("1b/2b/filec", "fileachange1");
-          g.add("1a/filea");
-          g.add("1b/fileb");
-          g.add("1b/2b/filec");
+          g.add(p.normalize("1a/filea"));
+          g.add(p.normalize("1b/fileb"));
+          g.add(p.normalize("1b/2b/filec"));
           g.commit({ m: "second" });
           g.checkout("other");
 
@@ -189,7 +189,7 @@ describe("merge", function() {
           fs.writeFileSync("1b/2b/filec", "fileachange2");
 
           expect(function() { g.merge("master"); })
-            .toThrow("local changes would be lost\n1a/filea\n1b/fileb\n1b/2b/filec\n");
+            .toThrow("local changes would be lost\n" + p.normalize("1a/filea") + "\n" + p.normalize("1b/fileb") + "\n" + p.normalize("1b/2b/filec") + "\n");
         });
       });
     });
@@ -293,11 +293,11 @@ describe("merge", function() {
 
         g.add("fileb");
         g.commit({ m: "second" });
-        g.add("c1/filec");
+        g.add(p.normalize("c1/filec"));
         g.commit({ m: "third" });
-        g.add("d1/filed");
+        g.add(p.normalize("d1/filed"));
         g.commit({ m: "fourth" });
-        g.add("e1/e2/filee");
+        g.add(p.normalize("e1/e2/filee"));
         g.commit({ m: "fifth" });
 
         var masterHash = testUtil.refHash("refs/heads/master");
@@ -383,7 +383,7 @@ describe("merge", function() {
           g.commit({ m: "b" });
 
           g.checkout("other");
-          g.add("c1/filec");
+          g.add(p.normalize("c1/filec"));
           g.commit({ m: "c" });
         });
 
@@ -505,14 +505,14 @@ describe("merge", function() {
           g.commit({ m: "b" });
 
           g.checkout("other");
-          g.add("c1/filec");
+          g.add(p.normalize("c1/filec"));
           g.commit({ m: "c" });
 
           g.merge("master");
 
           expect(testUtil.index().length).toEqual(3);
           expect(testUtil.index()[0].path).toEqual("filea");
-          expect(testUtil.index()[1].path).toEqual("c1/filec");
+          expect(testUtil.index()[1].path).toEqual(p.normalize("c1/filec"));
           expect(testUtil.index()[2].path).toEqual("fileb");
 
           testUtil.expectFile("filea", "filea");
@@ -522,7 +522,7 @@ describe("merge", function() {
           var index = testUtil.index();
           expect(Object.keys(index).length).toEqual(3);
           expect(index[0].path).toEqual("filea");
-          expect(index[1].path).toEqual("c1/filec");
+          expect(index[1].path).toEqual(p.normalize("c1/filec"));
           expect(index[2].path).toEqual("fileb");
         });
       });

@@ -1,5 +1,5 @@
 var fs = require("fs");
-var nodePath = require("path");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -38,13 +38,13 @@ describe("push", function() {
     process.chdir(localRepo);
     testUtil.createStandardFileStructure();
     gl.init();
-    gl.add("1a/filea");
+    gl.add(p.normalize("1a/filea"));
     gl.commit({ m: "first" });
 
     process.chdir(remoteRepo);
     gr.remote("add", "origin", localRepo);
     gr.fetch("origin", "master");
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     expect(function() { gr.push("origin", "master"); })
@@ -58,7 +58,7 @@ describe("push", function() {
 
     testUtil.createStandardFileStructure();
     gr.init();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
     gr.branch("other");
     gr.checkout("other");
@@ -77,14 +77,14 @@ describe("push", function() {
 
     testUtil.createStandardFileStructure();
     gl.init();
-    gl.add("1a/filea");
+    gl.add(p.normalize("1a/filea"));
     gl.commit({ m: "first" });
 
     process.chdir("../");
     g.clone(localRepo, remoteRepo, { bare: true });
 
     process.chdir(localRepo);
-    gl.add("1b/fileb");
+    gl.add(p.normalize("1b/fileb"));
     gl.commit({ m: "second" });
     gl.remote("add", "origin", "../repo2");
 
@@ -98,7 +98,7 @@ describe("push", function() {
 
     testUtil.createStandardFileStructure();
     g.init();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "first" });
     g.branch("other");
     g.checkout("other");
@@ -109,14 +109,14 @@ describe("push", function() {
     process.chdir(remoteRepo);
     fs.mkdirSync("1b");
     fs.writeFileSync("1b/fileb", "fileb");
-    g.add("1b/fileb");
+    g.add(p.normalize("1b/fileb"));
     g.commit({ m: "second" });
 
     process.chdir("../");
     g.clone(remoteRepo, bareRepo, { bare: true });
 
     process.chdir(bareRepo);
-    g.remote("add", "local", "../repo1");
+    g.remote("add", "local", p.normalize("../repo1"));
 
     expect(fs.readFileSync("config", "utf8").split("\n")[5]).toEqual("  bare = true");
     expect(g.push("local", "master")).toMatch("master -> master");
@@ -130,7 +130,7 @@ describe("push", function() {
 
       testUtil.createStandardFileStructure();
       gl.init();
-      gl.add("1a/filea");
+      gl.add(p.normalize("1a/filea"));
       gl.commit({ m: "first" });
       gl.branch("other");
       gl.checkout("other");
@@ -141,13 +141,13 @@ describe("push", function() {
       process.chdir(remoteRepo);
       fs.mkdirSync("1b");
       fs.writeFileSync("1b/fileb");
-      gr.add("1b/fileb");
+      gr.add(p.normalize("1b/fileb"));
       gr.commit({ m: "second" });
     });
 
     it("should return report of what happened", function() {
       expect(g.push("origin", "master", { f: true }))
-        .toEqual("To ../repo1\nCount 8\nmaster -> master\n");
+        .toEqual("To " + p.normalize("../repo1") + "\nCount 8\nmaster -> master\n");
     });
 
     it("should set remote master to latest commit", function() {
@@ -176,9 +176,9 @@ describe("push", function() {
 
     testUtil.createStandardFileStructure();
     gl.init();
-    gl.add("1a/filea");
+    gl.add(p.normalize("1a/filea"));
     gl.commit({ m: "first" });
-    gl.add("1b/fileb");
+    gl.add(p.normalize("1b/fileb"));
     gl.commit({ m: "second" });
     gl.branch("other");
     gl.checkout("other");
@@ -198,7 +198,7 @@ describe("push", function() {
     gr.update_ref("HEAD", amendedCommitHash);
 
     expect(function() { gr.push("origin", "master"); })
-      .toThrow("failed to push some refs to ../repo1");
+      .toThrow("failed to push some refs to " + p.normalize("../repo1"));
   });
 
   describe("updating remote if push must be forced and -f passed", function() {
@@ -209,9 +209,9 @@ describe("push", function() {
 
       testUtil.createStandardFileStructure();
       gl.init();
-      gl.add("1a/filea");
+      gl.add(p.normalize("1a/filea"));
       gl.commit({ m: "first" });
-      gl.add("1b/fileb");
+      gl.add(p.normalize("1b/fileb"));
       gl.commit({ m: "second" });
       gl.branch("other");
       gl.checkout("other");
@@ -233,7 +233,7 @@ describe("push", function() {
 
     it("should return report of what happened", function() {
       expect(g.push("origin", "master", { f: true }))
-        .toEqual("To ../repo1\nCount 9\nmaster -> master\n");
+        .toEqual("To " + p.normalize("../repo1") + "\nCount 9\nmaster -> master\n");
     });
 
     it("should set remote master to latest commit", function() {

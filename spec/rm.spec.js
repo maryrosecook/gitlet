@@ -1,6 +1,6 @@
 var fs = require("fs");
 var g = require("../gitlet");
-var nodePath = require("path");
+var p = require("path");
 var testUtil = require("./test-util");
 
 describe("rm", function() {
@@ -27,18 +27,17 @@ describe("rm", function() {
     it("should throw rel path if not in root and pathspec does not match files", function() {
       g.init();
       testUtil.createFilesFromTree({ "1": { "2": {}}})
-      process.chdir("1/2");
+      process.chdir(p.normalize("1/2"));
       expect(function() { g.rm("blah"); })
-        .toThrow("1/2/blah did not match any files");
+        .toThrow(p.normalize("1/2/blah") + " did not match any files");
     });
 
     it("should rm from index+disk if in idx + on disk and cwd not in repo root", function() {
       g.init();
       testUtil.createFilesFromTree({ a: { b: { filea: "filea" }}});
-      g.add("a/b/filea", { add: true });
+      g.add(p.normalize("a/b/filea"), { add: true });
       g.commit({ m: "first" });
-
-      process.chdir("a/b");
+      process.chdir(p.normalize("a/b"));
       g.rm("filea");
       expect(testUtil.index().length).toEqual(0);
       expect(fs.existsSync("filea")).toEqual(false);
@@ -152,16 +151,16 @@ describe("rm", function() {
       g.init();
       testUtil.createFilesFromTree({ src: { filea: "filea", fileb: "fileb" } });
 
-      g.add("src/filea", { add: true });
-      g.add("src/fileb", { add: true });
+      g.add(p.normalize("src/filea"), { add: true });
+      g.add(p.normalize("src/fileb"), { add: true });
       g.commit({ m: "first" });
 
       fs.writeFileSync("src/filea", "fileaa");
       fs.writeFileSync("src/fileb", "fileab");
-      g.add("src/filea");
+      g.add(p.normalize("src/filea"));
 
       expect(function() { g.rm("src", { r: true }); })
-        .toThrow("these files have changes:\nsrc/filea\nsrc/fileb\n");
+        .toThrow("these files have changes:\n" + p.normalize("src/filea") + "\n" + p.normalize("src/fileb") + "\n");
     });
 
     it("should rm nested files", function() {

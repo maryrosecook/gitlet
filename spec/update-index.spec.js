@@ -1,6 +1,6 @@
 var fs = require("fs");
 var g = require("../gitlet");
-var nodePath = require("path");
+var p = require("path");
 var testUtil = require("./test-util");
 
 describe("update-index", function() {
@@ -29,9 +29,9 @@ describe("update-index", function() {
     it("should throw rel path if not in root and pathspec does not match file", function() {
       g.init();
       testUtil.createFilesFromTree({ "1": { "2": {}}})
-      process.chdir("1/2");
+      process.chdir(p.normalize("1/2"));
       expect(function() { g.update_index("blah"); })
-        .toThrow("1/2/blah does not exist and --remove not passed\n");
+        .toThrow(p.normalize("1/2/blah") + " does not exist and --remove not passed\n");
     });
 
     it("should throw rel path if not in root and path is dir", function() {
@@ -39,7 +39,7 @@ describe("update-index", function() {
       testUtil.createFilesFromTree({ "1": { "2": {}}})
       process.chdir("1");
       expect(function() { g.update_index("2"); })
-        .toThrow("1/2 is a directory - add files inside\n");
+        .toThrow(p.normalize("1/2") + " is a directory - add files inside\n");
     });
   });
 
@@ -51,7 +51,7 @@ describe("update-index", function() {
       fs.writeFileSync("README.md", content);
       g.update_index("README.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash(content)), content);
+      testUtil.expectFile(p.join(".gitlet/objects", testUtil.hash(content)), content);
 
       expect(testUtil.index()[0].path).toEqual("README.md");
     });
@@ -62,9 +62,9 @@ describe("update-index", function() {
       g.update_index("README1.md", { add: true });
       g.update_index("README2.md", { add: true });
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("this is a readme1")),
+      testUtil.expectFile(p.join(".gitlet/objects", testUtil.hash("this is a readme1")),
                           "this is a readme1");
-      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("this is a readme2")),
+      testUtil.expectFile(p.join(".gitlet/objects", testUtil.hash("this is a readme2")),
                           "this is a readme2");
 
       expect(testUtil.index()[0].path).toEqual("README1.md");
@@ -78,7 +78,7 @@ describe("update-index", function() {
       g.update_index("filea");
       g.update_index("filea");
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash("filea")), "filea");
+      testUtil.expectFile(p.join(".gitlet/objects", testUtil.hash("filea")), "filea");
       expect(testUtil.index()[0].path).toEqual("filea");
     });
 
@@ -113,7 +113,7 @@ describe("update-index", function() {
 
       var newVersionHash = testUtil.index()[0].hash;
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", newVersionHash), "this is a readme1");
+      testUtil.expectFile(p.join(".gitlet/objects", newVersionHash), "this is a readme1");
       expect(newVersionHash).toEqual(testUtil.hash("this is a readme1"));
     });
   });
@@ -218,7 +218,7 @@ describe("update-index", function() {
       fs.writeFileSync("filea", resolvedContent);
       g.add("filea"); // resolve conflict
 
-      testUtil.expectFile(nodePath.join(".gitlet/objects", testUtil.hash(resolvedContent)),
+      testUtil.expectFile(p.join(".gitlet/objects", testUtil.hash(resolvedContent)),
                           resolvedContent);
     });
   });

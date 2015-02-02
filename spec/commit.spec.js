@@ -1,4 +1,5 @@
 var fs = require("fs");
+var p = require("path");
 var g = require("../gitlet");
 var nodePath = require("path");
 var testUtil = require("./test-util");
@@ -131,7 +132,7 @@ describe("commit", function() {
   it("should complain nothing to commit if only changes are unstaged", function() {
     testUtil.createStandardFileStructure();
     g.init();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "first" });
     fs.writeFileSync("1a/filea", "somethingelse");
     expect(function() { g.commit({ m: "second" }); })
@@ -141,12 +142,12 @@ describe("commit", function() {
   it("should allow commiting to other checked out branch", function() {
     testUtil.createStandardFileStructure();
     g.init();
-    g.add("1a/filea");
+    g.add(p.normalize("1a/filea"));
     g.commit({ m: "first" });
 
     g.branch("other");
     g.checkout("other");
-    g.add("1b/fileb");
+    g.add(p.normalize("1b/fileb"));
     g.commit({ m: "second" });
 
     testUtil.expectFile(".gitlet/HEAD", "ref: refs/heads/other");
@@ -198,22 +199,22 @@ describe("commit", function() {
     it("should report in det head when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       g.checkout("17a11ad4");
 
-      g.add("1b/fileb")
+      g.add(p.normalize("1b/fileb"));
       expect(g.commit({ m: "second" })).toEqual("[detached HEAD 16b35712] second");
     });
 
     it("should point head at new commit when commit to detached HEAD", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       g.checkout("17a11ad4");
 
-      g.add("1b/fileb")
+      g.add(p.normalize("1b/fileb"));
       g.commit({ m: "second" });
       testUtil.expectFile(".gitlet/HEAD", "16b35712");
     });
@@ -221,11 +222,11 @@ describe("commit", function() {
     it("should create commit file when committing", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       g.checkout("17a11ad4");
 
-      g.add("1b/fileb")
+      g.add(p.normalize("1b/fileb"));
       g.commit({ m: "second" });
       testUtil.expectFile(".gitlet/HEAD", "16b35712");
 
@@ -241,7 +242,7 @@ describe("commit", function() {
     it("should mention detached head if nothing to commit", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       g.checkout("17a11ad4");
 

@@ -1,5 +1,5 @@
 var fs = require("fs");
-var nodePath = require("path");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -39,17 +39,17 @@ describe("pull", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
-    gr.add("1b/fileb");
+    gr.add(p.normalize("1b/fileb"));
     gr.commit({ m: "second" });
 
     process.chdir(localRepo);
     gl.init();
     testUtil.createStandardFileStructure();
     fs.unlinkSync("1b/fileb"); // rm local file to prove we got it into WC from remote
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" }); // need to add bullshit commits to avoid not valid a object
 
     gl.remote("add", "origin", remoteRepo);
@@ -57,8 +57,8 @@ describe("pull", function() {
 
     // check index
     expect(testUtil.index().length).toEqual(2);
-    expect(testUtil.index()[0].path).toEqual("1a/filea");
-    expect(testUtil.index()[1].path).toEqual("1b/fileb");
+    expect(testUtil.index()[0].path).toEqual(p.normalize("1a/filea"));
+    expect(testUtil.index()[1].path).toEqual(p.normalize("1b/fileb"));
 
     // check working copy
     testUtil.expectFile("1a/filea", "filea");
@@ -67,8 +67,8 @@ describe("pull", function() {
     // check commit file tree
     var index = testUtil.index();
     expect(Object.keys(index).length).toEqual(2);
-    expect(index[0].path).toEqual("1a/filea");
-    expect(index[1].path).toEqual("1b/fileb");
+    expect(index[0].path).toEqual(p.normalize("1a/filea"));
+    expect(index[1].path).toEqual(p.normalize("1b/fileb"));
   });
 
   it("should say up to date if already up to date", function() {
@@ -79,14 +79,14 @@ describe("pull", function() {
     gr.init();
     testUtil.createStandardFileStructure();
 
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);
     gl.init();
     testUtil.createStandardFileStructure();
     fs.unlinkSync("1b/fileb"); // rm local file to prove we got it into WC from remote
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" }); // add identical commits
 
     gl.remote("add", "origin", remoteRepo);
