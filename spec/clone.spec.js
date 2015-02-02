@@ -1,6 +1,6 @@
 var fs = require("fs");
 var g = require("../gitlet");
-var nodePath = require("path");
+var p = require("path");
 var testUtil = require("./test-util");
 
 describe("clone", function() {
@@ -25,7 +25,7 @@ describe("clone", function() {
     process.chdir("../");
 
     fs.mkdirSync("exists");
-    fs.writeFileSync(nodePath.join("exists", "filea"), "filea");
+    fs.writeFileSync(p.join("exists", "filea"), "filea");
     expect(function() { g.clone(remoteRepo, "exists"); })
       .toThrow("exists already exists and is not empty");
   });
@@ -41,7 +41,7 @@ describe("clone", function() {
     it("should write working copy after cloning", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
@@ -53,20 +53,20 @@ describe("clone", function() {
     it("should set origin of new repo to remote", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
       g.clone(remoteRepo, "local");
       process.chdir("local");
       expect(fs.readFileSync(".gitlet/config", "utf8").split("\n")[1])
-        .toEqual("  url = ../repo1");
+        .toEqual("  url = " + p.normalize("../repo1"));
     });
 
     it("should return repo cloned when finished", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
@@ -76,7 +76,7 @@ describe("clone", function() {
     it("should return repo cloned when finished", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
@@ -86,7 +86,7 @@ describe("clone", function() {
     it("should set master to remote master hash", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
@@ -98,20 +98,20 @@ describe("clone", function() {
     it("should write remote master hash index", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
       g.clone(remoteRepo, "local");
       process.chdir("local");
-      expect(testUtil.index()[0].path).toEqual("1a/filea");
+      expect(testUtil.index()[0].path).toEqual(p.normalize("1a/filea"));
       expect(testUtil.index()[0].hash).toEqual("5ceba65");
     });
 
     it("should be able to create bare clone of repo", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 
@@ -124,7 +124,7 @@ describe("clone", function() {
     it("should be able to clone a bare repo", function() {
       testUtil.createStandardFileStructure();
       g.init();
-      g.add("1a/filea");
+      g.add(p.normalize("1a/filea"));
       g.commit({ m: "first" });
       process.chdir("../");
 

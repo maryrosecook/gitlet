@@ -1,4 +1,5 @@
 var fs = require("fs");
+var p = require("path");
 var g = require("../gitlet");
 var testUtil = require("./test-util");
 
@@ -37,7 +38,7 @@ describe("write-tree", function() {
   it("should omit files in trees above dir that is several layers down", function() {
     g.init();
     testUtil.createStandardFileStructure();
-    g.add("1b/2b");
+    g.add(p.normalize("1b/2b"));
     expect(g.write_tree()).toEqual("133bcd6");
 
     testUtil.expectFile(".gitlet/objects/133bcd6", "tree aacf336 1b\n"); // note no 1a
@@ -53,7 +54,7 @@ describe("write-tree", function() {
     var _3aHash = "51125fde";
     var _3bHash = "3b5029be";
 
-    g.add("1/2/3a");
+    g.add(p.normalize("1/2/3a"));
     expect(g.write_tree()).toEqual("59431df");
     testUtil.expectFile(".gitlet/objects/59431df", "tree 2711fbd9 1\n");
     testUtil.expectFile(".gitlet/objects/2711fbd9", "tree 74f6972d 2\n");
@@ -61,7 +62,7 @@ describe("write-tree", function() {
     testUtil.expectFile(".gitlet/objects/" + _3aHash, "blob 5ceba68 filed\nblob 5ceba69 filee\n");
     expect(fs.readdirSync(".gitlet/objects").length).toEqual(6);
 
-    g.add("1/2/3b");
+    g.add(p.normalize("1/2/3b"));
     expect(g.write_tree()).toEqual("53d8eab5");
     testUtil.expectFile(".gitlet/objects/53d8eab5", "tree 494c2c41 1\n");
     testUtil.expectFile(".gitlet/objects/494c2c41", "tree 9c02fdc 2\n");
@@ -83,7 +84,7 @@ describe("write-tree", function() {
 
     testUtil.createStandardFileStructure();
     gl.init();
-    gl.add("1a/filea");
+    gl.add(p.normalize("1a/filea"));
     gl.commit({ m: "first" });
 
     process.chdir("../");

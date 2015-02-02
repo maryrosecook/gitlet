@@ -32,7 +32,7 @@ describe("push", function() {
 
     testUtil.createStandardFileStructure();
     gr.init();
-    gr.add("1a/filea");
+    gr.add(p.normalize("1a/filea"));
     gr.commit({ m: "first" });
 
     process.chdir(localRepo);

@@ -158,7 +158,7 @@ describe("merge", function() {
           g.checkout("other");
 
           fs.writeFileSync("1a/filea", "fileachange2");
-          g.add("1a/filea");
+          g.add(p.normalize("1a/filea"));
 
           expect(function() { g.merge("master"); })
             .toThrow("local changes would be lost\n" + p.normalize("1a/filea") + "\n");
