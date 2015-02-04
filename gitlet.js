@@ -1818,7 +1818,6 @@ var files = {
     } else if (fs.statSync(path).isFile()) {
       return [path];
     } else if (fs.statSync(path).isDirectory()) {
-      var self = this;
       return fs.readdirSync(path).reduce(function(fileList, dirChild) {
         return fileList.concat(files.lsRecursive(nodePath.join(path, dirChild)));
       }, []);
