@@ -732,7 +732,7 @@ var gitlet = module.exports = {
       // If files is being removed, is not on disk and is in the
       // index, remove it from the index.
       } else {
-        index.deleteStageEntry(path, 0)
+        index.writeRm(path);
         return "\n";
       }
 
@@ -749,7 +749,7 @@ var gitlet = module.exports = {
     // If file is on disk and either `-add` was passed or the file is
     // in the index, add the file's current content to the index.
     } else if (isOnDisk && (opts.add || isInIndex)) {
-      index.writeAdd(path);
+      index.writeNonConflict(path, files.read(files.workingCopyPath(path)));
       return "\n";
 
     // Abort if the file is not on disk and `--remove` not passed.
@@ -1092,7 +1092,7 @@ var objects = {
 
 // Index entry keys are actually a `path,stage` combination.  Stage is
 // always `0`, unless the entry is about a file that is in conflict.
-// See `merge.writeIndex()` for more details.
+// See `index.writeConflict()` for more details.
 
 var index = {
 
@@ -1149,31 +1149,54 @@ var index = {
       .map(function(k) { return index.keyPieces(k).path; });
   },
 
-  // **writeAdd()** gets the current content of the file at `path` in
-  // the working copy.  It stores that content in the index.  If that
-  // file is in conflict, it is set to be no longer in conflict.
-  writeAdd: function(path) {
-    if (index.isFileInConflict(path)) {
-      index.deleteStageEntry(path, 1);
-      index.deleteStageEntry(path, 2);
-      index.deleteStageEntry(path, 3);
-    }
+  // **writeNonConflict()** sets a non-conflicting index entry for the
+  // file at `path` to the hash of `content`.  (If the file was in
+  // conflict, it is set to be no longer in conflict.)
+  writeNonConflict: function(path, content) {
+    // Remove all keys for the file from the index.
+    index.writeRm(path);
 
-    index.writeStageEntry(path, 0, files.read(files.workingCopyPath(path)));
+    // Write a key for `path` at stage `0` to indicate that the
+    // file is not in conflict.
+    index._writeStageEntry(path, 0, content);
   },
 
-  // **writeStageEntry()** adds a hash of `content` to the index at key
-  // `path,stage`.
-  writeStageEntry: function(path, stage, content) {
+  // **writeConflict()** sets an index entry for the file
+  // at `path` that indicates the file is in conflict after a merge.
+  // `receiverContent` is the version of the file that is being merged
+  // into. `giverContent` is the version being merged in.
+  // `baseContent` is the version that the receiver and
+  // giver both descended from.
+  writeConflict: function(path, receiverContent, giverContent, baseContent) {
+    if (baseContent !== undefined) {
+      // Write a key for `path` at stage `1` for `baseContent`.
+      // (There is no `baseContent` if the same file was added for the
+      // first time by both versions being merged.)
+      index._writeStageEntry(path, 1, baseContent);
+    }
+
+    // Write a key for `path` at stage `2` for `receiverContent`.
+    index._writeStageEntry(path, 2, receiverContent);
+
+    // Write a key for `path` at stage `3` for `giverContent`.
+    index._writeStageEntry(path, 3, giverContent);
+  },
+
+  // **writeRm()** removes the index entry for the file at `path`.
+  // The file will be removed from the index even if it is in
+  // conflict.  (See `index.writeConflict()` for more information on
+  // conflicts.)
+  writeRm: function(path) {
     var idx = index.read();
-    idx[index.key(path, stage)] = objects.write(content);
+    [0, 1, 2, 3].forEach(function(stage) { delete idx[index.key(path, stage)]; });
     index.write(idx);
   },
 
-  // **deleteStageEntry()** removes the entry at key `path,stage`.
-  deleteStageEntry: function(path, stage) {
+  // **_writeStageEntry()** adds the hashed `content` to the index at
+  // key `path,stage`.
+  _writeStageEntry: function(path, stage, content) {
     var idx = index.read();
-    delete idx[index.key(path, stage)];
+    idx[index.key(path, stage)] = objects.write(content);
     index.write(idx);
   },
 
@@ -1415,18 +1438,16 @@ var merge = {
     index.write({});
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
-        if (mergeDiff[p].base !== undefined) { // (undef if same filepath ADDED w dif content)
-          index.writeStageEntry(p, 1, objects.read(mergeDiff[p].base));
-        }
-
-        index.writeStageEntry(p, 2, objects.read(mergeDiff[p].receiver));
-        index.writeStageEntry(p, 3, objects.read(mergeDiff[p].giver));
+        index.writeConflict(p,
+                            objects.read(mergeDiff[p].receiver),
+                            objects.read(mergeDiff[p].giver),
+                            objects.read(mergeDiff[p].base));
       } else if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-        index.writeStageEntry(p, 0, mergeDiff[p].giver);
+        index.writeNonConflict(p, objects.read(mergeDiff[p].giver));
       } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-        index.writeStageEntry(p, 0, content);
+        index.writeNonConflict(p, content);
       }
     });
   },

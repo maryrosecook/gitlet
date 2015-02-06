@@ -455,7 +455,8 @@ describe("diff", function() {
         g.commit({ m: "second" });
         g.branch("b");
 
-        expect(g.diff("b", "a")).toEqual("M " + p.normalize("1a/filea") + "\nD " + p.normalize("1b/fileb") + "\n");
+        expect(g.diff("b", "a"))
+          .toEqual("D " + p.normalize("1b/fileb") + "\nM " + p.normalize("1a/filea") + "\n");
       });
     });
   });
