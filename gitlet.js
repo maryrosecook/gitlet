@@ -732,7 +732,7 @@ var gitlet = module.exports = {
       // If files is being removed, is not on disk and is in the
       // index, remove it from the index.
       } else {
-        index.writeRm(path);
+        index.deleteStageEntry(path, 0)
         return "\n";
       }
 
@@ -1154,30 +1154,24 @@ var index = {
   // file is in conflict, it is set to be no longer in conflict.
   writeAdd: function(path) {
     if (index.isFileInConflict(path)) {
-      index.rmEntry(path, 1);
-      index.rmEntry(path, 2);
-      index.rmEntry(path, 3);
+      index.deleteStageEntry(path, 1);
+      index.deleteStageEntry(path, 2);
+      index.deleteStageEntry(path, 3);
     }
 
-    index.writeEntry(path, 0, files.read(files.workingCopyPath(path)));
+    index.writeStageEntry(path, 0, files.read(files.workingCopyPath(path)));
   },
 
-  // **writeRm()** removes `path` from the index.  This operation will
-  // do nothing if the file is in conflict.
-  writeRm: function(path) {
-    index.rmEntry(path, 0);
-  },
-
-  // **writeEntry()** adds a hash of `content` to the index at key
+  // **writeStageEntry()** adds a hash of `content` to the index at key
   // `path,stage`.
-  writeEntry: function(path, stage, content) {
+  writeStageEntry: function(path, stage, content) {
     var idx = index.read();
     idx[index.key(path, stage)] = objects.write(content);
     index.write(idx);
   },
 
-  // **rmEntry()** removes the entry at key `path,stage`.
-  rmEntry: function(path, stage) {
+  // **deleteStageEntry()** removes the entry at key `path,stage`.
+  deleteStageEntry: function(path, stage) {
     var idx = index.read();
     delete idx[index.key(path, stage)];
     index.write(idx);
@@ -1422,17 +1416,17 @@ var merge = {
     Object.keys(mergeDiff).forEach(function(p) {
       if (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
         if (mergeDiff[p].base !== undefined) { // (undef if same filepath ADDED w dif content)
-          index.writeEntry(p, 1, objects.read(mergeDiff[p].base));
+          index.writeStageEntry(p, 1, objects.read(mergeDiff[p].base));
         }
 
-        index.writeEntry(p, 2, objects.read(mergeDiff[p].receiver));
-        index.writeEntry(p, 3, objects.read(mergeDiff[p].giver));
+        index.writeStageEntry(p, 2, objects.read(mergeDiff[p].receiver));
+        index.writeStageEntry(p, 3, objects.read(mergeDiff[p].giver));
       } else if (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-        index.writeEntry(p, 0, mergeDiff[p].giver);
+        index.writeStageEntry(p, 0, mergeDiff[p].giver);
       } else if (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         var content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-        index.writeEntry(p, 0, content);
+        index.writeStageEntry(p, 0, content);
       }
     });
   },
