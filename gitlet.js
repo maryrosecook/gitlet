@@ -1323,9 +1323,8 @@ var diff = {
   // hash.  It returns a list of paths that appear in both lists.
   changedFilesCommitWouldOverwrite: function(hash) {
     var headHash = refs.hash("HEAD");
-    var hashToWcDiff = diff.nameStatus(diff.diff(headHash));
-    var headToHashDiff = diff.nameStatus(diff.diff(headHash, hash));
-    return Object.keys(hashToWcDiff).filter(function(p) { return p in headToHashDiff; });
+    return util.intersection(Object.keys(diff.nameStatus(diff.diff(headHash))),
+                             Object.keys(diff.nameStatus(diff.diff(headHash, hash))));
   },
 
   // **addedOrModifiedFiles()** returns a list of files that have been
