@@ -198,7 +198,7 @@ var gitlet = module.exports = {
 
     // Write a tree object that represents the current state of the
     // index.
-    var treeHash = this.write_tree();
+    var treeHash = gitlet.write_tree();
 
     var headDesc = refs.isHeadDetached() ? "detached HEAD" : refs.headBranchName();
 
@@ -230,7 +230,7 @@ var gitlet = module.exports = {
         var commitHash = objects.writeCommit(treeHash, m, refs.commitParentHashes());
 
         // Point `HEAD` at new commit.
-        this.update_ref("HEAD", commitHash);
+        gitlet.update_ref("HEAD", commitHash);
 
         // If `MERGE_HEAD` exists, the repository was in the merge
         // state. Remove `MERGE_HEAD` and `MERGE_MSG`to exit the merge
@@ -275,7 +275,7 @@ var gitlet = module.exports = {
     // `name` that contains the hash of the commit that `HEAD` points
     // at.
     } else {
-      this.update_ref(refs.toLocalRef(name), refs.hash("HEAD"));
+      gitlet.update_ref(refs.toLocalRef(name), refs.hash("HEAD"));
     }
   },
 
@@ -554,7 +554,7 @@ var gitlet = module.exports = {
         // If there are no conflicted files, a commit is created from
         // the merged changes and the merge is over.
         } else {
-          return this.commit();
+          return gitlet.commit();
         }
       }
     }
@@ -565,8 +565,8 @@ var gitlet = module.exports = {
   pull: function(remote, branch, _) {
     files.assertInRepo();
     config.assertNotBare();
-    this.fetch(remote, branch);
-    return this.merge("FETCH_HEAD");
+    gitlet.fetch(remote, branch);
+    return gitlet.merge("FETCH_HEAD");
   },
 
   // **push()** gets the commit that `branch` is on in the local repo
@@ -822,7 +822,7 @@ var refs = {
 
     // If `ref` is "HEAD" and head is pointing at a branch, return the
     // branch.
-    if (ref === "HEAD" && !this.isHeadDetached()) {
+    if (ref === "HEAD" && !refs.isHeadDetached()) {
       return files.read(files.gitletPath("HEAD")).match("ref: (refs/heads/.+)")[1];
 
     // If ref is qualified, return it.
@@ -992,11 +992,12 @@ var objects = {
   // **writeCommit()** creates a commit object and writes it to the
   // objects database.
   writeCommit: function(treeHash, message, parentHashes) {
-    return this.write("commit " + treeHash + "\n" +
-                      parentHashes.map(function(h) { return "parent " + h + "\n"; }).join("")+
-                      "Date:  " + new Date().toString() + "\n" +
-                      "\n" +
-                      "    " + message + "\n");
+    return objects.write("commit " + treeHash + "\n" +
+                         parentHashes
+                           .map(function(h) { return "parent " + h + "\n"; }).join("") +
+                         "Date:  " + new Date().toString() + "\n" +
+                         "\n" +
+                         "    " + message + "\n");
   },
 
   // **write()** writes `str` to the objects database.
