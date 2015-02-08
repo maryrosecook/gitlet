@@ -38,6 +38,19 @@ describe("clone", function() {
 
   describe("successful clone", function() {
     var remoteRepo = "repo1";
+
+    it("should be able to clone to a dir that exists but is empty", function() {
+      testUtil.createStandardFileStructure();
+      g.init();
+      process.chdir("../");
+
+      fs.mkdirSync("local");
+      fs.existsSync("local"); // sanity
+      g.clone(remoteRepo, "local");
+      process.chdir("local");
+      expect(testUtil.index().length).toEqual(0);
+    });
+
     it("should write working copy after cloning", function() {
       testUtil.createStandardFileStructure();
       g.init();
