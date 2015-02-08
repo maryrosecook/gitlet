@@ -724,7 +724,7 @@ index.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> treeHash = <span class="hljs-keyword">this</span>.write_tree();
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> treeHash = gitlet.write_tree();
 
     <span class="hljs-keyword">var</span> headDesc = refs.isHeadDetached() ? <span class="hljs-string">"detached HEAD"</span> : refs.headBranchName();</pre></div></div>
             
@@ -828,7 +828,7 @@ merge state, use the message passed with <code>-m</code>.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>.update_ref(<span class="hljs-string">"HEAD"</span>, commitHash);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        gitlet.update_ref(<span class="hljs-string">"HEAD"</span>, commitHash);</pre></div></div>
             
         </li>
         
@@ -957,7 +957,7 @@ at.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    } <span class="hljs-keyword">else</span> {
-      <span class="hljs-keyword">this</span>.update_ref(refs.toLocalRef(name), refs.hash(<span class="hljs-string">"HEAD"</span>));
+      gitlet.update_ref(refs.toLocalRef(name), refs.hash(<span class="hljs-string">"HEAD"</span>));
     }
   },</pre></div></div>
             
@@ -1835,7 +1835,7 @@ the merged changes and the merge is over.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        } <span class="hljs-keyword">else</span> {
-          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.commit();
+          <span class="hljs-keyword">return</span> gitlet.commit();
         }
       }
     }
@@ -1858,8 +1858,8 @@ It merges that commit into the current branch.</p>
             <div class="content"><div class='highlight'><pre>  pull: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(remote, branch, _)</span> {</span>
     files.assertInRepo();
     config.assertNotBare();
-    <span class="hljs-keyword">this</span>.fetch(remote, branch);
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.merge(<span class="hljs-string">"FETCH_HEAD"</span>);
+    gitlet.fetch(remote, branch);
+    <span class="hljs-keyword">return</span> gitlet.merge(<span class="hljs-string">"FETCH_HEAD"</span>);
   },</pre></div></div>
             
         </li>
@@ -2438,7 +2438,7 @@ in the index, add the file’s current content to the index.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isOnDisk &amp;&amp; (opts.add || isInIndex)) {
-      index.writeAdd(path);
+      index.writeNonConflict(path, files.read(files.workingCopyPath(path)));
       <span class="hljs-keyword">return</span> <span class="hljs-string">"\n"</span>;</pre></div></div>
             
         </li>
@@ -2677,7 +2677,7 @@ branch.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (ref === <span class="hljs-string">"HEAD"</span> &amp;&amp; !<span class="hljs-keyword">this</span>.isHeadDetached()) {
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (ref === <span class="hljs-string">"HEAD"</span> &amp;&amp; !refs.isHeadDetached()) {
       <span class="hljs-keyword">return</span> files.read(files.gitletPath(<span class="hljs-string">"HEAD"</span>)).match(<span class="hljs-string">"ref: (refs/heads/.+)"</span>)[<span class="hljs-number">1</span>];</pre></div></div>
             
         </li>
@@ -2811,7 +2811,7 @@ qualified remote branch ref.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  toRemoteRef: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(remote, name)</span> {</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-string">"refs/remotes/"</span> + remote + nodePath.sep + name;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"refs/remotes/"</span> + remote + <span class="hljs-string">"/"</span> + name;
   },</pre></div></div>
             
         </li>
@@ -2830,7 +2830,7 @@ qualified remote branch ref.</p>
             
             <div class="content"><div class='highlight'><pre>  write: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(ref, content)</span> {</span>
     <span class="hljs-keyword">if</span> (refs.isRef(ref)) {
-      files.write(files.gitletPath(ref), content);
+      files.write(files.gitletPath(nodePath.normalize(ref)), content);
     }
   },</pre></div></div>
             
@@ -3123,11 +3123,12 @@ objects database.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  writeCommit: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(treeHash, message, parentHashes)</span> {</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.write(<span class="hljs-string">"commit "</span> + treeHash + <span class="hljs-string">"\n"</span> +
-                      parentHashes.map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(h)</span> {</span> <span class="hljs-keyword">return</span> <span class="hljs-string">"parent "</span> + h + <span class="hljs-string">"\n"</span>; }).join(<span class="hljs-string">""</span>)+
-                      <span class="hljs-string">"Date:  "</span> + <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().toString() + <span class="hljs-string">"\n"</span> +
-                      <span class="hljs-string">"\n"</span> +
-                      <span class="hljs-string">"    "</span> + message + <span class="hljs-string">"\n"</span>);
+    <span class="hljs-keyword">return</span> objects.write(<span class="hljs-string">"commit "</span> + treeHash + <span class="hljs-string">"\n"</span> +
+                         parentHashes
+                           .map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(h)</span> {</span> <span class="hljs-keyword">return</span> <span class="hljs-string">"parent "</span> + h + <span class="hljs-string">"\n"</span>; }).join(<span class="hljs-string">""</span>) +
+                         <span class="hljs-string">"Date:  "</span> + <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().toString() + <span class="hljs-string">"\n"</span> +
+                         <span class="hljs-string">"\n"</span> +
+                         <span class="hljs-string">"    "</span> + message + <span class="hljs-string">"\n"</span>);
   },</pre></div></div>
             
         </li>
@@ -3396,7 +3397,7 @@ created, a tree is built that mirrors the content of the index.</p>
               </div>
               <p>Index entry keys are actually a <code>path,stage</code> combination.  Stage is
 always <code>0</code>, unless the entry is about a file that is in conflict.
-See <code>merge.writeIndex()</code> for more details.</p>
+See <code>index.writeConflict()</code> for more details.</p>
 
             </div>
             
@@ -3549,21 +3550,13 @@ that are in conflict.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-201">&#182;</a>
               </div>
-              <p><strong>writeAdd()</strong> gets the current content of the file at <code>path</code> in
-the working copy.  It stores that content in the index.  If that
-file is in conflict, it is set to be no longer in conflict.</p>
+              <p><strong>writeNonConflict()</strong> sets a non-conflicting index entry for the
+file at <code>path</code> to the hash of <code>content</code>.  (If the file was in
+conflict, it is set to be no longer in conflict.)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  writeAdd: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path)</span> {</span>
-    <span class="hljs-keyword">if</span> (index.isFileInConflict(path)) {
-      index.rmEntry(path, <span class="hljs-number">1</span>);
-      index.rmEntry(path, <span class="hljs-number">2</span>);
-      index.rmEntry(path, <span class="hljs-number">3</span>);
-    }
-
-    index.writeEntry(path, <span class="hljs-number">0</span>, files.read(files.workingCopyPath(path)));
-  },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  writeNonConflict: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, content)</span> {</span></pre></div></div>
             
         </li>
         
@@ -3574,14 +3567,11 @@ file is in conflict, it is set to be no longer in conflict.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-202">&#182;</a>
               </div>
-              <p><strong>writeRm()</strong> removes <code>path</code> from the index.  This operation will
-do nothing if the file is in conflict.</p>
+              <p>Remove all keys for the file from the index.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  writeRm: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path)</span> {</span>
-    index.rmEntry(path, <span class="hljs-number">0</span>);
-  },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    index.writeRm(path);</pre></div></div>
             
         </li>
         
@@ -3592,15 +3582,12 @@ do nothing if the file is in conflict.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-203">&#182;</a>
               </div>
-              <p><strong>writeEntry()</strong> adds a hash of <code>content</code> to the index at key
-<code>path,stage</code>.</p>
+              <p>Write a key for <code>path</code> at stage <code>0</code> to indicate that the
+file is not in conflict.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  writeEntry: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, stage, content)</span> {</span>
-    <span class="hljs-keyword">var</span> idx = index.read();
-    idx[index.key(path, stage)] = objects.write(content);
-    index.write(idx);
+            <div class="content"><div class='highlight'><pre>    index._writeStageEntry(path, <span class="hljs-number">0</span>, content);
   },</pre></div></div>
             
         </li>
@@ -3612,15 +3599,17 @@ do nothing if the file is in conflict.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-204">&#182;</a>
               </div>
-              <p><strong>rmEntry()</strong> removes the entry at key <code>path,stage</code>.</p>
+              <p><strong>writeConflict()</strong> sets an index entry for the file
+at <code>path</code> that indicates the file is in conflict after a merge.
+<code>receiverContent</code> is the version of the file that is being merged
+into. <code>giverContent</code> is the version being merged in.
+<code>baseContent</code> is the version that the receiver and
+giver both descended from.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  rmEntry: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, stage)</span> {</span>
-    <span class="hljs-keyword">var</span> idx = index.read();
-    <span class="hljs-keyword">delete</span> idx[index.key(path, stage)];
-    index.write(idx);
-  },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  writeConflict: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, receiverContent, giverContent, baseContent)</span> {</span>
+    <span class="hljs-keyword">if</span> (baseContent !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
             
         </li>
         
@@ -3630,6 +3619,97 @@ do nothing if the file is in conflict.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-205">&#182;</a>
+              </div>
+              <p>Write a key for <code>path</code> at stage <code>1</code> for <code>baseContent</code>.
+(There is no <code>baseContent</code> if the same file was added for the
+first time by both versions being merged.)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      index._writeStageEntry(path, <span class="hljs-number">1</span>, baseContent);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-206">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-206">&#182;</a>
+              </div>
+              <p>Write a key for <code>path</code> at stage <code>2</code> for <code>receiverContent</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    index._writeStageEntry(path, <span class="hljs-number">2</span>, receiverContent);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-207">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-207">&#182;</a>
+              </div>
+              <p>Write a key for <code>path</code> at stage <code>3</code> for <code>giverContent</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    index._writeStageEntry(path, <span class="hljs-number">3</span>, giverContent);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-208">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-208">&#182;</a>
+              </div>
+              <p><strong>writeRm()</strong> removes the index entry for the file at <code>path</code>.
+The file will be removed from the index even if it is in
+conflict.  (See <code>index.writeConflict()</code> for more information on
+conflicts.)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  writeRm: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path)</span> {</span>
+    <span class="hljs-keyword">var</span> idx = index.read();
+    [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(stage)</span> {</span> <span class="hljs-keyword">delete</span> idx[index.key(path, stage)]; });
+    index.write(idx);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-209">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-209">&#182;</a>
+              </div>
+              <p><strong>_writeStageEntry()</strong> adds the hashed <code>content</code> to the index at
+key <code>path,stage</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _writeStageEntry: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, stage, content)</span> {</span>
+    <span class="hljs-keyword">var</span> idx = index.read();
+    idx[index.key(path, stage)] = objects.write(content);
+    index.write(idx);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-210">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-210">&#182;</a>
               </div>
               <p><strong>write()</strong> takes a JS object that represents an index and writes
 it to <code>.gitlet/index</code>.</p>
@@ -3646,11 +3726,11 @@ it to <code>.gitlet/index</code>.</p>
         </li>
         
         
-        <li id="section-206">
+        <li id="section-211">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-206">&#182;</a>
+                <a class="pilcrow" href="#section-211">&#182;</a>
               </div>
               <p><strong>workingCopyToc()</strong> returns an object that maps the file paths
 in the working copy to hashes of those files’ content.</p>
@@ -3670,11 +3750,11 @@ in the working copy to hashes of those files’ content.</p>
         </li>
         
         
-        <li id="section-207">
+        <li id="section-212">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-207">&#182;</a>
+                <a class="pilcrow" href="#section-212">&#182;</a>
               </div>
               <p><strong>tocToIndex()</strong> takes an object that maps file paths to hashes
 of the files’ content.  It returns an object that is identical,
@@ -3691,11 +3771,11 @@ stage <code>0</code>.  eg: `{ “file1,0”: hash(1), “src/file2,0”: hash(2)
         </li>
         
         
-        <li id="section-208">
+        <li id="section-213">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-208">&#182;</a>
+                <a class="pilcrow" href="#section-213">&#182;</a>
               </div>
               <p><strong>matchingFiles()</strong> returns all the paths in the index that match
 <code>pathSpec</code>.  It matches relative to <code>currentDir</code>.</p>
@@ -3705,18 +3785,18 @@ stage <code>0</code>.  eg: `{ “file1,0”: hash(1), “src/file2,0”: hash(2)
             <div class="content"><div class='highlight'><pre>  matchingFiles: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(pathSpec)</span> {</span>
     <span class="hljs-keyword">var</span> searchPath = files.pathFromRepoRoot(pathSpec);
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(index.toc())
-      .filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> p.match(<span class="hljs-string">"^"</span> + searchPath); });
+      .filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> p.match(<span class="hljs-string">"^"</span> + searchPath.replace(<span class="hljs-regexp">/\\/g</span>, <span class="hljs-string">"\\\\"</span>)); });
   }
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-209">
+        <li id="section-214">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-209">&#182;</a>
+                <a class="pilcrow" href="#section-214">&#182;</a>
               </div>
               <h2 id="diff-module">Diff module</h2>
 
@@ -3725,11 +3805,11 @@ stage <code>0</code>.  eg: `{ “file1,0”: hash(1), “src/file2,0”: hash(2)
         </li>
         
         
-        <li id="section-210">
+        <li id="section-215">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-210">&#182;</a>
+                <a class="pilcrow" href="#section-215">&#182;</a>
               </div>
               
             </div>
@@ -3737,11 +3817,11 @@ stage <code>0</code>.  eg: `{ “file1,0”: hash(1), “src/file2,0”: hash(2)
         </li>
         
         
-        <li id="section-211">
+        <li id="section-216">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-211">&#182;</a>
+                <a class="pilcrow" href="#section-216">&#182;</a>
               </div>
               <p>Produces diffs between versions of the repository content.  Diffs
 are represented as JS objects that map file paths to objects that
@@ -3771,11 +3851,11 @@ file (the receiver) to the second (the giver).  eg:</p>
         </li>
         
         
-        <li id="section-212">
+        <li id="section-217">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-212">&#182;</a>
+                <a class="pilcrow" href="#section-217">&#182;</a>
               </div>
               <p><strong>diff()</strong> returns a diff object (see above for the format of a
 diff object).  If <code>hash1</code> is passed, it is used as the first
@@ -3794,11 +3874,11 @@ If it is not passed` the working copy is used.</p>
         </li>
         
         
-        <li id="section-213">
+        <li id="section-218">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-213">&#182;</a>
+                <a class="pilcrow" href="#section-218">&#182;</a>
               </div>
               <p><strong>nameStatus()</strong> takes a diff and returns a JS object that maps
 from file paths to file statuses.</p>
@@ -3814,11 +3894,11 @@ from file paths to file statuses.</p>
         </li>
         
         
-        <li id="section-214">
+        <li id="section-219">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-214">&#182;</a>
+                <a class="pilcrow" href="#section-219">&#182;</a>
               </div>
               <p><strong>tocDiff()</strong> takes three JS objects that map file paths to
 hashes of file content.  It returns a diff between <code>receiver</code> and
@@ -3836,11 +3916,11 @@ used.</p>
         </li>
         
         
-        <li id="section-215">
+        <li id="section-220">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-215">&#182;</a>
+                <a class="pilcrow" href="#section-220">&#182;</a>
               </div>
               <p>fileStatus() takes three strings that represent different
 versions of the content of a file.  It returns the change that
@@ -3872,11 +3952,11 @@ needs to be made to get from the <code>receiver</code> to the <code>giver</code>
         </li>
         
         
-        <li id="section-216">
+        <li id="section-221">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-216">&#182;</a>
+                <a class="pilcrow" href="#section-221">&#182;</a>
               </div>
               <p>If <code>base</code> was not passed, use <code>receiver</code> as the base.</p>
 
@@ -3887,11 +3967,11 @@ needs to be made to get from the <code>receiver</code> to the <code>giver</code>
         </li>
         
         
-        <li id="section-217">
+        <li id="section-222">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-217">&#182;</a>
+                <a class="pilcrow" href="#section-222">&#182;</a>
               </div>
               <p>Get an array of all the paths in all the versions.</p>
 
@@ -3902,11 +3982,11 @@ needs to be made to get from the <code>receiver</code> to the <code>giver</code>
         </li>
         
         
-        <li id="section-218">
+        <li id="section-223">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-218">&#182;</a>
+                <a class="pilcrow" href="#section-223">&#182;</a>
               </div>
               <p>Create and return diff.</p>
 
@@ -3925,11 +4005,11 @@ needs to be made to get from the <code>receiver</code> to the <code>giver</code>
         </li>
         
         
-        <li id="section-219">
+        <li id="section-224">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-219">&#182;</a>
+                <a class="pilcrow" href="#section-224">&#182;</a>
               </div>
               <p><strong>changedFilesCommitWouldOverwrite()</strong> gets a list of files
 changed in the working copy.  It gets a list of the files that
@@ -3940,19 +4020,18 @@ hash.  It returns a list of paths that appear in both lists.</p>
             
             <div class="content"><div class='highlight'><pre>  changedFilesCommitWouldOverwrite: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(hash)</span> {</span>
     <span class="hljs-keyword">var</span> headHash = refs.hash(<span class="hljs-string">"HEAD"</span>);
-    <span class="hljs-keyword">var</span> hashToWcDiff = diff.nameStatus(diff.diff(headHash));
-    <span class="hljs-keyword">var</span> headToHashDiff = diff.nameStatus(diff.diff(headHash, hash));
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(hashToWcDiff).filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span> <span class="hljs-keyword">return</span> p <span class="hljs-keyword">in</span> headToHashDiff; });
+    <span class="hljs-keyword">return</span> util.intersection(<span class="hljs-built_in">Object</span>.keys(diff.nameStatus(diff.diff(headHash))),
+                             <span class="hljs-built_in">Object</span>.keys(diff.nameStatus(diff.diff(headHash, hash))));
   },</pre></div></div>
             
         </li>
         
         
-        <li id="section-220">
+        <li id="section-225">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-220">&#182;</a>
+                <a class="pilcrow" href="#section-225">&#182;</a>
               </div>
               <p><strong>addedOrModifiedFiles()</strong> returns a list of files that have been
 added to or modified in the working copy since the last commit.</p>
@@ -3969,11 +4048,11 @@ added to or modified in the working copy since the last commit.</p>
         </li>
         
         
-        <li id="section-221">
+        <li id="section-226">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-221">&#182;</a>
+                <a class="pilcrow" href="#section-226">&#182;</a>
               </div>
               <h2 id="merge-module">Merge module</h2>
 
@@ -3982,11 +4061,11 @@ added to or modified in the working copy since the last commit.</p>
         </li>
         
         
-        <li id="section-222">
+        <li id="section-227">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-222">&#182;</a>
+                <a class="pilcrow" href="#section-227">&#182;</a>
               </div>
               
             </div>
@@ -3997,11 +4076,11 @@ added to or modified in the working copy since the last commit.</p>
         </li>
         
         
-        <li id="section-223">
+        <li id="section-228">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-223">&#182;</a>
+                <a class="pilcrow" href="#section-228">&#182;</a>
               </div>
               <p><strong>commonAncestor()</strong> returns the hash of the commit that is the
 most recent common ancestor of <code>aHash</code> and <code>bHash</code>.</p>
@@ -4020,11 +4099,11 @@ most recent common ancestor of <code>aHash</code> and <code>bHash</code>.</p>
         </li>
         
         
-        <li id="section-224">
+        <li id="section-229">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-224">&#182;</a>
+                <a class="pilcrow" href="#section-229">&#182;</a>
               </div>
               <p><strong>isMergeInProgress()</strong> returns true if the repository is in the
 middle of a merge.</p>
@@ -4038,11 +4117,11 @@ middle of a merge.</p>
         </li>
         
         
-        <li id="section-225">
+        <li id="section-230">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-225">&#182;</a>
+                <a class="pilcrow" href="#section-230">&#182;</a>
               </div>
               <p><strong>canFastForward()</strong> A fast forward is possible if the changes
 made to get to the <code>giverHash</code> commit already incorporate the
@@ -4061,11 +4140,11 @@ repository has no commits, yet.</p>
         </li>
         
         
-        <li id="section-226">
+        <li id="section-231">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-226">&#182;</a>
+                <a class="pilcrow" href="#section-231">&#182;</a>
               </div>
               <p><strong>isAForceFetch()</strong> returns true if hash for local commit
 (<code>receiverHash</code>) is not ancestor of hash for fetched commit
@@ -4080,11 +4159,11 @@ repository has no commits, yet.</p>
         </li>
         
         
-        <li id="section-227">
+        <li id="section-232">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-227">&#182;</a>
+                <a class="pilcrow" href="#section-232">&#182;</a>
               </div>
               <p><strong>hasConflicts()</strong> returns true if merging the commit for
 <code>giverHash</code> into the commit for <code>receiverHash</code> would produce
@@ -4101,11 +4180,11 @@ conflicts.</p>
         </li>
         
         
-        <li id="section-228">
+        <li id="section-233">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-228">&#182;</a>
+                <a class="pilcrow" href="#section-233">&#182;</a>
               </div>
               <p><strong>mergeDiff()</strong> returns a diff that represents the changes to get
 from the <code>receiverHash</code> commit to the <code>giverHash</code> commit.
@@ -4124,11 +4203,11 @@ avoid trivial conflicts.</p>
         </li>
         
         
-        <li id="section-229">
+        <li id="section-234">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-229">&#182;</a>
+                <a class="pilcrow" href="#section-234">&#182;</a>
               </div>
               <p><strong>writeMergeMsg()</strong> creates a message for the merge commit that
 will potentially be created when the <code>giverHash</code> commit is merged
@@ -4153,11 +4232,11 @@ into the <code>receiverHash</code> commit.  It writes this message to
         </li>
         
         
-        <li id="section-230">
+        <li id="section-235">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-230">&#182;</a>
+                <a class="pilcrow" href="#section-235">&#182;</a>
               </div>
               <p><strong>writeIndex()</strong> merges the <code>giverHash</code> commit into the
 <code>receiverHash</code> commit and writes the merged content to the index.</p>
@@ -4169,18 +4248,16 @@ into the <code>receiverHash</code> commit.  It writes this message to
     index.write({});
     <span class="hljs-built_in">Object</span>.keys(mergeDiff).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span> {</span>
       <span class="hljs-keyword">if</span> (mergeDiff[p].status === diff.FILE_STATUS.CONFLICT) {
-        <span class="hljs-keyword">if</span> (mergeDiff[p].base !== <span class="hljs-literal">undefined</span>) { <span class="hljs-comment">// (undef if same filepath ADDED w dif content)</span>
-          index.writeEntry(p, <span class="hljs-number">1</span>, objects.read(mergeDiff[p].base));
-        }
-
-        index.writeEntry(p, <span class="hljs-number">2</span>, objects.read(mergeDiff[p].receiver));
-        index.writeEntry(p, <span class="hljs-number">3</span>, objects.read(mergeDiff[p].giver));
+        index.writeConflict(p,
+                            objects.read(mergeDiff[p].receiver),
+                            objects.read(mergeDiff[p].giver),
+                            objects.read(mergeDiff[p].base));
       } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (mergeDiff[p].status === diff.FILE_STATUS.MODIFY) {
-        index.writeEntry(p, <span class="hljs-number">0</span>, mergeDiff[p].giver);
+        index.writeNonConflict(p, objects.read(mergeDiff[p].giver));
       } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (mergeDiff[p].status === diff.FILE_STATUS.ADD ||
                  mergeDiff[p].status === diff.FILE_STATUS.SAME) {
         <span class="hljs-keyword">var</span> content = objects.read(mergeDiff[p].receiver || mergeDiff[p].giver);
-        index.writeEntry(p, <span class="hljs-number">0</span>, content);
+        index.writeNonConflict(p, content);
       }
     });
   },</pre></div></div>
@@ -4188,11 +4265,11 @@ into the <code>receiverHash</code> commit.  It writes this message to
         </li>
         
         
-        <li id="section-231">
+        <li id="section-236">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-231">&#182;</a>
+                <a class="pilcrow" href="#section-236">&#182;</a>
               </div>
               <p><strong>writeFastForwardMerge()</strong> Fast forwarding means making the
 current branch reflect the commit that <code>giverHash</code> points at.  No
@@ -4205,11 +4282,11 @@ new commit is created.</p>
         </li>
         
         
-        <li id="section-232">
+        <li id="section-237">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-232">&#182;</a>
+                <a class="pilcrow" href="#section-237">&#182;</a>
               </div>
               <p>Point head at <code>giverHash</code>.</p>
 
@@ -4220,11 +4297,11 @@ new commit is created.</p>
         </li>
         
         
-        <li id="section-233">
+        <li id="section-238">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-233">&#182;</a>
+                <a class="pilcrow" href="#section-238">&#182;</a>
               </div>
               <p>Make the index mirror the content of <code>giverHash</code>.</p>
 
@@ -4235,11 +4312,11 @@ new commit is created.</p>
         </li>
         
         
-        <li id="section-234">
+        <li id="section-239">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-234">&#182;</a>
+                <a class="pilcrow" href="#section-239">&#182;</a>
               </div>
               <p>If the repo is bare, it has no working copy, so there is no
 more work to do.  If the repo is not bare…</p>
@@ -4251,11 +4328,11 @@ more work to do.  If the repo is not bare…</p>
         </li>
         
         
-        <li id="section-235">
+        <li id="section-240">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-235">&#182;</a>
+                <a class="pilcrow" href="#section-240">&#182;</a>
               </div>
               <p>…Get an object that maps from file paths in the
 <code>receiverHash</code> commit to hashes of the files’ content.  If
@@ -4269,11 +4346,11 @@ yet, and the mapping object is empty.</p>
         </li>
         
         
-        <li id="section-236">
+        <li id="section-241">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-236">&#182;</a>
+                <a class="pilcrow" href="#section-241">&#182;</a>
               </div>
               <p>…and write the content of the files to the working copy.</p>
 
@@ -4286,11 +4363,11 @@ yet, and the mapping object is empty.</p>
         </li>
         
         
-        <li id="section-237">
+        <li id="section-242">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-237">&#182;</a>
+                <a class="pilcrow" href="#section-242">&#182;</a>
               </div>
               <p><strong>writeNonFastForwardMerge()</strong> A non fast forward merge creates a
 merge commit to integrate the content of the <code>receiverHash</code>
@@ -4308,11 +4385,11 @@ motion.</p>
         </li>
         
         
-        <li id="section-238">
+        <li id="section-243">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-238">&#182;</a>
+                <a class="pilcrow" href="#section-243">&#182;</a>
               </div>
               <p>Write <code>giverHash</code> to <code>.gitlet/MERGE_HEAD</code>.  This file acts as a
 record of <code>giverHash</code> and as the signal that the repository is
@@ -4325,11 +4402,11 @@ in the merging state.</p>
         </li>
         
         
-        <li id="section-239">
+        <li id="section-244">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-239">&#182;</a>
+                <a class="pilcrow" href="#section-244">&#182;</a>
               </div>
               <p>Write a standard merge commit message that will be used when
 the merge commit is created.</p>
@@ -4341,11 +4418,11 @@ the merge commit is created.</p>
         </li>
         
         
-        <li id="section-240">
+        <li id="section-245">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-240">&#182;</a>
+                <a class="pilcrow" href="#section-245">&#182;</a>
               </div>
               <p>Merge the <code>receiverHash</code> commit with the <code>giverHash</code> commit and
 write the content to the index.</p>
@@ -4357,11 +4434,11 @@ write the content to the index.</p>
         </li>
         
         
-        <li id="section-241">
+        <li id="section-246">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-241">&#182;</a>
+                <a class="pilcrow" href="#section-246">&#182;</a>
               </div>
               <p>If the repo is bare, it has no working copy, so there is no
 more work to do.  If the repo is not bare…</p>
@@ -4373,11 +4450,11 @@ more work to do.  If the repo is not bare…</p>
         </li>
         
         
-        <li id="section-242">
+        <li id="section-247">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-242">&#182;</a>
+                <a class="pilcrow" href="#section-247">&#182;</a>
               </div>
               <p>…merge the <code>receiverHash</code> commit with the <code>giverHash</code>
 commit and write the content to the working copy.</p>
@@ -4392,11 +4469,11 @@ commit and write the content to the working copy.</p>
         </li>
         
         
-        <li id="section-243">
+        <li id="section-248">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-243">&#182;</a>
+                <a class="pilcrow" href="#section-248">&#182;</a>
               </div>
               <h2 id="working-copy-module">Working copy module</h2>
 
@@ -4405,11 +4482,11 @@ commit and write the content to the working copy.</p>
         </li>
         
         
-        <li id="section-244">
+        <li id="section-249">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-244">&#182;</a>
+                <a class="pilcrow" href="#section-249">&#182;</a>
               </div>
               
             </div>
@@ -4417,11 +4494,11 @@ commit and write the content to the working copy.</p>
         </li>
         
         
-        <li id="section-245">
+        <li id="section-250">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-245">&#182;</a>
+                <a class="pilcrow" href="#section-250">&#182;</a>
               </div>
               <p>The working copy is the set of files that are inside the
 repository, excluding the <code>.gitlet</code> directory.</p>
@@ -4434,11 +4511,11 @@ repository, excluding the <code>.gitlet</code> directory.</p>
         </li>
         
         
-        <li id="section-246">
+        <li id="section-251">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-246">&#182;</a>
+                <a class="pilcrow" href="#section-251">&#182;</a>
               </div>
               <p><strong>write()</strong> takes a diff object (see the diff module for a
 description of the format) and applies the changes in it to the
@@ -4451,11 +4528,11 @@ working copy.</p>
         </li>
         
         
-        <li id="section-247">
+        <li id="section-252">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-247">&#182;</a>
+                <a class="pilcrow" href="#section-252">&#182;</a>
               </div>
               <p><code>composeConflict()</code> takes the hashes of two versions of the
 same file and returns a string that represents the two versions
@@ -4480,11 +4557,11 @@ conflict.</p>
         </li>
         
         
-        <li id="section-248">
+        <li id="section-253">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-248">&#182;</a>
+                <a class="pilcrow" href="#section-253">&#182;</a>
               </div>
               <p>Go through all the files that have changed, updating the
 working copy for each.</p>
@@ -4506,11 +4583,11 @@ working copy for each.</p>
         </li>
         
         
-        <li id="section-249">
+        <li id="section-254">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-249">&#182;</a>
+                <a class="pilcrow" href="#section-254">&#182;</a>
               </div>
               <p>Remove any directories that have been left empty after the
 deletion of all the files in them.</p>
@@ -4526,11 +4603,11 @@ deletion of all the files in them.</p>
         </li>
         
         
-        <li id="section-250">
+        <li id="section-255">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-250">&#182;</a>
+                <a class="pilcrow" href="#section-255">&#182;</a>
               </div>
               <h2 id="config-module">Config module</h2>
 
@@ -4539,11 +4616,11 @@ deletion of all the files in them.</p>
         </li>
         
         
-        <li id="section-251">
+        <li id="section-256">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-251">&#182;</a>
+                <a class="pilcrow" href="#section-256">&#182;</a>
               </div>
               
             </div>
@@ -4551,11 +4628,11 @@ deletion of all the files in them.</p>
         </li>
         
         
-        <li id="section-252">
+        <li id="section-257">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-252">&#182;</a>
+                <a class="pilcrow" href="#section-257">&#182;</a>
               </div>
               <p>This code allows the config file at <code>.gitlet/config</code> to be read and
 written.</p>
@@ -4568,11 +4645,11 @@ written.</p>
         </li>
         
         
-        <li id="section-253">
+        <li id="section-258">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-253">&#182;</a>
+                <a class="pilcrow" href="#section-258">&#182;</a>
               </div>
               <p><strong>isBare()</strong> returns true if the repository is bare.</p>
 
@@ -4585,11 +4662,11 @@ written.</p>
         </li>
         
         
-        <li id="section-254">
+        <li id="section-259">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-254">&#182;</a>
+                <a class="pilcrow" href="#section-259">&#182;</a>
               </div>
               <p><strong>assertNotBare()</strong> throws if the repository is bare.</p>
 
@@ -4604,11 +4681,11 @@ written.</p>
         </li>
         
         
-        <li id="section-255">
+        <li id="section-260">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-255">&#182;</a>
+                <a class="pilcrow" href="#section-260">&#182;</a>
               </div>
               <p><strong>read()</strong> returns the contents of the config file as a nested JS
 object.</p>
@@ -4622,11 +4699,11 @@ object.</p>
         </li>
         
         
-        <li id="section-256">
+        <li id="section-261">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-256">&#182;</a>
+                <a class="pilcrow" href="#section-261">&#182;</a>
               </div>
               <p><strong>write()</strong> stringifies the nested JS object <code>configObj</code> and
 overwrites the config file with it.</p>
@@ -4640,11 +4717,11 @@ overwrites the config file with it.</p>
         </li>
         
         
-        <li id="section-257">
+        <li id="section-262">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-257">&#182;</a>
+                <a class="pilcrow" href="#section-262">&#182;</a>
               </div>
               <p><strong>strToObj()</strong> parses the config string <code>str</code> and returns its
 contents as a nested JS object.</p>
@@ -4662,11 +4739,11 @@ contents as a nested JS object.</p>
         </li>
         
         
-        <li id="section-258">
+        <li id="section-263">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-258">&#182;</a>
+                <a class="pilcrow" href="#section-263">&#182;</a>
               </div>
               <p>section eg “core”</p>
 
@@ -4677,11 +4754,11 @@ contents as a nested JS object.</p>
         </li>
         
         
-        <li id="section-259">
+        <li id="section-264">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-259">&#182;</a>
+                <a class="pilcrow" href="#section-264">&#182;</a>
               </div>
               <p>eg “master”</p>
 
@@ -4694,11 +4771,11 @@ contents as a nested JS object.</p>
         </li>
         
         
-        <li id="section-260">
+        <li id="section-265">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-260">&#182;</a>
+                <a class="pilcrow" href="#section-265">&#182;</a>
               </div>
               <p>options and their values</p>
 
@@ -4716,11 +4793,11 @@ contents as a nested JS object.</p>
         </li>
         
         
-        <li id="section-261">
+        <li id="section-266">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-261">&#182;</a>
+                <a class="pilcrow" href="#section-266">&#182;</a>
               </div>
               <p><strong>objToStr()</strong> <code>configObj</code> is a JS object that holds the config
 for the repository.  <code>objToStr()</code> stringifies the object and
@@ -4751,11 +4828,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-262">
+        <li id="section-267">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-262">&#182;</a>
+                <a class="pilcrow" href="#section-267">&#182;</a>
               </div>
               <h2 id="util-module">Util module</h2>
 
@@ -4764,11 +4841,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-263">
+        <li id="section-268">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-263">&#182;</a>
+                <a class="pilcrow" href="#section-268">&#182;</a>
               </div>
               
             </div>
@@ -4776,11 +4853,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-264">
+        <li id="section-269">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-264">&#182;</a>
+                <a class="pilcrow" href="#section-269">&#182;</a>
               </div>
               <p>A set of handy functions.</p>
 
@@ -4792,11 +4869,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-265">
+        <li id="section-270">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-265">&#182;</a>
+                <a class="pilcrow" href="#section-270">&#182;</a>
               </div>
               <p><strong>isString()</strong> returns true if <code>thing</code> is a string.</p>
 
@@ -4809,11 +4886,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-266">
+        <li id="section-271">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-266">&#182;</a>
+                <a class="pilcrow" href="#section-271">&#182;</a>
               </div>
               <p><strong>hash()</strong> returns a hash of <code>string</code>.</p>
 
@@ -4832,11 +4909,11 @@ returns the string.</p>
         </li>
         
         
-        <li id="section-267">
+        <li id="section-272">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-267">&#182;</a>
+                <a class="pilcrow" href="#section-272">&#182;</a>
               </div>
               <p><strong>setIn()</strong> takes an array that contains 1 or more keys and has
 one value at the end.  It drills down into <code>obj</code> using the keys
@@ -4859,11 +4936,11 @@ and sets the value as the value of the last key.  eg<br/>
         </li>
         
         
-        <li id="section-268">
+        <li id="section-273">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-268">&#182;</a>
+                <a class="pilcrow" href="#section-273">&#182;</a>
               </div>
               <p><strong>lines()</strong> takes a string, splits on newlines and returns an
 array of the lines that are not empty.</p>
@@ -4877,11 +4954,11 @@ array of the lines that are not empty.</p>
         </li>
         
         
-        <li id="section-269">
+        <li id="section-274">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-269">&#182;</a>
+                <a class="pilcrow" href="#section-274">&#182;</a>
               </div>
               <p><strong>flatten()</strong> returns a flattened version of <code>arr</code>.</p>
 
@@ -4896,11 +4973,11 @@ array of the lines that are not empty.</p>
         </li>
         
         
-        <li id="section-270">
+        <li id="section-275">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-270">&#182;</a>
+                <a class="pilcrow" href="#section-275">&#182;</a>
               </div>
               <p><strong>unique()</strong> returns the unique elements in <code>arr</code>.</p>
 
@@ -4913,11 +4990,11 @@ array of the lines that are not empty.</p>
         </li>
         
         
-        <li id="section-271">
+        <li id="section-276">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-271">&#182;</a>
+                <a class="pilcrow" href="#section-276">&#182;</a>
               </div>
               <p><strong>intersection()</strong> takes two arrays <code>a</code> and <code>b</code>.  It returns an
 array of the items that appear in both.</p>
@@ -4931,11 +5008,11 @@ array of the items that appear in both.</p>
         </li>
         
         
-        <li id="section-272">
+        <li id="section-277">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-272">&#182;</a>
+                <a class="pilcrow" href="#section-277">&#182;</a>
               </div>
               <p><strong>remote()</strong> allows execution of a command on a remote
 repository.  It returns an anonymous function that takes another
@@ -4959,11 +5036,11 @@ original directory.</p>
         </li>
         
         
-        <li id="section-273">
+        <li id="section-278">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-273">&#182;</a>
+                <a class="pilcrow" href="#section-278">&#182;</a>
               </div>
               <h2 id="files-module">Files module</h2>
 
@@ -4972,11 +5049,11 @@ original directory.</p>
         </li>
         
         
-        <li id="section-274">
+        <li id="section-279">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-274">&#182;</a>
+                <a class="pilcrow" href="#section-279">&#182;</a>
               </div>
               
             </div>
@@ -4987,11 +5064,11 @@ original directory.</p>
         </li>
         
         
-        <li id="section-275">
+        <li id="section-280">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-275">&#182;</a>
+                <a class="pilcrow" href="#section-280">&#182;</a>
               </div>
               <p><strong>inRepo()</strong> returns true if the current working directory is
 inside a repository.</p>
@@ -5005,11 +5082,11 @@ inside a repository.</p>
         </li>
         
         
-        <li id="section-276">
+        <li id="section-281">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-276">&#182;</a>
+                <a class="pilcrow" href="#section-281">&#182;</a>
               </div>
               <p><strong>assertInRepo()</strong> throws if the current working directory is not
 inside a repository.</p>
@@ -5025,11 +5102,11 @@ inside a repository.</p>
         </li>
         
         
-        <li id="section-277">
+        <li id="section-282">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-277">&#182;</a>
+                <a class="pilcrow" href="#section-282">&#182;</a>
               </div>
               <p><strong>pathFromRepoRoot()</strong> returns <code>path</code> relative to the repo root</p>
 
@@ -5042,11 +5119,11 @@ inside a repository.</p>
         </li>
         
         
-        <li id="section-278">
+        <li id="section-283">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-278">&#182;</a>
+                <a class="pilcrow" href="#section-283">&#182;</a>
               </div>
               <p><strong>write()</strong> writes <code>content</code> to file at <code>path</code>, overwriting
 anything that is already there.</p>
@@ -5054,17 +5131,18 @@ anything that is already there.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  write: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(path, content)</span> {</span>
-    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), <span class="hljs-string">"/"</span>);
+    <span class="hljs-keyword">var</span> prefix = <span class="hljs-built_in">require</span>(<span class="hljs-string">"os"</span>).platform() == <span class="hljs-string">"win32"</span> ? <span class="hljs-string">"."</span> : <span class="hljs-string">"/"</span>;
+    files.writeFilesFromTree(util.setIn({}, path.split(nodePath.sep).concat(content)), prefix);
   },</pre></div></div>
             
         </li>
         
         
-        <li id="section-279">
+        <li id="section-284">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-279">&#182;</a>
+                <a class="pilcrow" href="#section-284">&#182;</a>
               </div>
               <p><strong>writeFilesFromTree()</strong> takes <code>tree</code> of files as a nested JS obj
 and writes all those files to disk taking <code>prefix</code> as the root of
@@ -5090,11 +5168,11 @@ the tree.  <code>tree</code> format is: <code>{ a: { b: { c: &quot;filecontent&q
         </li>
         
         
-        <li id="section-280">
+        <li id="section-285">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-280">&#182;</a>
+                <a class="pilcrow" href="#section-285">&#182;</a>
               </div>
               <p><strong>rmEmptyDirs()</strong> recursively removes all the empty directories
 inside <code>path</code>.</p>
@@ -5113,11 +5191,11 @@ inside <code>path</code>.</p>
         </li>
         
         
-        <li id="section-281">
+        <li id="section-286">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-281">&#182;</a>
+                <a class="pilcrow" href="#section-286">&#182;</a>
               </div>
               <p><strong>read()</strong> returns the contents of the file at <code>path</code> as a
 string.  It returns <code>undefined</code> if the file doesn’t exist.</p>
@@ -5133,11 +5211,11 @@ string.  It returns <code>undefined</code> if the file doesn’t exist.</p>
         </li>
         
         
-        <li id="section-282">
+        <li id="section-287">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-282">&#182;</a>
+                <a class="pilcrow" href="#section-287">&#182;</a>
               </div>
               <p><strong>gitletPath()</strong> returns a string made by concatenating <code>path</code> to
 the absolute path of the <code>.gitlet</code> directory of the repository.</p>
@@ -5150,6 +5228,7 @@ the absolute path of the <code>.gitlet</code> directory of the repository.</p>
         <span class="hljs-keyword">var</span> potentialConfigFile = nodePath.join(dir, <span class="hljs-string">"config"</span>);
         <span class="hljs-keyword">var</span> potentialGitletPath = nodePath.join(dir, <span class="hljs-string">".gitlet"</span>);
         <span class="hljs-keyword">if</span> (fs.existsSync(potentialConfigFile) &amp;&amp;
+            fs.statSync(potentialConfigFile).isFile() &amp;&amp;
             files.read(potentialConfigFile).match(<span class="hljs-regexp">/\[core\]/</span>)) {
           <span class="hljs-keyword">return</span> dir;
         } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fs.existsSync(potentialGitletPath)) {
@@ -5169,11 +5248,11 @@ the absolute path of the <code>.gitlet</code> directory of the repository.</p>
         </li>
         
         
-        <li id="section-283">
+        <li id="section-288">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-283">&#182;</a>
+                <a class="pilcrow" href="#section-288">&#182;</a>
               </div>
               <p><strong>workingCopyPath()</strong> returns a string made by concatenating <code>path</code> to
 the absolute path of the root of the repository.</p>
@@ -5187,11 +5266,11 @@ the absolute path of the root of the repository.</p>
         </li>
         
         
-        <li id="section-284">
+        <li id="section-289">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-284">&#182;</a>
+                <a class="pilcrow" href="#section-289">&#182;</a>
               </div>
               <p><strong>lsRecursive()</strong> returns an array of all the files found in a
 recursive search of <code>path</code>.</p>
@@ -5204,7 +5283,6 @@ recursive search of <code>path</code>.</p>
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fs.statSync(path).isFile()) {
       <span class="hljs-keyword">return</span> [path];
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fs.statSync(path).isDirectory()) {
-      <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
       <span class="hljs-keyword">return</span> fs.readdirSync(path).reduce(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(fileList, dirChild)</span> {</span>
         <span class="hljs-keyword">return</span> fileList.concat(files.lsRecursive(nodePath.join(path, dirChild)));
       }, []);
@@ -5214,11 +5292,11 @@ recursive search of <code>path</code>.</p>
         </li>
         
         
-        <li id="section-285">
+        <li id="section-290">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-285">&#182;</a>
+                <a class="pilcrow" href="#section-290">&#182;</a>
               </div>
               <p><strong>nestFlatTree()</strong> takes <code>obj</code>, a mapping of file path strings to
 content, and returns a nested JS obj where each key represents a
@@ -5237,11 +5315,11 @@ eg <code>nestFlatTree({ &quot;a/b&quot;: &quot;me&quot; }); // =&gt; { a: { b: &
         </li>
         
         
-        <li id="section-286">
+        <li id="section-291">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-286">&#182;</a>
+                <a class="pilcrow" href="#section-291">&#182;</a>
               </div>
               <p><strong>flattenNestedTree()</strong> takes <code>tree</code>, a nested JS object where
 each key represents a sub directory and returns a JS object
@@ -5270,11 +5348,11 @@ eg <code>flattenNestedTree({ a: { b: &quot;me&quot; }}); // =&gt; { &quot;a/b&qu
         </li>
         
         
-        <li id="section-287">
+        <li id="section-292">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-287">&#182;</a>
+                <a class="pilcrow" href="#section-292">&#182;</a>
               </div>
               <h2 id="status-module">Status module</h2>
 
@@ -5283,11 +5361,11 @@ eg <code>flattenNestedTree({ a: { b: &quot;me&quot; }}); // =&gt; { &quot;a/b&qu
         </li>
         
         
-        <li id="section-288">
+        <li id="section-293">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-288">&#182;</a>
+                <a class="pilcrow" href="#section-293">&#182;</a>
               </div>
               
             </div>
@@ -5295,11 +5373,11 @@ eg <code>flattenNestedTree({ a: { b: &quot;me&quot; }}); // =&gt; { &quot;a/b&qu
         </li>
         
         
-        <li id="section-289">
+        <li id="section-294">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-289">&#182;</a>
+                <a class="pilcrow" href="#section-294">&#182;</a>
               </div>
               <p>Outputs the repository status as a human-readable string.</p>
 
@@ -5311,11 +5389,11 @@ eg <code>flattenNestedTree({ a: { b: &quot;me&quot; }}); // =&gt; { &quot;a/b&qu
         </li>
         
         
-        <li id="section-290">
+        <li id="section-295">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-290">&#182;</a>
+                <a class="pilcrow" href="#section-295">&#182;</a>
               </div>
               <p><strong>toString()</strong> returns the repository status as a human-readable
 string.</p>
@@ -5327,11 +5405,11 @@ string.</p>
         </li>
         
         
-        <li id="section-291">
+        <li id="section-296">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-291">&#182;</a>
+                <a class="pilcrow" href="#section-296">&#182;</a>
               </div>
               <p><strong>untracked()</strong> returns an array of lines listing the files not
 being tracked by Gitlet.</p>
@@ -5346,11 +5424,11 @@ being tracked by Gitlet.</p>
         </li>
         
         
-        <li id="section-292">
+        <li id="section-297">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-292">&#182;</a>
+                <a class="pilcrow" href="#section-297">&#182;</a>
               </div>
               <p><strong>toBeCommitted()</strong> returns an array of lines listing the files
 that have changes that will be included in the next commit.</p>
@@ -5367,11 +5445,11 @@ that have changes that will be included in the next commit.</p>
         </li>
         
         
-        <li id="section-293">
+        <li id="section-298">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-293">&#182;</a>
+                <a class="pilcrow" href="#section-298">&#182;</a>
               </div>
               <p><strong>notStagedForCommit()</strong> returns an array of lines listing the
 files that have changes that will not be included in the next
@@ -5387,11 +5465,11 @@ commit.</p>
         </li>
         
         
-        <li id="section-294">
+        <li id="section-299">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-294">&#182;</a>
+                <a class="pilcrow" href="#section-299">&#182;</a>
               </div>
               <p><strong>listing()</strong> keeps <code>lines</code> (prefixed by <code>heading</code>) only if it’s nonempty.</p>
 
@@ -5404,11 +5482,11 @@ commit.</p>
         </li>
         
         
-        <li id="section-295">
+        <li id="section-300">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-295">&#182;</a>
+                <a class="pilcrow" href="#section-300">&#182;</a>
               </div>
               <p>Gather all the sections, keeping only nonempty ones, and flatten them
 together into a string.</p>
@@ -5427,11 +5505,11 @@ together into a string.</p>
         </li>
         
         
-        <li id="section-296">
+        <li id="section-301">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-296">&#182;</a>
+                <a class="pilcrow" href="#section-301">&#182;</a>
               </div>
               <h2 id="running-gitlet-js-as-a-script">Running gitlet.js as a script</h2>
 
@@ -5440,11 +5518,11 @@ together into a string.</p>
         </li>
         
         
-        <li id="section-297">
+        <li id="section-302">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-297">&#182;</a>
+                <a class="pilcrow" href="#section-302">&#182;</a>
               </div>
               
             </div>
@@ -5452,11 +5530,11 @@ together into a string.</p>
         </li>
         
         
-        <li id="section-298">
+        <li id="section-303">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-298">&#182;</a>
+                <a class="pilcrow" href="#section-303">&#182;</a>
               </div>
               <p>Gitlet can be used from the command line.  For example, executing
 <code>node gitlet.js commit -m woo</code> would commit to the current repo
@@ -5467,11 +5545,11 @@ with the message “woo”.</p>
         </li>
         
         
-        <li id="section-299">
+        <li id="section-304">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-299">&#182;</a>
+                <a class="pilcrow" href="#section-304">&#182;</a>
               </div>
               <p><strong>parseOptions()</strong> takes the <code>process.argv</code> object passed when
 gitlet.js is run as a script. It returns an object that contains
@@ -5499,11 +5577,11 @@ the parsed parameters to be formed into a Gitlet command.</p>
         </li>
         
         
-        <li id="section-300">
+        <li id="section-305">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-300">&#182;</a>
+                <a class="pilcrow" href="#section-305">&#182;</a>
               </div>
               <p><strong>runCli()</strong> takes the <code>process.argv</code> object passed when gitlet.js
 is run as a script.  It parses the command line arguments, runs the
@@ -5538,11 +5616,11 @@ command.</p>
         </li>
         
         
-        <li id="section-301">
+        <li id="section-306">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-301">&#182;</a>
+                <a class="pilcrow" href="#section-306">&#182;</a>
               </div>
               <p>If <code>gitlet.js</code> is run as a script, pass the <code>process.argv</code> array of
 script arguments to <code>runCli()</code> so they can be used to run a Gitlet
