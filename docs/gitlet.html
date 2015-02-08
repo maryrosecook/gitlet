@@ -1469,7 +1469,7 @@ that <code>branch</code> is on.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> newHash = util.remote(remoteUrl)(refs.hash, branch);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> newHash = util.onRemote(remoteUrl)(refs.hash, branch);</pre></div></div>
             
         </li>
         
@@ -1534,7 +1534,7 @@ recreate locally the commit the remote branch is on.)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> remoteObjects = util.remote(remoteUrl)(objects.allObjects);
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> remoteObjects = util.onRemote(remoteUrl)(objects.allObjects);
         remoteObjects.forEach(objects.write);</pre></div></div>
             
         </li>
@@ -1914,7 +1914,7 @@ and points <code>branch</code> on <code>remote</code> at the same commit.</p>
 
     } <span class="hljs-keyword">else</span> {
       <span class="hljs-keyword">var</span> remotePath = config.read().remote[remote].url;
-      <span class="hljs-keyword">var</span> remoteCall = util.remote(remotePath);</pre></div></div>
+      <span class="hljs-keyword">var</span> remoteCall = util.onRemote(remotePath);</pre></div></div>
             
         </li>
         
@@ -2158,7 +2158,7 @@ repository.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!fs.existsSync(remotePath) || !util.remote(remotePath)(files.inRepo)) {
+            <div class="content"><div class='highlight'><pre>    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!fs.existsSync(remotePath) || !util.onRemote(remotePath)(files.inRepo)) {
       <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"repository "</span> + remotePath + <span class="hljs-string">" does not exist"</span>);</pre></div></div>
             
         </li>
@@ -2224,7 +2224,7 @@ repository.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      util.remote(targetPath)(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      util.onRemote(targetPath)(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span></pre></div></div>
             
         </li>
         
@@ -2270,7 +2270,7 @@ the remote repository.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> remoteHeadHash = util.remote(remotePath)(refs.hash, <span class="hljs-string">"master"</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> remoteHeadHash = util.onRemote(remotePath)(refs.hash, <span class="hljs-string">"master"</span>);</pre></div></div>
             
         </li>
         
@@ -5014,7 +5014,7 @@ array of the items that appear in both.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-277">&#182;</a>
               </div>
-              <p><strong>remote()</strong> allows execution of a command on a remote
+              <p><strong>onRemote()</strong> allows execution of a command on a remote
 repository.  It returns an anonymous function that takes another
 function <code>fn</code>.  When the anonymous function is run, it switches
 to <code>remotePath</code>, executes <code>fn</code>, then switches back to the
@@ -5022,7 +5022,7 @@ original directory.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  remote: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(remotePath)</span> {</span>
+            <div class="content"><div class='highlight'><pre>  onRemote: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(remotePath)</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(fn)</span> {</span>
       <span class="hljs-keyword">var</span> originalDir = process.cwd();
       process.chdir(remotePath);
