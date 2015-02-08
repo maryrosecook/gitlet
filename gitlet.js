@@ -428,7 +428,7 @@ var gitlet = module.exports = {
 
       // Go to the remote repository and get the hash of the commit
       // that `branch` is on.
-      var newHash = util.remote(remoteUrl)(refs.hash, branch);
+      var newHash = util.onRemote(remoteUrl)(refs.hash, branch);
 
       // Abort if `branch` did not exist on the remote.
       if (newHash === undefined) {
@@ -445,7 +445,7 @@ var gitlet = module.exports = {
         // write them.  to the local `objects` directory.  (This is an
         // inefficient way of getting all the objects required to
         // recreate locally the commit the remote branch is on.)
-        var remoteObjects = util.remote(remoteUrl)(objects.allObjects);
+        var remoteObjects = util.onRemote(remoteUrl)(objects.allObjects);
         remoteObjects.forEach(objects.write);
 
         // Set the contents of the file at
@@ -585,7 +585,7 @@ var gitlet = module.exports = {
 
     } else {
       var remotePath = config.read().remote[remote].url;
-      var remoteCall = util.remote(remotePath);
+      var remoteCall = util.onRemote(remotePath);
 
       // Abort if remote repository is not bare and `branch` is
       // checked out.
@@ -661,7 +661,7 @@ var gitlet = module.exports = {
 
     // Abort if `remotePath` does not exist, or is not a Gitlet
     // repository.
-    } else if (!fs.existsSync(remotePath) || !util.remote(remotePath)(files.inRepo)) {
+    } else if (!fs.existsSync(remotePath) || !util.onRemote(remotePath)(files.inRepo)) {
       throw new Error("repository " + remotePath + " does not exist");
 
     // Abort if `targetPath` exists and is not empty.
@@ -679,7 +679,7 @@ var gitlet = module.exports = {
       }
 
       // In the directory for the new remote repository...
-      util.remote(targetPath)(function() {
+      util.onRemote(targetPath)(function() {
 
         // Initialize the directory as a Gitlet repository.
         gitlet.init(opts);
@@ -689,7 +689,7 @@ var gitlet = module.exports = {
 
         // Get the hash of the commit that master is pointing at on
         // the remote repository.
-        var remoteHeadHash = util.remote(remotePath)(refs.hash, "master");
+        var remoteHeadHash = util.onRemote(remotePath)(refs.hash, "master");
 
         // If the remote repo has any commits, that hash will exist.
         // The new repository records the commit that the passed
@@ -1710,12 +1710,12 @@ var util = {
     return a.filter(function(e) { return b.indexOf(e) !== -1; });
   },
 
-  // **remote()** allows execution of a command on a remote
+  // **onRemote()** allows execution of a command on a remote
   // repository.  It returns an anonymous function that takes another
   // function `fn`.  When the anonymous function is run, it switches
   // to `remotePath`, executes `fn`, then switches back to the
   // original directory.
-  remote: function(remotePath) {
+  onRemote: function(remotePath) {
     return function(fn) {
       var originalDir = process.cwd();
       process.chdir(remotePath);
