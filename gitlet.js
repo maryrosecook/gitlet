@@ -1268,7 +1268,7 @@ var diff = {
   // diff object).  If `hash1` is passed, it is used as the first
   // version in the diff.  If it is not passed, the index is used.  If
   // `hash2` is passed, it is used as the second version in the diff.
-  // If it is not passed` the working copy is used.
+  // If it is not passed, the working copy is used.
   diff: function(hash1, hash2) {
     var a = hash1 === undefined ? index.toc() : objects.commitToc(hash1);
     var b = hash2 === undefined ? index.workingCopyToc() : objects.commitToc(hash2);
