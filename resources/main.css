@@ -1,6 +1,6 @@
 body {
-  font-family: "Gill Sans W01 Book";
-  font-size: 1.20em;
+  font-family: "Gill Sans W01 Light";
+  font-size: 1.15em;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern";
   -webkit-font-feature-settings: "kern";
@@ -17,7 +17,7 @@ body {
 }
 
 code {
-  font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+  font-family: courier;
   font-size: 0.77em;
   background-color: #eee;
   padding: 1px 3px;
@@ -48,7 +48,6 @@ h1 {
 
 h2 {
   font-size: 1.4em;
-
   font-weight:normal;
   margin: 0 0 15px -1.5px;
   padding: 0;
@@ -82,15 +81,16 @@ hr {
 }
 
 pre {
-  font-size: 0.70em;
+  font-size: 0.8em;
   border-top:1px solid #ddd;
   border-bottom:1px solid #ddd;
   padding-left:-50px;
   margin-top:20px;
   margin-bottom:15px;
-  padding: 0.3em 0.3em;
+  padding: 1.1em 0;
   overflow: scroll;
-  font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+  font-family: courier;
+  color: #333;
 }
 
 pre .output {
@@ -117,14 +117,16 @@ li {
 
 .footer {
   text-align: center;
-  width:320px;
+  width:327px;
   margin-left: auto;
   margin-right: auto;
 }
 
 @media handheld, only screen and (max-width: 767px) {
   body {
+    font-family: "Gill Sans W01 Book";
     width: 350px;
+    font-size: 1.25em;
   }
 
   #fork-me {
