@@ -8,6 +8,8 @@
     "url": "https://github.com/maryrosecook/gitlet.git"
   },
 
+  "main": "./gitlet.js",
+
   "bin": {
     "gitlet": "./gitlet.js"
   },
