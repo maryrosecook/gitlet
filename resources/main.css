@@ -109,10 +109,9 @@ li {
   padding: 2px 0;
 }
 
-.tagline {
-  margin-left: auto;
-  margin-right: auto;
-  width: 235px;
+.links {
+  width: 100%;
+  text-align: center;
 }
 
 .footer {
