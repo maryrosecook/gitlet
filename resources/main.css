@@ -116,9 +116,6 @@ li {
 
 .footer {
   text-align: center;
-  width:327px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 @media handheld, only screen and (max-width: 767px) {
