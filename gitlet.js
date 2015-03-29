@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 // [Home](/) | [GitHub](https://github.com/maryrosecook/gitlet)
 
-// Introduction
+// Preparation
 // ------------
 
-// This code is intended to show how Git works under the covers.  It
-// is written to be readable.  It is heavily commented.
+// I wrote Gitlet to show how Git works under the covers.  I wrote
+// it to be readable.  I commented the code heavily.
 
-// If you would like to understand what happens when you run the basic
-// Git commands, you can read the short essay below.
+// If you are not familiar with the basic Git commands, you can read
+// Git in six hundred words (below).
+
+// For a six thousand word deep dive into the innards of Git, you can
+// read [Git from the inside
+// out](http://maryrosecook.com/blog/post/git-from-the-inside-out).
 
 // Git in six hundred words
 // ------------------------
