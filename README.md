@@ -95,4 +95,4 @@ $ npm test
 ## Contact
 
 Mary Rose Cook - http://maryrosecook.com<br/>
-I made this while working at [Hacker School](https://www.hackerschool.com).
+I made this while working at [Recurse Center](https://www.recurse.com).
