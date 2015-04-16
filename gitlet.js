@@ -200,15 +200,16 @@ var gitlet = module.exports = {
     files.assertInRepo();
     config.assertNotBare();
 
-    // Write a tree object that represents the current state of the
-    // index.
+    // Write a tree set of tree objects that represent the current
+    // state of the index.
     var treeHash = gitlet.write_tree();
 
     var headDesc = refs.isHeadDetached() ? "detached HEAD" : refs.headBranchName();
 
-    // If the hash of the new tree is the same as the hash of the tree
-    // that the `HEAD` commit points at, abort because there is
-    // nothing new to commit.
+    // Compare the hash of the tree object at the top of the tree that
+    // was just written with the hash of the tree object that the
+    // `HEAD` commit points at.  If they are the same, abort because
+    // there is nothing new to commit.
     if (refs.hash("HEAD") !== undefined &&
         treeHash === objects.treeHash(objects.read(refs.hash("HEAD")))) {
       throw new Error("# On " + headDesc + "\nnothing to commit, working directory clean");
