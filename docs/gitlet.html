@@ -734,8 +734,8 @@ and points <code>HEAD</code> at the commit.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
-              <p>Write a tree object that represents the current state of the
-index.</p>
+              <p>Write a tree set of tree objects that represent the current
+state of the index.</p>
 
             </div>
             
@@ -752,9 +752,10 @@ index.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
-              <p>If the hash of the new tree is the same as the hash of the tree
-that the <code>HEAD</code> commit points at, abort because there is
-nothing new to commit.</p>
+              <p>Compare the hash of the tree object at the top of the tree that
+was just written with the hash of the tree object that the
+<code>HEAD</code> commit points at.  If they are the same, abort because
+there is nothing new to commit.</p>
 
             </div>
             
