@@ -1,5 +1,5 @@
 body {
-  font-family: "Gill Sans W02 Light";
+  font-family: "Gill Sans W01 Light";
   font-size: 1.15em;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern";
@@ -120,7 +120,7 @@ li {
 
 @media handheld, only screen and (max-width: 767px) {
   body {
-    font-family: "Gill Sans W02 Book";
+    font-family: "Gill Sans W01 Book";
     width: 350px;
     font-size: 1.25em;
   }
