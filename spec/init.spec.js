@@ -27,6 +27,13 @@ describe("init", function() {
     testUtil.expectFile(__dirname + "/testData/repo1/.gitlet/config",
                         "[core]\n  bare = false\n");
   });
+  /*
+  it("should not crash when config is a directory", function() {
+      var dir = __dirname + "/testData/repo1/";
+      fs.createDirSync(dir + 'config');
+      g.init();
+    });
+    */
 
   it("should not crash when config is a directory", function() {
     var dir = __dirname + "/testData/repo1/";
@@ -46,4 +53,5 @@ describe("init", function() {
                           "[core]\n  bare = true\n");
     });
   });
+  
 });
