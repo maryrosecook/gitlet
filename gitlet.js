@@ -1961,8 +1961,10 @@ var parseOptions = function(argv) {
 var runCli = module.exports.runCli = function(argv) {
   var opts = parseOptions(argv);
   var commandName = opts._[2];
-
-  if (commandName === undefined) {
+  
+  if (opts.v || opts.version) {
+    return "v" + require('./package').version;
+  } else if (commandName === undefined) {
     throw new Error("you must specify a Gitlet command to run");
   } else {
     var commandFnName = commandName.replace(/-/g, "_");
