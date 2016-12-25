@@ -137,22 +137,29 @@ var gitlet = module.exports = {
 
   // **add()** adds files that match `path` to the index.
   add: function(path, _) {
-    files.assertInRepo();
-    config.assertNotBare();
-
-    // Get the paths of all the files matching `path`.
-    var addedFiles = files.lsRecursive(path);
-
-    // Abort if no files matched `path`.
-    if (addedFiles.length === 0) {
-      throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
-
-    // Otherwise, use the `update_index()` Git command to actually add
-    // the files.
-    } else {
-      addedFiles.forEach(function(p) { gitlet.update_index(p, { add: true }); });
+    var msg;
+    if (!path) {
+      console.log("Nothing specified, nothing added.\n" +
+                  "Maybe you wanted to say 'gitlet add .'?");
+    else {
+      files.assertInRepo();
+      config.assertNotBare();
+  
+      // Get the paths of all the files matching `path`.
+      var addedFiles = files.lsRecursive(path);
+  
+      // Abort if no files matched `path`.
+      if (addedFiles.length === 0) {
+        throw new Error(files.pathFromRepoRoot(path) + " did not match any files");
+  
+      // Otherwise, use the `update_index()` Git command to actually add
+      // the files.
+      } else {
+        addedFiles.forEach(function(p) { gitlet.update_index(p, { add: true }); });
+      }
     }
-  },
+  }
+},
 
   // **rm()** removes files that match `path` from the index.
   rm: function(path, opts) {
