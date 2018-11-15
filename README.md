@@ -1,4 +1,4 @@
-# Gitlet1
+# Gitlet
 
 Git implemented in JavaScript.
 
